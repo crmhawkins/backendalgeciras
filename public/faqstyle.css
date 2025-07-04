@@ -1,0 +1,284 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Segoe UI', sans-serif;
+    background-color: #f2f2f2;
+    color: #111;
+}
+
+header {
+    position: sticky;
+    top: 0;
+    background-color: white;
+    z-index: 1000;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+.inicio a {
+    text-decoration: none;
+    color: #111;
+}
+
+.header-top {
+    background-color: black;
+    color: white;
+    padding: 5px;
+    text-align: center;
+    font-size: 0.9rem;
+}
+
+.nav-bar ul li a:hover,
+.login a:hover {
+    color: #c6001a;
+    transition: color 0.3s ease;
+}
+
+.nav-bar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem;
+}
+
+.nav-bar .logo {
+    height: 60px;
+}
+
+.nav-bar ul {
+    list-style: none;
+    display: flex;
+    gap: 1.5rem;
+}
+
+.nav-bar ul li a {
+    text-decoration: none;
+    color: #111;
+    font-weight: bold;
+}
+
+.login a {
+    text-decoration: none;
+    color: #111;
+    font-weight: bold;
+}
+
+.banner {
+    background-color: black;
+    color: white;
+    text-align: center;
+    padding: 2rem 1rem;
+    font-size: 1.6rem;
+    font-weight: bold;
+}
+
+.red-banner {
+    display: flex;
+    justify-content: space-around;
+    background-color: #c6001a;
+    color: white;
+    text-align: center;
+    flex-wrap: wrap;
+}
+
+
+.info-box {
+    flex: 1;
+    padding: 1rem;
+    border-right: 1px solid #ffffff4b;
+}
+
+.info-box:last-child {
+    border-right: none;
+}
+
+.icon-placeholder {
+    width: 30px;
+    height: 30px;
+    margin: 0 auto 0.5rem;
+    background-color: transparent;
+}
+
+footer {
+    background-color: #111;
+    color: white;
+    margin-top: 3rem;
+}
+
+.sponsors {
+    background-color: #c6001a;
+    text-align: center;
+    padding: 2rem 1rem;
+}
+
+.sponsors .logos {
+    display: flex;
+    justify-content: center;
+    gap: 2rem;
+    margin-top: 1rem;
+    flex-wrap: wrap;
+}
+
+.sponsors .logos img {
+    height: 60px;
+}
+
+.footer-bottom {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    padding: 2rem;
+    font-size: 0.9rem;
+    background-color: #000;
+}
+
+.footer-bottom h4 {
+    margin-bottom: 1rem;
+}
+
+.footer-bottom a {
+    color: white;
+    text-decoration: none;
+    margin: 0 5px;
+}
+
+.footer-bottom img {
+    height: 24px;
+    margin: 0 5px;
+}
+
+.footer-bottom a:hover {
+    color: #999;
+    transition: color 0.3s ease;
+}
+
+.nav-bar .logo {
+    height: 60px;
+    margin-right: 10px;
+}
+
+.nav-bar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem;
+}
+
+.nav-bar .logo-container {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.nav-bar .logo-container span {
+    font-weight: bold;
+    font-size: 1.3rem;
+}
+
+@media (max-width: 768px) {
+    .red-banner {
+        flex-direction: column;
+    }
+
+    .nav-bar ul {
+        flex-direction: column;
+        gap: 0.5rem;
+        align-items: center;
+    }
+
+    .footer-bottom {
+        flex-direction: column;
+        gap: 2rem;
+    }
+}
+
+.faq-wrapper {
+    padding: 2rem;
+    background: #fff;
+    max-width: 1100px;
+    margin: 0 auto;
+}
+
+.faq-container h2 {
+    font-size: 2rem;
+    color: #fff;
+    text-align: center;
+    background: #000;
+    padding: 2rem 1rem;
+    margin-bottom: 2rem;
+    font-weight: 800;
+    text-transform: uppercase;
+}
+
+.accordion {
+    margin-bottom: 1rem;
+}
+
+.accordion-header {
+    width: 100%;
+    background-color: #000;
+    color: white;
+    padding: 1rem;
+    font-weight: bold;
+    border: none;
+    font-size: 1rem;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: background 0.3s;
+}
+
+.accordion-header.active {
+    background-color: #c6001a;
+}
+
+.accordion-body {
+    max-height: 0;
+    overflow: hidden;
+    background-color: #eee;
+    padding: 0 1.5rem;
+    transition: all 0.3s ease;
+}
+
+.accordion-body.open {
+    padding: 1rem 1.5rem;
+    max-height: 500px;
+}
+
+.accordion-body p {
+    margin: 0 0 1rem 0;
+    line-height: 1.6;
+}
+
+.faq-button {
+    background-color: #000;
+    color: white;
+    padding: 0.6rem 1rem;
+    border-radius: 4px;
+    text-decoration: none;
+    font-weight: bold;
+    font-size: 0.9rem;
+    display: inline-block;
+}
+
+.faq-button:hover {
+    background-color: #c6001a;
+    transition: background-color 0.3s ease;
+}
+
+@media (max-width: 768px) {
+    .faq-wrapper {
+        padding: 1rem;
+    }
+
+    .accordion-header {
+        font-size: 0.95rem;
+    }
+
+    .faq-button {
+        font-size: 0.85rem;
+        padding: 0.5rem 0.9rem;
+    }
+}

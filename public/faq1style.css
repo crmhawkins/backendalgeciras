@@ -1,0 +1,278 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Segoe UI', sans-serif;
+    background-color: #f2f2f2;
+    color: #111;
+}
+
+header {
+    position: sticky;
+    top: 0;
+    background-color: white;
+    z-index: 1000;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+.inicio a {
+    text-decoration: none;
+    color: #111;
+}
+
+.header-top {
+    background-color: black;
+    color: white;
+    padding: 5px;
+    text-align: center;
+    font-size: 0.9rem;
+}
+
+.nav-bar ul li a:hover,
+.login a:hover {
+    color: #c6001a;
+    transition: color 0.3s ease;
+}
+
+.nav-bar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem;
+}
+
+.nav-bar .logo {
+    height: 60px;
+}
+
+.nav-bar ul {
+    list-style: none;
+    display: flex;
+    gap: 1.5rem;
+}
+
+.nav-bar ul li a {
+    text-decoration: none;
+    color: #111;
+    font-weight: bold;
+}
+
+.login a {
+    text-decoration: none;
+    color: #111;
+    font-weight: bold;
+}
+
+.banner {
+    background-color: black;
+    color: white;
+    text-align: center;
+    padding: 2rem 1rem;
+    font-size: 1.6rem;
+    font-weight: bold;
+}
+
+.red-banner {
+    display: flex;
+    justify-content: space-around;
+    background-color: #c6001a;
+    color: white;
+    text-align: center;
+    flex-wrap: wrap;
+}
+
+
+.info-box {
+    flex: 1;
+    padding: 1rem;
+    border-right: 1px solid #ffffff4b;
+}
+
+.info-box:last-child {
+    border-right: none;
+}
+
+.icon-placeholder {
+    width: 30px;
+    height: 30px;
+    margin: 0 auto 0.5rem;
+    background-color: transparent;
+}
+
+footer {
+    background-color: #111;
+    color: white;
+    margin-top: 3rem;
+}
+
+.sponsors {
+    background-color: #c6001a;
+    text-align: center;
+    padding: 2rem 1rem;
+}
+
+.sponsors .logos {
+    display: flex;
+    justify-content: center;
+    gap: 2rem;
+    margin-top: 1rem;
+    flex-wrap: wrap;
+}
+
+.sponsors .logos img {
+    height: 60px;
+}
+
+.footer-bottom {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    padding: 2rem;
+    font-size: 0.9rem;
+    background-color: #000;
+}
+
+.footer-bottom h4 {
+    margin-bottom: 1rem;
+}
+
+.footer-bottom a {
+    color: white;
+    text-decoration: none;
+    margin: 0 5px;
+}
+
+.footer-bottom img {
+    height: 24px;
+    margin: 0 5px;
+}
+
+.footer-bottom a:hover {
+    color: #999;
+    transition: color 0.3s ease;
+}
+
+.nav-bar .logo {
+    height: 60px;
+    margin-right: 10px;
+}
+
+.nav-bar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem;
+}
+
+.nav-bar .logo-container {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.nav-bar .logo-container span {
+    font-weight: bold;
+    font-size: 1.3rem;
+}
+
+@media (max-width: 768px) {
+    .red-banner {
+        flex-direction: column;
+    }
+
+    .nav-bar ul {
+        flex-direction: column;
+        gap: 0.5rem;
+        align-items: center;
+    }
+
+    .footer-bottom {
+        flex-direction: column;
+        gap: 2rem;
+    }
+}
+
+.faq-detail-wrapper {
+    padding: 2rem 1rem;
+    background-color: #fff;
+    max-width: 1100px;
+    margin: 0 auto;
+    font-size: 1rem;
+    line-height: 1.7;
+}
+
+.faq-detail-container h2 {
+    font-size: 1.4rem;
+    color: #111;
+    text-align: center;
+    margin-bottom: 1.5rem;
+}
+
+.faq-detail-container p,
+.faq-detail-container ol {
+    margin-bottom: 1rem;
+    color: #222;
+    text-align: justify;
+}
+
+.faq-detail-container strong {
+    color: #000;
+    font-weight: 600;
+}
+
+.faq-detail-container ol {
+    padding-left: 1.5rem;
+}
+
+.faq-detail-container li {
+    margin-bottom: 1.5rem;
+}
+
+.faq-image {
+    margin-top: 1rem;
+    text-align: center;
+}
+
+.faq-image img {
+    width: 100%;
+    max-width: 600px;
+    border-radius: 8px;
+    box-shadow: 0 0 10px rgba(0,0,0,0.1);
+}
+
+.back-btn-container {
+    margin-top: 2rem;
+    text-align: right;
+}
+
+.back-btn {
+    background-color: #000;
+    color: #fff;
+    padding: 0.7rem 1.5rem;
+    text-decoration: none;
+    font-weight: bold;
+    border-radius: 4px;
+    display: inline-block;
+    transition: background-color 0.3s ease;
+}
+
+.back-btn:hover {
+    background-color: #333;
+}
+
+@media (max-width: 768px) {
+    .faq-detail-container h2 {
+        font-size: 1.2rem;
+    }
+
+    .faq-detail-wrapper {
+        padding: 1rem;
+    }
+
+    .back-btn-container {
+        text-align: center;
+    }
+}

@@ -1,0 +1,20 @@
+[
+    {
+        "id": 30,
+        "nombre": "Stage of Honor Odd",
+        "capacidad": 64,
+        "precio": 0.0,
+        "gradaId": 6,
+        "activo": true,
+        "imagen": null
+    },
+    {
+        "id": 31,
+        "nombre": "Stage of Honor Even",
+        "capacidad": 64,
+        "precio": 0.0,
+        "gradaId": 6,
+        "activo": true,
+        "imagen": null
+    }
+]

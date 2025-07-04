@@ -1,0 +1,722 @@
+[
+  {
+    "id": 1869,
+    "numero": 58,
+    "fila": 1,
+    "estado": "disponible",
+    "sectorId": 19,
+    "partidoId": null
+  },
+  {
+    "id": 1870,
+    "numero": 60,
+    "fila": 1,
+    "estado": "disponible",
+    "sectorId": 19,
+    "partidoId": null
+  },
+  {
+    "id": 1871,
+    "numero": 62,
+    "fila": 1,
+    "estado": "disponible",
+    "sectorId": 19,
+    "partidoId": null
+  },
+  {
+    "id": 1872,
+    "numero": 64,
+    "fila": 1,
+    "estado": "disponible",
+    "sectorId": 19,
+    "partidoId": null
+  },
+  {
+    "id": 1873,
+    "numero": 66,
+    "fila": 1,
+    "estado": "disponible",
+    "sectorId": 19,
+    "partidoId": null
+  },
+  {
+    "id": 1874,
+    "numero": 68,
+    "fila": 1,
+    "estado": "disponible",
+    "sectorId": 19,
+    "partidoId": null
+  },
+  {
+    "id": 1875,
+    "numero": 70,
+    "fila": 1,
+    "estado": "disponible",
+    "sectorId": 19,
+    "partidoId": null
+  },
+  {
+    "id": 1876,
+    "numero": 72,
+    "fila": 1,
+    "estado": "disponible",
+    "sectorId": 19,
+    "partidoId": null
+  },
+  {
+    "id": 1877,
+    "numero": 74,
+    "fila": 1,
+    "estado": "disponible",
+    "sectorId": 19,
+    "partidoId": null
+  },
+  {
+    "id": 1878,
+    "numero": 76,
+    "fila": 1,
+    "estado": "disponible",
+    "sectorId": 19,
+    "partidoId": null
+  },
+  {
+    "id": 1879,
+    "numero": 78,
+    "fila": 1,
+    "estado": "disponible",
+    "sectorId": 19,
+    "partidoId": null
+  },
+  {
+    "id": 1880,
+    "numero": 80,
+    "fila": 1,
+    "estado": "disponible",
+    "sectorId": 19,
+    "partidoId": null
+  },
+  {
+    "id": 1881,
+    "numero": 82,
+    "fila": 1,
+    "estado": "disponible",
+    "sectorId": 19,
+    "partidoId": null
+  },
+  {
+    "id": 1882,
+    "numero": 84,
+    "fila": 1,
+    "estado": "disponible",
+    "sectorId": 19,
+    "partidoId": null
+  },
+  {
+    "id": 1883,
+    "numero": 86,
+    "fila": 1,
+    "estado": "disponible",
+    "sectorId": 19,
+    "partidoId": null
+  },
+  {
+    "id": 1884,
+    "numero": 58,
+    "fila": 2,
+    "estado": "disponible",
+    "sectorId": 19,
+    "partidoId": null
+  },
+  {
+    "id": 1885,
+    "numero": 60,
+    "fila": 2,
+    "estado": "disponible",
+    "sectorId": 19,
+    "partidoId": null
+  },
+  {
+    "id": 1886,
+    "numero": 62,
+    "fila": 2,
+    "estado": "disponible",
+    "sectorId": 19,
+    "partidoId": null
+  },
+  {
+    "id": 1887,
+    "numero": 64,
+    "fila": 2,
+    "estado": "disponible",
+    "sectorId": 19,
+    "partidoId": null
+  },
+  {
+    "id": 1888,
+    "numero": 66,
+    "fila": 2,
+    "estado": "disponible",
+    "sectorId": 19,
+    "partidoId": null
+  },
+  {
+    "id": 1889,
+    "numero": 68,
+    "fila": 2,
+    "estado": "disponible",
+    "sectorId": 19,
+    "partidoId": null
+  },
+  {
+    "id": 1890,
+    "numero": 70,
+    "fila": 2,
+    "estado": "disponible",
+    "sectorId": 19,
+    "partidoId": null
+  },
+  {
+    "id": 1891,
+    "numero": 72,
+    "fila": 2,
+    "estado": "disponible",
+    "sectorId": 19,
+    "partidoId": null
+  },
+  {
+    "id": 1892,
+    "numero": 74,
+    "fila": 2,
+    "estado": "disponible",
+    "sectorId": 19,
+    "partidoId": null
+  },
+  {
+    "id": 1893,
+    "numero": 76,
+    "fila": 2,
+    "estado": "disponible",
+    "sectorId": 19,
+    "partidoId": null
+  },
+  {
+    "id": 1894,
+    "numero": 78,
+    "fila": 2,
+    "estado": "disponible",
+    "sectorId": 19,
+    "partidoId": null
+  },
+  {
+    "id": 1895,
+    "numero": 80,
+    "fila": 2,
+    "estado": "disponible",
+    "sectorId": 19,
+    "partidoId": null
+  },
+  {
+    "id": 1896,
+    "numero": 82,
+    "fila": 2,
+    "estado": "disponible",
+    "sectorId": 19,
+    "partidoId": null
+  },
+  {
+    "id": 1897,
+    "numero": 84,
+    "fila": 2,
+    "estado": "disponible",
+    "sectorId": 19,
+    "partidoId": null
+  },
+  {
+    "id": 1898,
+    "numero": 86,
+    "fila": 2,
+    "estado": "disponible",
+    "sectorId": 19,
+    "partidoId": null
+  },
+  {
+    "id": 1899,
+    "numero": 58,
+    "fila": 3,
+    "estado": "disponible",
+    "sectorId": 19,
+    "partidoId": null
+  },
+  {
+    "id": 1900,
+    "numero": 60,
+    "fila": 3,
+    "estado": "disponible",
+    "sectorId": 19,
+    "partidoId": null
+  },
+  {
+    "id": 1901,
+    "numero": 62,
+    "fila": 3,
+    "estado": "disponible",
+    "sectorId": 19,
+    "partidoId": null
+  },
+  {
+    "id": 1902,
+    "numero": 64,
+    "fila": 3,
+    "estado": "disponible",
+    "sectorId": 19,
+    "partidoId": null
+  },
+  {
+    "id": 1903,
+    "numero": 66,
+    "fila": 3,
+    "estado": "disponible",
+    "sectorId": 19,
+    "partidoId": null
+  },
+  {
+    "id": 1904,
+    "numero": 68,
+    "fila": 3,
+    "estado": "disponible",
+    "sectorId": 19,
+    "partidoId": null
+  },
+  {
+    "id": 1905,
+    "numero": 70,
+    "fila": 3,
+    "estado": "disponible",
+    "sectorId": 19,
+    "partidoId": null
+  },
+  {
+    "id": 1906,
+    "numero": 72,
+    "fila": 3,
+    "estado": "disponible",
+    "sectorId": 19,
+    "partidoId": null
+  },
+  {
+    "id": 1907,
+    "numero": 74,
+    "fila": 3,
+    "estado": "disponible",
+    "sectorId": 19,
+    "partidoId": null
+  },
+  {
+    "id": 1908,
+    "numero": 76,
+    "fila": 3,
+    "estado": "disponible",
+    "sectorId": 19,
+    "partidoId": null
+  },
+  {
+    "id": 1909,
+    "numero": 78,
+    "fila": 3,
+    "estado": "disponible",
+    "sectorId": 19,
+    "partidoId": null
+  },
+  {
+    "id": 1910,
+    "numero": 80,
+    "fila": 3,
+    "estado": "disponible",
+    "sectorId": 19,
+    "partidoId": null
+  },
+  {
+    "id": 1911,
+    "numero": 82,
+    "fila": 3,
+    "estado": "disponible",
+    "sectorId": 19,
+    "partidoId": null
+  },
+  {
+    "id": 1912,
+    "numero": 84,
+    "fila": 3,
+    "estado": "disponible",
+    "sectorId": 19,
+    "partidoId": null
+  },
+  {
+    "id": 1913,
+    "numero": 86,
+    "fila": 3,
+    "estado": "disponible",
+    "sectorId": 19,
+    "partidoId": null
+  },
+  {
+    "id": 1914,
+    "numero": 58,
+    "fila": 4,
+    "estado": "disponible",
+    "sectorId": 19,
+    "partidoId": null
+  },
+  {
+    "id": 1915,
+    "numero": 60,
+    "fila": 4,
+    "estado": "disponible",
+    "sectorId": 19,
+    "partidoId": null
+  },
+  {
+    "id": 1916,
+    "numero": 62,
+    "fila": 4,
+    "estado": "disponible",
+    "sectorId": 19,
+    "partidoId": null
+  },
+  {
+    "id": 1917,
+    "numero": 64,
+    "fila": 4,
+    "estado": "disponible",
+    "sectorId": 19,
+    "partidoId": null
+  },
+  {
+    "id": 1918,
+    "numero": 66,
+    "fila": 4,
+    "estado": "disponible",
+    "sectorId": 19,
+    "partidoId": null
+  },
+  {
+    "id": 1919,
+    "numero": 68,
+    "fila": 4,
+    "estado": "disponible",
+    "sectorId": 19,
+    "partidoId": null
+  },
+  {
+    "id": 1920,
+    "numero": 70,
+    "fila": 4,
+    "estado": "disponible",
+    "sectorId": 19,
+    "partidoId": null
+  },
+  {
+    "id": 1921,
+    "numero": 72,
+    "fila": 4,
+    "estado": "disponible",
+    "sectorId": 19,
+    "partidoId": null
+  },
+  {
+    "id": 1922,
+    "numero": 74,
+    "fila": 4,
+    "estado": "disponible",
+    "sectorId": 19,
+    "partidoId": null
+  },
+  {
+    "id": 1923,
+    "numero": 76,
+    "fila": 4,
+    "estado": "disponible",
+    "sectorId": 19,
+    "partidoId": null
+  },
+  {
+    "id": 1924,
+    "numero": 78,
+    "fila": 4,
+    "estado": "disponible",
+    "sectorId": 19,
+    "partidoId": null
+  },
+  {
+    "id": 1925,
+    "numero": 80,
+    "fila": 4,
+    "estado": "disponible",
+    "sectorId": 19,
+    "partidoId": null
+  },
+  {
+    "id": 1926,
+    "numero": 82,
+    "fila": 4,
+    "estado": "disponible",
+    "sectorId": 19,
+    "partidoId": null
+  },
+  {
+    "id": 1927,
+    "numero": 84,
+    "fila": 4,
+    "estado": "disponible",
+    "sectorId": 19,
+    "partidoId": null
+  },
+  {
+    "id": 1928,
+    "numero": 86,
+    "fila": 4,
+    "estado": "disponible",
+    "sectorId": 19,
+    "partidoId": null
+  },
+  {
+    "id": 1929,
+    "numero": 58,
+    "fila": 5,
+    "estado": "disponible",
+    "sectorId": 19,
+    "partidoId": null
+  },
+  {
+    "id": 1930,
+    "numero": 60,
+    "fila": 5,
+    "estado": "disponible",
+    "sectorId": 19,
+    "partidoId": null
+  },
+  {
+    "id": 1931,
+    "numero": 62,
+    "fila": 5,
+    "estado": "disponible",
+    "sectorId": 19,
+    "partidoId": null
+  },
+  {
+    "id": 1932,
+    "numero": 64,
+    "fila": 5,
+    "estado": "disponible",
+    "sectorId": 19,
+    "partidoId": null
+  },
+  {
+    "id": 1933,
+    "numero": 66,
+    "fila": 5,
+    "estado": "disponible",
+    "sectorId": 19,
+    "partidoId": null
+  },
+  {
+    "id": 1934,
+    "numero": 68,
+    "fila": 5,
+    "estado": "disponible",
+    "sectorId": 19,
+    "partidoId": null
+  },
+  {
+    "id": 1935,
+    "numero": 70,
+    "fila": 5,
+    "estado": "disponible",
+    "sectorId": 19,
+    "partidoId": null
+  },
+  {
+    "id": 1936,
+    "numero": 72,
+    "fila": 5,
+    "estado": "ocupado",
+    "sectorId": 19,
+    "partidoId": null
+  },
+  {
+    "id": 1937,
+    "numero": 74,
+    "fila": 5,
+    "estado": "disponible",
+    "sectorId": 19,
+    "partidoId": null
+  },
+  {
+    "id": 1938,
+    "numero": 76,
+    "fila": 5,
+    "estado": "disponible",
+    "sectorId": 19,
+    "partidoId": null
+  },
+  {
+    "id": 1939,
+    "numero": 78,
+    "fila": 5,
+    "estado": "disponible",
+    "sectorId": 19,
+    "partidoId": null
+  },
+  {
+    "id": 1940,
+    "numero": 80,
+    "fila": 5,
+    "estado": "disponible",
+    "sectorId": 19,
+    "partidoId": null
+  },
+  {
+    "id": 1941,
+    "numero": 82,
+    "fila": 5,
+    "estado": "disponible",
+    "sectorId": 19,
+    "partidoId": null
+  },
+  {
+    "id": 1942,
+    "numero": 84,
+    "fila": 5,
+    "estado": "disponible",
+    "sectorId": 19,
+    "partidoId": null
+  },
+  {
+    "id": 1943,
+    "numero": 86,
+    "fila": 5,
+    "estado": "disponible",
+    "sectorId": 19,
+    "partidoId": null
+  },
+  {
+    "id": 1944,
+    "numero": 58,
+    "fila": 6,
+    "estado": "disponible",
+    "sectorId": 19,
+    "partidoId": null
+  },
+  {
+    "id": 1945,
+    "numero": 60,
+    "fila": 6,
+    "estado": "disponible",
+    "sectorId": 19,
+    "partidoId": null
+  },
+  {
+    "id": 1946,
+    "numero": 62,
+    "fila": 6,
+    "estado": "disponible",
+    "sectorId": 19,
+    "partidoId": null
+  },
+  {
+    "id": 1947,
+    "numero": 64,
+    "fila": 6,
+    "estado": "disponible",
+    "sectorId": 19,
+    "partidoId": null
+  },
+  {
+    "id": 1948,
+    "numero": 66,
+    "fila": 6,
+    "estado": "disponible",
+    "sectorId": 19,
+    "partidoId": null
+  },
+  {
+    "id": 1949,
+    "numero": 68,
+    "fila": 6,
+    "estado": "disponible",
+    "sectorId": 19,
+    "partidoId": null
+  },
+  {
+    "id": 1950,
+    "numero": 70,
+    "fila": 6,
+    "estado": "disponible",
+    "sectorId": 19,
+    "partidoId": null
+  },
+  {
+    "id": 1951,
+    "numero": 72,
+    "fila": 6,
+    "estado": "disponible",
+    "sectorId": 19,
+    "partidoId": null
+  },
+  {
+    "id": 1952,
+    "numero": 74,
+    "fila": 6,
+    "estado": "disponible",
+    "sectorId": 19,
+    "partidoId": null
+  },
+  {
+    "id": 1953,
+    "numero": 76,
+    "fila": 6,
+    "estado": "disponible",
+    "sectorId": 19,
+    "partidoId": null
+  },
+  {
+    "id": 1954,
+    "numero": 78,
+    "fila": 6,
+    "estado": "disponible",
+    "sectorId": 19,
+    "partidoId": null
+  },
+  {
+    "id": 1955,
+    "numero": 80,
+    "fila": 6,
+    "estado": "disponible",
+    "sectorId": 19,
+    "partidoId": null
+  },
+  {
+    "id": 1956,
+    "numero": 82,
+    "fila": 6,
+    "estado": "disponible",
+    "sectorId": 19,
+    "partidoId": null
+  },
+  {
+    "id": 1957,
+    "numero": 84,
+    "fila": 6,
+    "estado": "disponible",
+    "sectorId": 19,
+    "partidoId": null
+  },
+  {
+    "id": 1958,
+    "numero": 86,
+    "fila": 6,
+    "estado": "disponible",
+    "sectorId": 19,
+    "partidoId": null
+  }
+]

@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Renovar Abono - Algeciras CF</title>
+    <link rel="stylesheet" href="./nuevostyle.css">
+    <link rel="icon" type="image/png" href="./imagenes/escudo.png">
+</head>
+
+<body>
+
+    <header></header>
+
+    <div class="banner">
+        <h1>ABONO TEMPORADA 2025/2026</h1>
+    </div>
+
+    <main class="seleccion-sector" id="contenedor-principal">
+        <section class="mapa-sector">
+          <h2>SELECCIONAR SECTOR</h2>
+          <p>A) Selecciona el sector pinchando en el mapa:</p>
+          <div class="svg-container" id="mapaSVG"></div>
+          <div id="menu"></div>
+        </section>
+      
+      <section class="tabla-sector">
+        <p>B) O en la siguiente tabla:</p>
+        <input type="text" id="busquedaSector" placeholder="Buscar...">
+        
+        <div class="tabla-scroll">
+          <table>
+            <thead>
+              <tr>
+                <th>SECTOR</th>
+                <th>DESDE</th>
+                <th>LIBRES</th>
+              </tr>
+            </thead>
+            <tbody id="tablaSectores"></tbody>
+          </table>
+        </div>
+      </section>
+
+      </main>
+      
+      <div id="formulario-container" style="display:none;">
+        <h2>COMPLETA TUS DATOS</h2>
+        <form id="formulario-abono">
+            <div id="lista-asientos-seleccionados"></div>
+    
+            <div id="campos-usuario">
+                <label>Nombre: <input type="text" name="nombre" required /></label>
+                <label>Apellidos: <input type="text" name="apellidos" required /></label>
+                <label>Género:
+                    <select name="genero" required>
+                        <option value="">Seleccione</option>
+                        <option value="masculino">Masculino</option>
+                        <option value="femenino">Femenino</option>
+                    </select>
+                </label>
+                <label>DNI: <input type="text" name="dni" required /></label>
+                <label>Fecha de nacimiento: <input type="date" name="fechaNacimiento" required /></label>
+                <label>Email: <input type="email" name="email" required /></label>
+                <label>Teléfono: <input type="tel" name="telefono" required /></label>
+                <label>País: <input type="text" name="pais" required /></label>
+                <label>Provincia: <input type="text" name="provincia" required /></label>
+                <label>Localidad: <input type="text" name="localidad" required /></label>
+                <label>Domicilio: <input type="text" name="domicilio" required /></label>
+                <label>Código Postal: <input type="text" name="codigoPostal" required /></label>
+            </div>
+    
+            <button type="submit">CONTINUAR COMPRA</button>
+        </form>
+    </div>
+    
+
+    <footer></footer>
+
+    <div id="toast-container"></div>
+
+
+    <script src="./js/nuevoscript.js" defer></script>
+    <script src="./js/loadLayout.js" defer></script>
+
+</body>
+
+</html>

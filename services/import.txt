@@ -1,0 +1,6 @@
+npm install node-fetch@2 cheerio fs-extra
+
+
+npm install node-cron
+
+npm install multer // Para subir archivos imagenes

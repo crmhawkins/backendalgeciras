@@ -1,0 +1,263 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Segoe UI', sans-serif;
+    background-color: #f2f2f2;
+    color: #111;
+}
+
+header {
+    position: sticky;
+    top: 0;
+    background-color: white;
+    z-index: 1000;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+.inicio a {
+    text-decoration: none;
+    color: #111;
+}
+
+.header-top {
+    background-color: black;
+    color: white;
+    padding: 5px;
+    text-align: center;
+    font-size: 0.9rem;
+}
+
+.nav-bar ul li a:hover,
+.login a:hover {
+    color: #c6001a;
+    transition: color 0.3s ease;
+}
+
+.nav-bar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem;
+}
+
+.nav-bar .logo {
+    height: 60px;
+}
+
+.nav-bar ul {
+    list-style: none;
+    display: flex;
+    gap: 1.5rem;
+}
+
+.nav-bar ul li a {
+    text-decoration: none;
+    color: #111;
+    font-weight: bold;
+}
+
+.login a {
+    text-decoration: none;
+    color: #111;
+    font-weight: bold;
+}
+
+.banner {
+    background-color: black;
+    color: white;
+    text-align: center;
+    padding: 2rem 1rem;
+    font-size: 1.6rem;
+    font-weight: bold;
+}
+
+.red-banner {
+    display: flex;
+    justify-content: space-around;
+    background-color: #c6001a;
+    color: white;
+    text-align: center;
+    flex-wrap: wrap;
+}
+
+
+.info-box {
+    flex: 1;
+    padding: 1rem;
+    border-right: 1px solid #ffffff4b;
+}
+
+.info-box:last-child {
+    border-right: none;
+}
+
+.icon-placeholder {
+    width: 30px;
+    height: 30px;
+    margin: 0 auto 0.5rem;
+    background-color: transparent;
+}
+
+footer {
+    background-color: #111;
+    color: white;
+    margin-top: 3rem;
+}
+
+.sponsors {
+    background-color: #c6001a;
+    text-align: center;
+    padding: 2rem 1rem;
+}
+
+.sponsors .logos {
+    display: flex;
+    justify-content: center;
+    gap: 2rem;
+    margin-top: 1rem;
+    flex-wrap: wrap;
+}
+
+.sponsors .logos img {
+    height: 60px;
+}
+
+.footer-bottom {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    padding: 2rem;
+    font-size: 0.9rem;
+    background-color: #000;
+}
+
+.footer-bottom h4 {
+    margin-bottom: 1rem;
+}
+
+.footer-bottom a {
+    color: white;
+    text-decoration: none;
+    margin: 0 5px;
+}
+
+.footer-bottom img {
+    height: 24px;
+    margin: 0 5px;
+}
+
+.footer-bottom a:hover {
+    color: #999;
+    transition: color 0.3s ease;
+}
+
+.nav-bar .logo {
+    height: 60px;
+    margin-right: 10px;
+}
+
+.nav-bar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem;
+}
+
+.nav-bar .logo-container {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.nav-bar .logo-container span {
+    font-weight: bold;
+    font-size: 1.3rem;
+}
+
+@media (max-width: 768px) {
+    .red-banner {
+        flex-direction: column;
+    }
+
+    .nav-bar ul {
+        flex-direction: column;
+        gap: 0.5rem;
+        align-items: center;
+    }
+
+    .footer-bottom {
+        flex-direction: column;
+        gap: 2rem;
+    }
+}
+
+.ayuda-main {
+    min-height: 100vh;
+    background-image: url('imagenes/fondologin.jpg'); 
+    background-size: cover;
+    background-position: center;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 5%;
+}
+
+.ayuda-box {
+    background-color: white;
+    padding: 2rem;
+    border-radius: 8px;
+    max-width: 500px;
+    width: 100%;
+    box-shadow: 0 5px 20px rgba(0,0,0,0.3);
+}
+
+.ayuda-box form {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.ayuda-box label {
+    font-weight: bold;
+    font-size: 0.9rem;
+}
+
+.ayuda-box input,
+.ayuda-box textarea {
+    padding: 0.75rem;
+    border: 1px solid #ccc;
+    font-size: 1rem;
+    resize: vertical;
+    width: 100%;
+}
+
+.captcha-placeholder {
+    display: flex;
+    justify-content: center;
+    margin: 1rem 0;
+}
+
+.btn-enviar {
+    background-color: #333;
+    color: white;
+    font-weight: bold;
+    padding: 0.75rem;
+    border: none;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.btn-enviar:hover {
+    background-color: #c6001a;
+}
+
+@media (max-width: 480px) {
+    .ayuda-box {
+        padding: 1.5rem 1rem;
+    }
+}
+

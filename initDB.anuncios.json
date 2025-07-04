@@ -1,0 +1,87 @@
+[
+    {
+    "nombre": "Huawei P20 Pro",
+    "venta": true,
+    "precio": 320.00,
+    "img": "huaweip20pro.jpg",
+    "tags": [ "lifestyle", "mobile"]
+    },
+    {
+    "nombre": "Huawei P30 Lite",
+    "venta": true,
+    "precio": 430.00,
+    "img": "huaweip30lite.jpg",
+    "tags": [ "lifestyle", "mobile"]
+    },
+    {
+    "nombre": "Iphone 11 Pro",
+    "venta": true,
+    "precio": 580,
+    "img": "iphone11pro.jpg",
+    "tags": [ "electronics", "lifestyle", "mobile"]
+    },
+    {
+    "nombre": "Xaomi 11T",
+    "venta": true,
+    "precio": 360.00,
+    "img": "xaomi11t.jpg",
+    "tags": [ "lifestyle", "mobile"]
+    },
+    {
+    "nombre": "Maquita DHP453RFE",
+    "venta": false,
+    "precio": 300.00,
+    "img": "makita.jpg",
+    "tags": [ "work"]
+    },
+    {
+    "nombre": "Ipad",
+    "venta": false,
+    "precio": 220.00,
+    "img": "ipad.jpg",
+    "tags": [ "lifestyle", "mobile"]
+    },
+    {
+    "nombre": "Audio A4",
+    "venta": true,
+    "precio": 22000.00,
+    "img": "audia4.jpg",
+    "tags": [ "lifestyle", "motor"]
+    },
+    {
+    "nombre": "Chaqueta de Esqui",
+    "venta": true,
+    "precio": 18.00,
+    "img": "chaquetadeesqui.jpg",
+    "tags": [ "colectables", "motor"]
+    },
+    {
+    "nombre": "Yo yo",
+    "venta": true,
+    "precio": 10.00,
+    "img": "",
+    "tags": [ "lifestyle", "toys"]
+    },
+    {
+    "nombre": "Zapatillas nike",
+    "venta": true,
+    "precio": 25.10,
+    "img": "nike.jpg",
+    "tags": [ "colectables", "clothing", "lifestyle"]
+    },
+    {
+    "nombre": "Cargador para iphone",
+    "venta": true,
+    "precio": 12.00,
+    "img": "cargardoriphone.jpg",
+    "tags": [ "mobile", "lifestyle"]
+    },
+    {
+    "nombre": "Reloj",
+    "venta": true,
+    "precio": 300.00,
+    "img": "reloj.jpg",
+    "tags": [ "colectables", "lifestyle"]
+    }
+    
+]

@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Partidos - Algeciras CF</title>
+    <link rel="stylesheet" href="./partidostyle.css">
+    <link rel="stylesheet" href="./nuevostyle.css">
+    <link rel="icon" type="image/png" href="./imagenes/escudo.png">
+</head>
+
+<div id="modalInfo" class="modal">
+    <div class="modal-content">
+        <h2>Venta Oficial de entradas</h2>
+        <p>Disfruta el mejor partido de tu equipo comprando tus entradas en tan sólo dos minutos, una compra fácil,
+            segura y rápida para vivir una experiencia única. No olvides en cumplir la normativa vigente en la ejecución
+            del encuentro.</p>
+        <h3>Normativa</h3>
+        <p>RD 203/2010 REGLAMENTO DE PREVENCIÓN DE LA VIOLENCIA, EL RACISMO, LA XENOFOBIA Y LA INTOLERANCIA EN EL
+            DEPORTE. Recinto deportivo video vigilado para la seguridad de los asistentes y participantes en el
+            encuentro. Causas que impiden el acceso o la permanencia en el recinto deportivo. a) Participar en
+            altercados, riñas, peleas o desórdenes públicos. b) Introducir, portar o utilizar cualquier clase de armas o
+            de objetos que pudieran producir los mismos efectos. c) Objetos de peso superior a 500g susceptibles de
+            utilizar como proyectiles. d) Introducir o estar en posesión de bengalas, petardos, explosivos o, en general
+            productos inflamables. e) Introducir o vender cualquier clase de bebidas alcohólicas, estupefacientes,
+            psicotrópicos, estimulantes. f) Introducir, exhibir o elaborar pancartas, banderas, símbolos, u otras señas
+            que inciten a la violencia o terrorismo. g) Realizar cánticos, expresiones, sonidos o aptitudes que inciten
+            a la violencia o al terrorismo. h) Irrumpir en el terreno de juego. i) Haber sido sancionado con la
+            prohibición de acceso a cualquier recinto deportivo en tanto no se haya extinguido la sanción. LA
+            ADQUISICIÓN DE ESTA ENTRADA REPRESENTA LA ACEPTACIÓN DE LAS SIGUIENTES CONDICIONES: -La Organización no
+            garantiza la autenticidad de esta entrada si no ha sido adquirida en los puntos de venta oficiales. No está
+            permitida la reventa de esta entrada. Toda entrada enmendada, rota, sospechosa de falsificación o adquirida
+            ilícitamente autorizará al organizador a privar del acceso al portador de la misma. -El personal de
+            seguridad y control de accesos, se reserva el derecho a retirar los tapones o cubierta de todos los envases,
+            así como todos aquellos recipientes que por su capacidad y rigidez puedan resultar peligrosos. - Conservar
+            la entrada hasta la salida del recinto. La salida del recinto implica pérdida del derecho a entrar
+            nuevamente, salvo en aquellos eventos que el organizador disponga lo contrario</p>
+        <button class="btn-cerrar" onclick="cerrarModal()">CERRAR</button>
+    </div>
+</div>
+
+<body>
+
+    <header></header>
+
+    <div class="banner">
+        <h1>PARTIDOS TEMPORADA 2025/2026</h1>
+    </div>
+
+    <section class="red-banner">
+        <div class="info-box">
+            <strong>100%</strong>
+            <p>Página web oficial</p>
+        </div>
+        <div class="info-box">
+            <div class="icon-placeholder"><img src="imagenes/personascreciendo.png" alt=""></div>
+            <p>Reserva online y evita cola</p>
+        </div>
+        <div class="info-box">
+            <div class="icon-placeholder"><img src="imagenes/campana.png" alt=""></div>
+            <p>Los mejores asientos disponibles</p>
+        </div>
+        <div class="info-box">
+            <div class="icon-placeholder"><img src="imagenes/candado.png" alt=""></div>
+            <p>Web 100% segura</p>
+        </div>
+    </section>
+
+    <main class="partidos-container" id="partidosContainer">
+
+    </main>
+
+    <footer></footer>
+
+    <script type="module" src="./js/partidoscript.js"></script>
+    <script src="js/loadLayout.js" defer></script>
+
+</body>
+
+</html>

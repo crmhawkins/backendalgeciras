@@ -1,0 +1,110 @@
+[
+    {
+        "id": 24,
+        "nombre": "Main S. - Higher Odd 10",
+        "capacidad": 104,
+        "precio": 0.0,
+        "gradaId": 1,
+        "activo": true,
+        "imagen": null
+    },
+    {
+        "id": 25,
+        "nombre": "Main S. - Higher Odd 9",
+        "capacidad": 168,
+        "precio": 0.0,
+        "gradaId": 1,
+        "activo": true,
+        "imagen": null
+    },
+    {
+        "id": 26,
+        "nombre": "Main S. - Higher Odd 8",
+        "capacidad": 195,
+        "precio": 0.0,
+        "gradaId": 1,
+        "activo": true,
+        "imagen": null
+    },
+    {
+        "id": 27,
+        "nombre": "Main S. - Higher Odd 7",
+        "capacidad": 168,
+        "precio": 0.0,
+        "gradaId": 1,
+        "activo": true,
+        "imagen": null
+    },
+    {
+        "id": 28,
+        "nombre": "Main S. - Higher Odd 6",
+        "capacidad": 195,
+        "precio": 0.0,
+        "gradaId": 1,
+        "activo": true,
+        "imagen": null
+    },
+    {
+        "id": 29,
+        "nombre": "Main S. - Higher Odd B",
+        "capacidad": 198,
+        "precio": 0.0,
+        "gradaId": 1,
+        "activo": true,
+        "imagen": null
+    },
+    {
+        "id": 32,
+        "nombre": "Main S. - Higher Even A",
+        "capacidad": 198,
+        "precio": 0.0,
+        "gradaId": 1,
+        "activo": true,
+        "imagen": null
+    },
+    {
+        "id": 33,
+        "nombre": "Main S. - Higher Even 5",
+        "capacidad": 195,
+        "precio": 0.0,
+        "gradaId": 1,
+        "activo": true,
+        "imagen": null
+    },
+    {
+        "id": 34,
+        "nombre": "Main S. - Higher Even 4",
+        "capacidad": 168,
+        "precio": 0.0,
+        "gradaId": 1,
+        "activo": true,
+        "imagen": null
+    },
+    {
+        "id": 35,
+        "nombre": "Main S. - Higher Even 3",
+        "capacidad": 195,
+        "precio": 0.0,
+        "gradaId": 1,
+        "activo": true,
+        "imagen": null
+    },
+    {
+        "id": 36,
+        "nombre": "Main S. - Higher Even 2",
+        "capacidad": 168,
+        "precio": 0.0,
+        "gradaId": 1,
+        "activo": true,
+        "imagen": null
+    },
+    {
+        "id": 37,
+        "nombre": "Main S. - Higher Even 1",
+        "capacidad": 104,
+        "precio": 0.0,
+        "gradaId": 1,
+        "activo": true,
+        "imagen": null
+    }
+]

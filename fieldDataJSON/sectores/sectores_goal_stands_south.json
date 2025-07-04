@@ -1,0 +1,83 @@
+[
+    {
+        "id": 38,
+        "nombre": "South Goal Odd 9",
+        "capacidad": 153,
+        "precio": 0.0,
+        "gradaId": 4,
+        "activo": true,
+        "imagen": null
+    },
+    {
+        "id": 39,
+        "nombre": "South Goal Odd 8",
+        "capacidad": 144,
+        "precio": 0.0,
+        "gradaId": 4,
+        "activo": true,
+        "imagen": null
+    },
+    {
+        "id": 40,
+        "nombre": "South Goal Odd 7",
+        "capacidad": 144,
+        "precio": 0.0,
+        "gradaId": 4,
+        "activo": true,
+        "imagen": null
+    },
+    {
+        "id": 41,
+        "nombre": "South Goal Odd 6",
+        "capacidad": 72,
+        "precio": 0.0,
+        "gradaId": 4,
+        "activo": true,
+        "imagen": null
+    },
+    {
+        "id": 42,
+        "nombre": "South Goal Even 5",
+        "capacidad": 72,
+        "precio": 0.0,
+        "gradaId": 4,
+        "activo": true,
+        "imagen": null
+    },
+    {
+        "id": 43,
+        "nombre": "South Goal Even 4",
+        "capacidad": 144,
+        "precio": 0.0,
+        "gradaId": 4,
+        "activo": true,
+        "imagen": null
+    },
+    {
+        "id": 44,
+        "nombre": "South Goal Even 3",
+        "capacidad": 126,
+        "precio": 0.0,
+        "gradaId": 4,
+        "activo": true,
+        "imagen": null
+    },
+    {
+        "id": 45,
+        "nombre": "South Goal Even 2",
+        "capacidad": 133,
+        "precio": 0.0,
+        "gradaId": 4,
+        "activo": true,
+        "imagen": null
+    },
+    {
+        "id": 46,
+        "nombre": "South Goal Even 1",
+        "capacidad": 117,
+        "precio": 0.0,
+        "gradaId": 4,
+        "activo": true,
+        "imagen": null
+    }
+]

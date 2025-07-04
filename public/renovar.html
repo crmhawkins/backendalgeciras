@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Renovar Abono - Algeciras CF</title>
+    <link rel="stylesheet" href="./renovarstyles.css">
+    <link rel="icon" type="image/png" href="./imagenes/escudo.png">
+</head>
+
+<body>
+
+    <header></header>
+
+    <div class="banner">
+        <h1>RENOVAR ABONO TEMPORADA 2025/2026</h1>
+    </div>
+
+    <main class="main-container">
+        <section class="form-section">
+            <h2>RENUEVA TU ABONO</h2>
+            <p>TEMPORADA 2025/2026</p>
+
+            <form id="renovarForm">
+                <label for="dni">DNI</label>
+                <input type="text" id="dni" name="dni" placeholder="Introduce tu documento" required>
+
+                <label for="codigo">Nº DE ABONADO TEMPORADA ANTERIOR</label>
+                <input type="text" id="codigo" name="codigo" placeholder="Introduce el código" required>
+
+                <button type="submit"><span>RENOVAR</span></button>
+
+            </form>
+        </section>
+
+        <section class="banner-img">
+            <img src="imagenes/fondorenovar.jpg" alt="Banner de abono">
+        </section>
+
+        <section id="resultado-renovacion" class="abono-resultado"></section>
+
+    </main>
+
+    <footer></footer>
+
+    <script src="./js/renovarscript.js"></script>
+    <script src="./js/loadLayout.js" defer></script>
+
+</body>
+
+</html>

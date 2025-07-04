@@ -1,0 +1,938 @@
+[
+  {
+    "id": 5449,
+    "numero": 128,
+    "fila": 1,
+    "estado": "disponible",
+    "sectorId": 46,
+    "partidoId": null
+  },
+  {
+    "id": 5450,
+    "numero": 130,
+    "fila": 1,
+    "estado": "disponible",
+    "sectorId": 46,
+    "partidoId": null
+  },
+  {
+    "id": 5451,
+    "numero": 132,
+    "fila": 1,
+    "estado": "disponible",
+    "sectorId": 46,
+    "partidoId": null
+  },
+  {
+    "id": 5452,
+    "numero": 134,
+    "fila": 1,
+    "estado": "disponible",
+    "sectorId": 46,
+    "partidoId": null
+  },
+  {
+    "id": 5453,
+    "numero": 136,
+    "fila": 1,
+    "estado": "disponible",
+    "sectorId": 46,
+    "partidoId": null
+  },
+  {
+    "id": 5454,
+    "numero": 138,
+    "fila": 1,
+    "estado": "disponible",
+    "sectorId": 46,
+    "partidoId": null
+  },
+  {
+    "id": 5455,
+    "numero": 140,
+    "fila": 1,
+    "estado": "disponible",
+    "sectorId": 46,
+    "partidoId": null
+  },
+  {
+    "id": 5456,
+    "numero": 142,
+    "fila": 1,
+    "estado": "disponible",
+    "sectorId": 46,
+    "partidoId": null
+  },
+  {
+    "id": 5457,
+    "numero": 144,
+    "fila": 1,
+    "estado": "disponible",
+    "sectorId": 46,
+    "partidoId": null
+  },
+  {
+    "id": 5458,
+    "numero": 146,
+    "fila": 1,
+    "estado": "disponible",
+    "sectorId": 46,
+    "partidoId": null
+  },
+  {
+    "id": 5459,
+    "numero": 148,
+    "fila": 1,
+    "estado": "disponible",
+    "sectorId": 46,
+    "partidoId": null
+  },
+  {
+    "id": 5460,
+    "numero": 150,
+    "fila": 1,
+    "estado": "disponible",
+    "sectorId": 46,
+    "partidoId": null
+  },
+  {
+    "id": 5461,
+    "numero": 152,
+    "fila": 1,
+    "estado": "disponible",
+    "sectorId": 46,
+    "partidoId": null
+  },
+  {
+    "id": 5462,
+    "numero": 128,
+    "fila": 2,
+    "estado": "disponible",
+    "sectorId": 46,
+    "partidoId": null
+  },
+  {
+    "id": 5463,
+    "numero": 130,
+    "fila": 2,
+    "estado": "disponible",
+    "sectorId": 46,
+    "partidoId": null
+  },
+  {
+    "id": 5464,
+    "numero": 132,
+    "fila": 2,
+    "estado": "disponible",
+    "sectorId": 46,
+    "partidoId": null
+  },
+  {
+    "id": 5465,
+    "numero": 134,
+    "fila": 2,
+    "estado": "disponible",
+    "sectorId": 46,
+    "partidoId": null
+  },
+  {
+    "id": 5466,
+    "numero": 136,
+    "fila": 2,
+    "estado": "disponible",
+    "sectorId": 46,
+    "partidoId": null
+  },
+  {
+    "id": 5467,
+    "numero": 138,
+    "fila": 2,
+    "estado": "disponible",
+    "sectorId": 46,
+    "partidoId": null
+  },
+  {
+    "id": 5468,
+    "numero": 140,
+    "fila": 2,
+    "estado": "disponible",
+    "sectorId": 46,
+    "partidoId": null
+  },
+  {
+    "id": 5469,
+    "numero": 142,
+    "fila": 2,
+    "estado": "disponible",
+    "sectorId": 46,
+    "partidoId": null
+  },
+  {
+    "id": 5470,
+    "numero": 144,
+    "fila": 2,
+    "estado": "disponible",
+    "sectorId": 46,
+    "partidoId": null
+  },
+  {
+    "id": 5471,
+    "numero": 146,
+    "fila": 2,
+    "estado": "disponible",
+    "sectorId": 46,
+    "partidoId": null
+  },
+  {
+    "id": 5472,
+    "numero": 148,
+    "fila": 2,
+    "estado": "disponible",
+    "sectorId": 46,
+    "partidoId": null
+  },
+  {
+    "id": 5473,
+    "numero": 150,
+    "fila": 2,
+    "estado": "disponible",
+    "sectorId": 46,
+    "partidoId": null
+  },
+  {
+    "id": 5474,
+    "numero": 152,
+    "fila": 2,
+    "estado": "disponible",
+    "sectorId": 46,
+    "partidoId": null
+  },
+  {
+    "id": 5475,
+    "numero": 154,
+    "fila": 2,
+    "estado": "disponible",
+    "sectorId": 46,
+    "partidoId": null
+  },
+  {
+    "id": 5476,
+    "numero": 128,
+    "fila": 3,
+    "estado": "disponible",
+    "sectorId": 46,
+    "partidoId": null
+  },
+  {
+    "id": 5477,
+    "numero": 130,
+    "fila": 3,
+    "estado": "disponible",
+    "sectorId": 46,
+    "partidoId": null
+  },
+  {
+    "id": 5478,
+    "numero": 132,
+    "fila": 3,
+    "estado": "disponible",
+    "sectorId": 46,
+    "partidoId": null
+  },
+  {
+    "id": 5479,
+    "numero": 134,
+    "fila": 3,
+    "estado": "disponible",
+    "sectorId": 46,
+    "partidoId": null
+  },
+  {
+    "id": 5480,
+    "numero": 136,
+    "fila": 3,
+    "estado": "disponible",
+    "sectorId": 46,
+    "partidoId": null
+  },
+  {
+    "id": 5481,
+    "numero": 138,
+    "fila": 3,
+    "estado": "disponible",
+    "sectorId": 46,
+    "partidoId": null
+  },
+  {
+    "id": 5482,
+    "numero": 140,
+    "fila": 3,
+    "estado": "disponible",
+    "sectorId": 46,
+    "partidoId": null
+  },
+  {
+    "id": 5483,
+    "numero": 142,
+    "fila": 3,
+    "estado": "disponible",
+    "sectorId": 46,
+    "partidoId": null
+  },
+  {
+    "id": 5484,
+    "numero": 144,
+    "fila": 3,
+    "estado": "disponible",
+    "sectorId": 46,
+    "partidoId": null
+  },
+  {
+    "id": 5485,
+    "numero": 146,
+    "fila": 3,
+    "estado": "disponible",
+    "sectorId": 46,
+    "partidoId": null
+  },
+  {
+    "id": 5486,
+    "numero": 148,
+    "fila": 3,
+    "estado": "disponible",
+    "sectorId": 46,
+    "partidoId": null
+  },
+  {
+    "id": 5487,
+    "numero": 150,
+    "fila": 3,
+    "estado": "disponible",
+    "sectorId": 46,
+    "partidoId": null
+  },
+  {
+    "id": 5488,
+    "numero": 152,
+    "fila": 3,
+    "estado": "disponible",
+    "sectorId": 46,
+    "partidoId": null
+  },
+  {
+    "id": 5489,
+    "numero": 154,
+    "fila": 3,
+    "estado": "disponible",
+    "sectorId": 46,
+    "partidoId": null
+  },
+  {
+    "id": 5490,
+    "numero": 156,
+    "fila": 3,
+    "estado": "disponible",
+    "sectorId": 46,
+    "partidoId": null
+  },
+  {
+    "id": 5491,
+    "numero": 128,
+    "fila": 4,
+    "estado": "disponible",
+    "sectorId": 46,
+    "partidoId": null
+  },
+  {
+    "id": 5492,
+    "numero": 130,
+    "fila": 4,
+    "estado": "disponible",
+    "sectorId": 46,
+    "partidoId": null
+  },
+  {
+    "id": 5493,
+    "numero": 132,
+    "fila": 4,
+    "estado": "disponible",
+    "sectorId": 46,
+    "partidoId": null
+  },
+  {
+    "id": 5494,
+    "numero": 134,
+    "fila": 4,
+    "estado": "disponible",
+    "sectorId": 46,
+    "partidoId": null
+  },
+  {
+    "id": 5495,
+    "numero": 136,
+    "fila": 4,
+    "estado": "disponible",
+    "sectorId": 46,
+    "partidoId": null
+  },
+  {
+    "id": 5496,
+    "numero": 138,
+    "fila": 4,
+    "estado": "disponible",
+    "sectorId": 46,
+    "partidoId": null
+  },
+  {
+    "id": 5497,
+    "numero": 140,
+    "fila": 4,
+    "estado": "disponible",
+    "sectorId": 46,
+    "partidoId": null
+  },
+  {
+    "id": 5498,
+    "numero": 142,
+    "fila": 4,
+    "estado": "disponible",
+    "sectorId": 46,
+    "partidoId": null
+  },
+  {
+    "id": 5499,
+    "numero": 144,
+    "fila": 4,
+    "estado": "disponible",
+    "sectorId": 46,
+    "partidoId": null
+  },
+  {
+    "id": 5500,
+    "numero": 146,
+    "fila": 4,
+    "estado": "disponible",
+    "sectorId": 46,
+    "partidoId": null
+  },
+  {
+    "id": 5501,
+    "numero": 148,
+    "fila": 4,
+    "estado": "disponible",
+    "sectorId": 46,
+    "partidoId": null
+  },
+  {
+    "id": 5502,
+    "numero": 150,
+    "fila": 4,
+    "estado": "disponible",
+    "sectorId": 46,
+    "partidoId": null
+  },
+  {
+    "id": 5503,
+    "numero": 152,
+    "fila": 4,
+    "estado": "disponible",
+    "sectorId": 46,
+    "partidoId": null
+  },
+  {
+    "id": 5504,
+    "numero": 154,
+    "fila": 4,
+    "estado": "disponible",
+    "sectorId": 46,
+    "partidoId": null
+  },
+  {
+    "id": 5505,
+    "numero": 156,
+    "fila": 4,
+    "estado": "disponible",
+    "sectorId": 46,
+    "partidoId": null
+  },
+  {
+    "id": 5506,
+    "numero": 158,
+    "fila": 4,
+    "estado": "disponible",
+    "sectorId": 46,
+    "partidoId": null
+  },
+  {
+    "id": 5507,
+    "numero": 128,
+    "fila": 5,
+    "estado": "disponible",
+    "sectorId": 46,
+    "partidoId": null
+  },
+  {
+    "id": 5508,
+    "numero": 130,
+    "fila": 5,
+    "estado": "disponible",
+    "sectorId": 46,
+    "partidoId": null
+  },
+  {
+    "id": 5509,
+    "numero": 132,
+    "fila": 5,
+    "estado": "disponible",
+    "sectorId": 46,
+    "partidoId": null
+  },
+  {
+    "id": 5510,
+    "numero": 134,
+    "fila": 5,
+    "estado": "disponible",
+    "sectorId": 46,
+    "partidoId": null
+  },
+  {
+    "id": 5511,
+    "numero": 136,
+    "fila": 5,
+    "estado": "disponible",
+    "sectorId": 46,
+    "partidoId": null
+  },
+  {
+    "id": 5512,
+    "numero": 138,
+    "fila": 5,
+    "estado": "disponible",
+    "sectorId": 46,
+    "partidoId": null
+  },
+  {
+    "id": 5513,
+    "numero": 140,
+    "fila": 5,
+    "estado": "disponible",
+    "sectorId": 46,
+    "partidoId": null
+  },
+  {
+    "id": 5514,
+    "numero": 142,
+    "fila": 5,
+    "estado": "disponible",
+    "sectorId": 46,
+    "partidoId": null
+  },
+  {
+    "id": 5515,
+    "numero": 144,
+    "fila": 5,
+    "estado": "disponible",
+    "sectorId": 46,
+    "partidoId": null
+  },
+  {
+    "id": 5516,
+    "numero": 146,
+    "fila": 5,
+    "estado": "disponible",
+    "sectorId": 46,
+    "partidoId": null
+  },
+  {
+    "id": 5517,
+    "numero": 148,
+    "fila": 5,
+    "estado": "disponible",
+    "sectorId": 46,
+    "partidoId": null
+  },
+  {
+    "id": 5518,
+    "numero": 150,
+    "fila": 5,
+    "estado": "disponible",
+    "sectorId": 46,
+    "partidoId": null
+  },
+  {
+    "id": 5519,
+    "numero": 152,
+    "fila": 5,
+    "estado": "disponible",
+    "sectorId": 46,
+    "partidoId": null
+  },
+  {
+    "id": 5520,
+    "numero": 154,
+    "fila": 5,
+    "estado": "disponible",
+    "sectorId": 46,
+    "partidoId": null
+  },
+  {
+    "id": 5521,
+    "numero": 156,
+    "fila": 5,
+    "estado": "disponible",
+    "sectorId": 46,
+    "partidoId": null
+  },
+  {
+    "id": 5522,
+    "numero": 158,
+    "fila": 5,
+    "estado": "disponible",
+    "sectorId": 46,
+    "partidoId": null
+  },
+  {
+    "id": 5523,
+    "numero": 160,
+    "fila": 5,
+    "estado": "disponible",
+    "sectorId": 46,
+    "partidoId": null
+  },
+  {
+    "id": 5524,
+    "numero": 162,
+    "fila": 5,
+    "estado": "disponible",
+    "sectorId": 46,
+    "partidoId": null
+  },
+  {
+    "id": 5525,
+    "numero": 128,
+    "fila": 6,
+    "estado": "disponible",
+    "sectorId": 46,
+    "partidoId": null
+  },
+  {
+    "id": 5526,
+    "numero": 130,
+    "fila": 6,
+    "estado": "disponible",
+    "sectorId": 46,
+    "partidoId": null
+  },
+  {
+    "id": 5527,
+    "numero": 132,
+    "fila": 6,
+    "estado": "disponible",
+    "sectorId": 46,
+    "partidoId": null
+  },
+  {
+    "id": 5528,
+    "numero": 134,
+    "fila": 6,
+    "estado": "disponible",
+    "sectorId": 46,
+    "partidoId": null
+  },
+  {
+    "id": 5529,
+    "numero": 136,
+    "fila": 6,
+    "estado": "disponible",
+    "sectorId": 46,
+    "partidoId": null
+  },
+  {
+    "id": 5530,
+    "numero": 138,
+    "fila": 6,
+    "estado": "disponible",
+    "sectorId": 46,
+    "partidoId": null
+  },
+  {
+    "id": 5531,
+    "numero": 140,
+    "fila": 6,
+    "estado": "disponible",
+    "sectorId": 46,
+    "partidoId": null
+  },
+  {
+    "id": 5532,
+    "numero": 142,
+    "fila": 6,
+    "estado": "disponible",
+    "sectorId": 46,
+    "partidoId": null
+  },
+  {
+    "id": 5533,
+    "numero": 144,
+    "fila": 6,
+    "estado": "disponible",
+    "sectorId": 46,
+    "partidoId": null
+  },
+  {
+    "id": 5534,
+    "numero": 146,
+    "fila": 6,
+    "estado": "disponible",
+    "sectorId": 46,
+    "partidoId": null
+  },
+  {
+    "id": 5535,
+    "numero": 148,
+    "fila": 6,
+    "estado": "disponible",
+    "sectorId": 46,
+    "partidoId": null
+  },
+  {
+    "id": 5536,
+    "numero": 150,
+    "fila": 6,
+    "estado": "disponible",
+    "sectorId": 46,
+    "partidoId": null
+  },
+  {
+    "id": 5537,
+    "numero": 152,
+    "fila": 6,
+    "estado": "disponible",
+    "sectorId": 46,
+    "partidoId": null
+  },
+  {
+    "id": 5538,
+    "numero": 154,
+    "fila": 6,
+    "estado": "disponible",
+    "sectorId": 46,
+    "partidoId": null
+  },
+  {
+    "id": 5539,
+    "numero": 156,
+    "fila": 6,
+    "estado": "disponible",
+    "sectorId": 46,
+    "partidoId": null
+  },
+  {
+    "id": 5540,
+    "numero": 158,
+    "fila": 6,
+    "estado": "disponible",
+    "sectorId": 46,
+    "partidoId": null
+  },
+  {
+    "id": 5541,
+    "numero": 160,
+    "fila": 6,
+    "estado": "disponible",
+    "sectorId": 46,
+    "partidoId": null
+  },
+  {
+    "id": 5542,
+    "numero": 162,
+    "fila": 6,
+    "estado": "disponible",
+    "sectorId": 46,
+    "partidoId": null
+  },
+  {
+    "id": 5543,
+    "numero": 164,
+    "fila": 6,
+    "estado": "disponible",
+    "sectorId": 46,
+    "partidoId": null
+  },
+  {
+    "id": 5544,
+    "numero": 166,
+    "fila": 6,
+    "estado": "disponible",
+    "sectorId": 46,
+    "partidoId": null
+  },
+  {
+    "id": 5545,
+    "numero": 128,
+    "fila": 7,
+    "estado": "disponible",
+    "sectorId": 46,
+    "partidoId": null
+  },
+  {
+    "id": 5546,
+    "numero": 130,
+    "fila": 7,
+    "estado": "disponible",
+    "sectorId": 46,
+    "partidoId": null
+  },
+  {
+    "id": 5547,
+    "numero": 132,
+    "fila": 7,
+    "estado": "disponible",
+    "sectorId": 46,
+    "partidoId": null
+  },
+  {
+    "id": 5548,
+    "numero": 134,
+    "fila": 7,
+    "estado": "disponible",
+    "sectorId": 46,
+    "partidoId": null
+  },
+  {
+    "id": 5549,
+    "numero": 136,
+    "fila": 7,
+    "estado": "disponible",
+    "sectorId": 46,
+    "partidoId": null
+  },
+  {
+    "id": 5550,
+    "numero": 138,
+    "fila": 7,
+    "estado": "disponible",
+    "sectorId": 46,
+    "partidoId": null
+  },
+  {
+    "id": 5551,
+    "numero": 140,
+    "fila": 7,
+    "estado": "disponible",
+    "sectorId": 46,
+    "partidoId": null
+  },
+  {
+    "id": 5552,
+    "numero": 142,
+    "fila": 7,
+    "estado": "disponible",
+    "sectorId": 46,
+    "partidoId": null
+  },
+  {
+    "id": 5553,
+    "numero": 144,
+    "fila": 7,
+    "estado": "disponible",
+    "sectorId": 46,
+    "partidoId": null
+  },
+  {
+    "id": 5554,
+    "numero": 146,
+    "fila": 7,
+    "estado": "disponible",
+    "sectorId": 46,
+    "partidoId": null
+  },
+  {
+    "id": 5555,
+    "numero": 148,
+    "fila": 7,
+    "estado": "disponible",
+    "sectorId": 46,
+    "partidoId": null
+  },
+  {
+    "id": 5556,
+    "numero": 150,
+    "fila": 7,
+    "estado": "disponible",
+    "sectorId": 46,
+    "partidoId": null
+  },
+  {
+    "id": 5557,
+    "numero": 152,
+    "fila": 7,
+    "estado": "disponible",
+    "sectorId": 46,
+    "partidoId": null
+  },
+  {
+    "id": 5558,
+    "numero": 154,
+    "fila": 7,
+    "estado": "disponible",
+    "sectorId": 46,
+    "partidoId": null
+  },
+  {
+    "id": 5559,
+    "numero": 156,
+    "fila": 7,
+    "estado": "disponible",
+    "sectorId": 46,
+    "partidoId": null
+  },
+  {
+    "id": 5560,
+    "numero": 158,
+    "fila": 7,
+    "estado": "disponible",
+    "sectorId": 46,
+    "partidoId": null
+  },
+  {
+    "id": 5561,
+    "numero": 160,
+    "fila": 7,
+    "estado": "disponible",
+    "sectorId": 46,
+    "partidoId": null
+  },
+  {
+    "id": 5562,
+    "numero": 162,
+    "fila": 7,
+    "estado": "disponible",
+    "sectorId": 46,
+    "partidoId": null
+  },
+  {
+    "id": 5563,
+    "numero": 164,
+    "fila": 7,
+    "estado": "disponible",
+    "sectorId": 46,
+    "partidoId": null
+  },
+  {
+    "id": 5564,
+    "numero": 166,
+    "fila": 7,
+    "estado": "disponible",
+    "sectorId": 46,
+    "partidoId": null
+  },
+  {
+    "id": 5565,
+    "numero": 168,
+    "fila": 7,
+    "estado": "disponible",
+    "sectorId": 46,
+    "partidoId": null
+  }
+]

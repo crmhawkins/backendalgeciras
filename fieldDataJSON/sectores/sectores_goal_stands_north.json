@@ -1,0 +1,83 @@
+[
+    {
+        "id": 1,
+        "nombre": "North Goal Odd 9",
+        "capacidad": 115,
+        "precio": 0.0,
+        "gradaId": 3,
+        "activo": true,
+        "imagen": null
+    },
+    {
+        "id": 2,
+        "nombre": "North Goal Odd 8",
+        "capacidad": 139,
+        "precio": 0.0,
+        "gradaId": 3,
+        "activo": true,
+        "imagen": null
+    },
+    {
+        "id": 3,
+        "nombre": "North Goal Odd 7",
+        "capacidad": 144,
+        "precio": 0.0,
+        "gradaId": 3,
+        "activo": true,
+        "imagen": null
+    },
+    {
+        "id": 4,
+        "nombre": "North Goal Odd 6",
+        "capacidad": 144,
+        "precio": 0.0,
+        "gradaId": 3,
+        "activo": true,
+        "imagen": null
+    },
+    {
+        "id": 5,
+        "nombre": "North Goal Odd 5",
+        "capacidad": 72,
+        "precio": 0.0,
+        "gradaId": 3,
+        "activo": true,
+        "imagen": null
+    },
+    {
+        "id": 6,
+        "nombre": "North Goal Even 4",
+        "capacidad": 72,
+        "precio": 0.0,
+        "gradaId": 3,
+        "activo": true,
+        "imagen": null
+    },
+    {
+        "id": 7,
+        "nombre": "North Goal Even 3",
+        "capacidad": 144,
+        "precio": 0.0,
+        "gradaId": 3,
+        "activo": true,
+        "imagen": null
+    },
+    {
+        "id": 8,
+        "nombre": "North Goal Even 2",
+        "capacidad": 144,
+        "precio": 0.0,
+        "gradaId": 3,
+        "activo": true,
+        "imagen": null
+    },
+    {
+        "id": 9,
+        "nombre": "North Goal Even 1",
+        "capacidad": 180,
+        "precio": 0.0,
+        "gradaId": 3,
+        "activo": true,
+        "imagen": null
+    }
+]

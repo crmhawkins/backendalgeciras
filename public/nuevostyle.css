@@ -1,0 +1,693 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+html, body {
+  width: 100%;
+  max-width: 100%;
+  overflow-x: hidden;
+}
+
+body {
+    font-family: 'Segoe UI', sans-serif;
+    background-color: #f2f2f2;
+    color: #111;
+}
+
+.inicio a {
+    text-decoration: none;
+    color: #111;
+}
+
+.sector-inactivo-overlay {
+  fill: rgba(255, 255, 255, 0.6); /* capa blanca semitransparente encima del color original */
+  pointer-events: none; /* evita que capture eventos, se aplicará al hijo de zona */
+}
+
+header {
+    position: sticky;
+    top: 0;
+    background-color: white;
+    z-index: 1000;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+.header-top {
+    position: sticky;
+    top:0;
+    background-color: black;
+    color: white;
+    padding: 5px;
+    text-align: center;
+    font-size: 0.9rem;
+}
+
+.nav-bar ul li a:hover,
+.login a:hover {
+    color: #c6001a;
+    transition: color 0.3s ease;
+}
+
+.nav-bar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem;
+}
+
+.nav-bar .logo {
+    height: 60px;
+}
+
+.nav-bar ul {
+    list-style: none;
+    display: flex;
+    gap: 1.5rem;
+}
+
+.nav-bar ul li a {
+    text-decoration: none;
+    color: #111;
+    font-weight: bold;
+}
+
+.login a {
+    text-decoration: none;
+    color: #111;
+    font-weight: bold;
+}
+
+.banner {
+    position: relative;
+    background-color: black;
+    color: white;
+    text-align: center;
+    padding: 1.5rem 1rem;
+    font-size: 1.6rem;
+    font-weight: bold;
+}
+
+footer {
+    background-color: #111;
+    color: white;
+    margin-top: 3rem;
+}
+
+.sponsors {
+    background-color: #c6001a;
+    text-align: center;
+    padding: 2rem 1rem;
+}
+
+.sponsors .logos {
+    display: flex;
+    justify-content: center;
+    gap: 2rem;
+    margin-top: 1rem;
+    flex-wrap: wrap;
+}
+
+.sponsors .logos img {
+    height: 60px;
+}
+
+.footer-bottom {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    padding: 2rem;
+    font-size: 0.9rem;
+    background-color: #000;
+}
+
+.footer-bottom h4 {
+    margin-bottom: 1rem;
+}
+
+.footer-bottom a {
+    color: white;
+    text-decoration: none;
+    margin: 0 5px;
+}
+
+.footer-bottom img {
+    height: 24px;
+    margin: 0 5px;
+}
+
+.footer-bottom a:hover {
+    color: #999;
+    transition: color 0.3s ease;
+}
+
+.nav-bar .logo {
+    height: 60px;
+    margin-right: 10px;
+}
+
+
+.nav-bar .logo-container {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.nav-bar .logo-container span {
+    font-weight: bold;
+    font-size: 1.3rem;
+}
+
+@media (max-width: 768px) {
+    .red-banner {
+        flex-direction: column;
+    }
+
+    .nav-bar ul {
+        flex-direction: column;
+        gap: 0.5rem;
+        align-items: center;
+    }
+
+    .footer-bottom {
+        flex-direction: column;
+        gap: 2rem;
+    }
+}
+
+.seleccion-sector {
+    width:100vw;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    padding: 2rem;
+}
+
+.mapa-sector {
+    flex: 1 1 60%;
+    padding: 1rem;
+}
+
+.tabla-sector {
+    flex: 1 1 35%;
+    padding: 1rem;
+    background-color: #f9f9f9;
+    border-radius: 8px;
+}
+
+#mapaSVG svg {
+    width: 100%;
+    height: auto;
+    max-width: 100%;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 1rem;
+}
+
+table th,
+table td {
+    padding: 0.5rem;
+    border-bottom: 1px solid #ccc;
+    text-align: left;
+}
+
+#busquedaSector {
+    width: 100%;
+    padding: 0.5rem;
+    margin-bottom: 0.5rem;
+}
+
+.zona-info {
+    flex: 1 1 35%;
+    padding: 1rem;
+}
+
+.zona-info img {
+    max-width: 100%;
+    border-radius: 8px;
+    margin-top: 1rem;
+}
+
+.selector-asientos {
+    flex: 1 1 60%;
+    padding: 1rem;
+}
+
+
+.selector-asientos h2 {
+    font-size: 1.5rem;
+    background-color: #000000;
+    text-align: center;
+    padding: 1.5rem 0.5rem;
+    color:white;
+    margin-bottom: 1rem;
+}
+
+/* Contenedor principal de asientos */
+.grada {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+}
+
+.fila {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  flex-wrap: nowrap;
+  margin-bottom: 8px;
+  width: 100%;
+  min-width: 100%;
+  padding: 0 10px;
+  overflow: visible;
+}
+
+
+.asiento.ocupado {
+    background-color: #c6001a;
+    cursor: not-allowed;
+}
+
+.asiento.seleccionado {
+    background-color: #7ca9f8;
+}
+
+.leyenda {
+    display: flex;
+    gap: 1rem;
+    margin-bottom: 1rem;
+}
+
+.leyenda-item {
+    padding: 0.3rem 0.6rem;
+    border-radius: 4px;
+    font-size: 0.9rem;
+    font-weight: bold;
+}
+
+.disponible {
+    background-color: #6cc46c;
+    color: white;
+}
+
+.ocupado {
+    background-color: #c6001a;
+    color: white;
+}
+
+.seleccionado {
+    background-color: #7ca9f8;
+    color: white;
+}
+
+.acciones-abono {
+    text-align: center;
+}
+
+.acciones-abono button {
+    padding: 0.75rem 2rem;
+    background-color: black;
+    color: white;
+    font-weight: bold;
+    border: none;
+    cursor: pointer;
+    margin-top: 1rem;
+}
+
+.acciones-abono button:disabled {
+    background-color: #999;
+    cursor: not-allowed;
+}
+
+.tabla-sector {
+    max-height: 300px;
+    overflow-y: auto;
+}
+
+.tabla-sector thead {
+    position: sticky;
+    top: 0;
+    background-color: #f9f9f9;
+    z-index: 1;
+}
+
+
+
+#formulario-container {
+    background-color: #eee;
+    padding: 2rem;
+    border-radius: 10px;
+    max-width: 1200px;
+    margin: 2rem auto;
+}
+
+#formulario-container h2 {
+    font-size: 2rem;
+    font-weight: 800;
+    text-align: left;
+    margin-bottom: 1rem;
+    text-transform: uppercase;
+}
+
+#formulario-abono {
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+}
+
+fieldset {
+    border: none;
+    background: #fff;
+    border-radius: 12px;
+    padding: 2rem;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.06);
+}
+
+fieldset legend {
+    font-weight: bold;
+    font-size: 1.3rem;
+    margin-bottom: 1.5rem;
+    color: #c6001a;
+}
+
+.form-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1.5rem;
+}
+
+.form-grid label {
+    display: flex;
+    flex-direction: column;
+    font-weight: bold;
+    font-size: 0.9rem;
+    color: #333;
+}
+
+.form-grid input,
+.form-grid select {
+    margin-top: 6px;
+    padding: 0.7rem 1rem;
+    border-radius: 6px;
+    border: 1px solid #ccc;
+    font-size: 1rem;
+}
+
+#formulario-abono button[type="submit"] {
+    align-self: flex-start;
+    padding: 1rem 2rem;
+    background-color: #c6001a;
+    color: white;
+    font-weight: bold;
+    font-size: 1rem;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background 0.3s ease;
+    margin-top: 1rem;
+}
+
+#formulario-abono button[type="submit"]:hover {
+    background-color: #a00016;
+}
+
+.btn-cambiar {
+    align-self: flex-start;
+    padding: 1rem 2rem;
+    background-color: #c6001a;
+    color: white;
+    font-weight: bold;
+    font-size: 1rem;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background 0.3s ease;
+    margin-top: 1rem;
+}
+
+.asiento.liberado {
+    background-color: yellow;
+    color: black;
+}
+
+.recinto-zona [fill] {
+  transition: fill 0.3s ease;
+}
+
+#menu {
+  position: absolute;
+  display: block;
+  opacity: 0;
+  transform: translateY(10px);
+  transition: opacity 0.3s ease, transform 0.3s ease;
+  pointer-events: none; 
+  background: white;
+  border: 2px solid #ccc;
+  box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.2);
+  padding: 12px;
+  border-radius: 8px;
+  font-family: sans-serif;
+  font-size: 14px;
+  z-index: 1000;
+  min-width: 180px;
+}
+
+#menu.visible {
+  opacity: 1;
+  transform: translateY(0);
+  pointer-events: auto;
+}
+
+#menu strong {
+    font-size: 16px;
+    display: block;
+    margin-bottom: 8px;
+}
+
+@media (max-width: 768px) {
+  .seleccion-sector {
+    flex-direction: column;
+    padding: 1rem;
+  }
+
+
+  .mapa-sector {
+    order: 1;
+    width: 100%;
+    padding: 0;
+  }
+
+   .tabla-sector {
+    order: 2;
+    width: 100%;
+    margin-top: 2rem; 
+    padding: 1rem;    
+    max-height: none;  
+  }
+
+  .tabla-sector table {
+    font-size: 0.95rem;
+  }
+
+}
+
+.tabla-sector {
+  flex: 1 1 35%;
+  padding: 1.5rem 1rem; 
+  background-color: #f9f9f9;
+  border-radius: 8px;
+  display: flex;
+  flex-direction: column;
+  max-height: 380px; /* antes 300px, ahora más alto */
+  margin-top: 1rem; /* separación adicional desde arriba */
+}
+
+
+.tabla-sector input {
+  margin: 0.5rem 0;
+}
+
+.tabla-scroll {
+  overflow-y: auto;
+  flex: 1;
+}
+
+.tabla-scroll table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.tabla-scroll th,
+.tabla-scroll td {
+  padding: 0.5rem;
+  border-bottom: 1px solid #ccc;
+  text-align: left;
+}
+
+.resumen-abonos {
+  margin-top: 20px;
+  padding: 10px;
+  border-radius: 6px;
+}
+
+#listaAbonos {
+  padding-right: 5px; 
+}
+
+#listaAbonos .abono-box {
+  background: #e7e7e7;
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  height: 4rem;
+  padding: 10px;
+  margin-bottom: 8px;
+  border-radius: 10%;
+  font-family: "Montserrat", sans-serif;
+}
+
+#toast-container {
+  position: fixed;
+  bottom: 1rem;
+  right: 1rem;
+  z-index: 9999;
+}
+
+.toast {
+  display: flex;
+  align-items: end  ;
+  gap: 10px;
+  background-color: #f44336;
+  color: white;
+  padding: 16px;
+  border-radius: 6px;
+  font-family: "Montserrat", sans-serif;
+  font-size: 14px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+  animation: slideIn 0.4s ease, fadeOut 0.5s ease 1.5s forwards;
+  max-width:70%
+}
+
+.toast .icon {
+  font-size: 18px;
+  color:white;
+}
+
+@keyframes slideIn {
+  from {
+    transform: translateX(50%);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+@keyframes fadeOut {
+  to {
+    opacity: 0;
+    transform: translateX(50%);
+  }
+}
+
+.contenedor-asientos {
+  width:100%;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  gap: 1rem;
+  margin: 2rem 0;
+}
+
+.selector-asientos {
+    flex: 1 1;
+    order: 2;
+
+}
+
+.zona-info {
+  flex: 1 1 30%;
+  order:1;
+}
+
+.asiento {
+  width: 30px; /* Tamaño fijo para desktop */
+  height: 30px;
+  min-width: 30px; /* Evita que se reduzcan demasiado */
+  min-height: 30px;
+  border-radius: 50%;
+  margin: 0 3px;
+  background-color: #6cc46c;
+  color: white;
+  font-weight: bold;
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  flex-shrink: 0; /* Evita que se encojan */
+}
+
+.asiento.ocupado {
+  background-color: #c6001a;
+}
+
+.asiento.seleccionado {
+  background-color: #7ca9f8;
+}
+
+
+@media (max-width: 768px) {
+  .contenedor-asientos {
+    flex-direction: column;
+  }
+
+  .asiento {
+    width: 20px;
+    height: 20px;
+    min-width: 20px;
+    min-height: 20px;
+    font-size: 10px;
+  }
+  .selector-asientos {
+    width:100%;
+    order: 1;
+  }
+
+  #listaAbonos .abono-box {
+    font-size: 0.85rem;
+    height: auto;
+    padding: 8px;
+    border-radius: 6px;
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+   .selector-asientos {
+    padding: 0.5rem;
+  }
+
+  .grada {
+    width:100%;
+    overflow: visible;
+    transform: scale(0.7); /* Escala proporcional */
+    transform-origin: top center;
+  }
+  .fila{
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center; /* o space-evenly, según quieras */
+    gap: 6px;
+  }
+
+  .zona-info {
+    order: 2;
+  }
+}

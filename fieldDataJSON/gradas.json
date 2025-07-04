@@ -1,0 +1,50 @@
+[
+  {
+    "id": 1,
+    "nombre": "Main Stands - Higher",
+    "imagen": null,
+    "descripcion": null,
+    "createdAt": "2025-05-09T10:58:56.000Z",
+    "updatedAt": "2025-05-09T10:58:56.000Z"
+  },
+  {
+    "id": 2,
+    "nombre": "Main Stands - Lower",
+    "imagen": null,
+    "descripcion": null,
+    "createdAt": "2025-05-09T10:58:56.000Z",
+    "updatedAt": "2025-05-09T10:58:56.000Z"
+  },
+  {
+    "id": 3,
+    "nombre": "Goal Stands - North",
+    "imagen": null,
+    "descripcion": null,
+    "createdAt": "2025-05-09T10:58:56.000Z",
+    "updatedAt": "2025-05-09T10:58:56.000Z"
+  },
+  {
+    "id": 4,
+    "nombre": "Goal Stands - South",
+    "imagen": null,
+    "descripcion": null,
+    "createdAt": "2025-05-09T10:58:56.000Z",
+    "updatedAt": "2025-05-09T10:58:56.000Z"
+  },
+  {
+    "id": 5,
+    "nombre": "Main Longside Stand",
+    "imagen": null,
+    "descripcion": null,
+    "createdAt": "2025-05-09T10:58:56.000Z",
+    "updatedAt": "2025-05-09T10:58:56.000Z"
+  },
+  {
+    "id": 6,
+    "nombre": "Stage of Honor",
+    "imagen": null,
+    "descripcion": null,
+    "createdAt": "2025-05-09T10:58:56.000Z",
+    "updatedAt": "2025-05-09T10:58:56.000Z"
+  }
+]

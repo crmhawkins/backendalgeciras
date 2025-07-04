@@ -1,0 +1,136 @@
+body,
+html {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  font-family: 'Bebas Neue', sans-serif;
+  letter-spacing: 2px;
+  box-sizing: border-box;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: inherit;
+}
+
+.background {
+  background-image: url('./imagenes/fondoalg.png');
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  height: 100vh;
+  width: 100%;
+}
+
+.overlay {
+  background-color: rgba(0, 0, 0, 0.6);
+  height: 100%;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 2vw;
+}
+
+.container {
+  width: 90%;
+  max-width: 1000px;
+  text-align: center;
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+  margin-bottom: 5vh;
+  flex-wrap: wrap;
+}
+
+.logo {
+  height: 100px;
+}
+
+.texto-header {
+  display: flex;
+  flex-direction: column;
+  color: white;
+  text-align: center;
+}
+
+.titulo {
+  font-size: clamp(28px, 6vw, 60px);
+  font-weight: bold;
+  margin: 0;
+}
+
+.subtitulo {
+  font-family: 'Roboto Condensed', sans-serif;
+  letter-spacing: normal;
+  font-size: clamp(16px, 3vw, 24px);
+  margin: 3px 0 0 0;
+  color: rgb(202, 55, 55);
+}
+
+.button-container {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 2rem;
+  margin-top: 3vh;
+  width: 100%;
+  max-width: 70%;
+}
+
+.main-button {
+  background-color: rgba(198, 0, 26, 0.7);
+  color: white;
+  border: none;
+  padding: 4rem 2rem;
+  font-size: 3rem;
+  font-weight: bold;
+  text-align: center;
+  text-decoration: none;
+  transition: background-color 0.3s ease, transform 0.2s ease;
+}
+
+.main-button:hover {
+  background-color: rgba(198, 0, 26, 1);
+  transform: scale(1.03);
+}
+
+.full-width {
+    grid-column: 1 / -1;        
+    justify-self: center;
+    width: 70%;                
+    max-width: 500px;           
+}
+
+@media (max-width: 768px) {
+  .header {
+    flex-direction: column;
+    gap: 1rem;
+  }
+
+  .logo {
+    height: 60px;
+  }
+
+  .button-container {
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+  }
+
+  .main-button {
+    font-size: 1.5rem;
+    padding: 1.5rem 1rem;
+  }
+  .full-width {
+    width:100%;
+  }
+
+  .full-width {
+    grid-column: span 1;
+  }
+}

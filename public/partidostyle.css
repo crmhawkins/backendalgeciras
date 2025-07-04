@@ -1,0 +1,385 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Segoe UI', sans-serif;
+    background-color: #f2f2f2;
+    color: #111;
+}
+
+.inicio a {
+    text-decoration: none;
+    color: #111;
+}
+
+header {
+    position: sticky;
+    top: 0;
+    background-color: white;
+    z-index: 1000;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+.header-top {
+    background-color: black;
+    color: white;
+    padding: 5px;
+    text-align: center;
+    font-size: 0.9rem;
+}
+
+.nav-bar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem;
+}
+
+.nav-bar .logo {
+    height: 60px;
+    margin-right: 10px;
+}
+
+.nav-bar .logo-container {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.nav-bar .logo-container span {
+    font-weight: bold;
+    font-size: 1.3rem;
+}
+
+.nav-bar ul {
+    list-style: none;
+    display: flex;
+    gap: 1.5rem;
+}
+
+.nav-bar ul li a,
+.login a {
+    text-decoration: none;
+    color: #111;
+    font-weight: bold;
+}
+
+.nav-bar ul li a:hover,
+.login a:hover {
+    color: #c6001a;
+    transition: color 0.3s ease;
+}
+
+.banner {
+    background-color: black;
+    color: white;
+    text-align: center;
+    padding: 2rem 1rem;
+    font-size: 1.6rem;
+    font-weight: bold;
+}
+
+.red-banner {
+    display: flex;
+    justify-content: space-around;
+    background-color: #c6001a;
+    color: white;
+    text-align: center;
+    flex-wrap: wrap;
+}
+
+.info-box {
+    flex: 1;
+    padding: 1rem;
+    border-right: 1px solid #ffffff4b;
+}
+
+.info-box:last-child {
+    border-right: none;
+}
+
+.icon-placeholder {
+    width: 30px;
+    height: 30px;
+    margin: 0 auto 0.5rem;
+    background-color: transparent;
+}
+
+.partidos-container {
+    padding: 3% 5%;
+}
+
+.partido {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background-color: #fff;
+    padding: 2% 3%;
+    border-bottom: 1px solid #ddd;
+    flex-wrap: wrap;
+}
+
+.partido-datos {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 1.5rem;
+    flex: 1;
+}
+
+.partido-fecha p {
+    font-size: 1rem;
+    margin-bottom: 0.3rem;
+}
+
+.partido-fecha strong {
+    font-size: 2rem;
+    display: block;
+    margin-bottom: 0.5rem;
+}
+
+.partido-versus {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 1rem;
+    font-weight: bold;
+    font-size: 1rem;
+    text-align: center;
+}
+
+.partido-versus img {
+    height: 50px;
+}
+
+.partido-versus .vs {
+    font-size: 1.5rem;
+    font-weight: bold;
+    margin: 0 0.5rem;
+}
+
+.partido-actions {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    flex: 0 0 200px;
+    height: 100%;
+}
+
+.btn-comprar {
+    padding: 0.75rem 2rem;
+    background-color: #000;
+    color: white;
+    font-weight: bold;
+    border: none;
+    cursor: pointer;
+    position: relative;
+    overflow: hidden;
+    max-width: 150px;
+    width: 100%;
+    text-align: center;
+}
+
+.btn-comprar::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background-color: #c6001a;
+    transition: left 0.4s ease;
+    z-index: 0;
+}
+
+.btn-comprar:hover::before {
+    left: 0;
+}
+
+.btn-comprar span {
+    position: relative;
+    z-index: 1;
+}
+
+.btn-info {
+    margin-top: 0.5rem;
+    background-color: #000;
+    color: white;
+    padding: 0.5rem 1rem;
+    font-weight: bold;
+    border: none;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.btn-info:hover {
+    background-color: #c6001a;
+}
+
+.modal {
+    display: none;
+    position: fixed;
+    z-index: 2000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    overflow-y: auto;
+    background-color: rgba(0, 0, 0, 0.6);
+}
+
+.modal-content {
+    background-color: #fff;
+    margin: 5% auto;
+    padding: 2rem;
+    width: 90%;
+    max-width: 700px;
+    border-radius: 8px;
+}
+
+.btn-cerrar {
+    padding: 0.75rem 2rem;
+    background-color: #000;
+    color: white;
+    font-weight: bold;
+    border: none;
+    cursor: pointer;
+    position: relative;
+    overflow: hidden;
+}
+
+.btn-cerrar::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background-color: #c6001a;
+    transition: left 0.4s ease;
+    z-index: 0;
+}
+
+.btn-cerrar:hover::before {
+    left: 0;
+}
+
+.btn-cerrar span {
+    position: relative;
+    z-index: 1;
+}
+
+footer {
+    background-color: #111;
+    color: white;
+    margin-top: 3rem;
+}
+
+.sponsors {
+    background-color: #c6001a;
+    text-align: center;
+    padding: 2rem 1rem;
+}
+
+.sponsors .logos {
+    display: flex;
+    justify-content: center;
+    gap: 2rem;
+    margin-top: 1rem;
+    flex-wrap: wrap;
+}
+
+.sponsors .logos img {
+    height: 60px;
+}
+
+.footer-bottom {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    padding: 2rem;
+    font-size: 0.9rem;
+    background-color: #000;
+}
+
+.footer-bottom h4 {
+    margin-bottom: 1rem;
+}
+
+.footer-bottom a {
+    color: white;
+    text-decoration: none;
+    margin: 0 5px;
+}
+
+.footer-bottom img {
+    height: 24px;
+    margin: 0 5px;
+}
+
+.footer-bottom a:hover {
+    color: #999;
+    transition: color 0.3s ease;
+}
+
+.no-partidos {
+    width: 100%;
+    text-align: center;
+    padding: 3rem 0;
+    background-color: #f8f8f8;
+    border: 1px solid #e0e0e0;
+    margin: 2rem 0;
+}
+
+.no-partidos-mensaje {
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: #555;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+@media (max-width: 768px) {
+    .red-banner {
+        flex-direction: column;
+    }
+
+    .partido {
+        flex-direction: column;
+        align-items: center;
+        gap: 1rem;
+    }
+
+    .partido-actions {
+        justify-content: center;
+        width: 100%;
+        margin-top: 1rem;
+    }
+
+    .btn-comprar {
+        width: 100%;
+    }
+
+    .partido-fecha {
+        text-align: center;
+    }
+
+    .nav-bar ul {
+        flex-direction: column;
+        gap: 0.5rem;
+        align-items: center;
+    }
+
+    .footer-bottom {
+        flex-direction: column;
+        gap: 2rem;
+    }
+
+     .no-partidos-mensaje {
+        font-size: 1.2rem;
+    }
+}

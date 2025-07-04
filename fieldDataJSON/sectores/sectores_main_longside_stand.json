@@ -1,0 +1,128 @@
+[
+    {
+        "id": 47,
+        "nombre": "Main Longside S. Odd 14",
+        "capacidad": 91,
+        "precio": 0.0,
+        "gradaId": 5,
+        "activo": true,
+        "imagen": null
+    },
+    {
+        "id": 48,
+        "nombre": "Main Longside S. Odd 13",
+        "capacidad": 105,
+        "precio": 0.0,
+        "gradaId": 5,
+        "activo": true,
+        "imagen": null
+    },
+    {
+        "id": 49,
+        "nombre": "Main Longside S. Odd 12",
+        "capacidad": 144,
+        "precio": 0.0,
+        "gradaId": 5,
+        "activo": true,
+        "imagen": null
+    },
+    {
+        "id": 50,
+        "nombre": "Main Longside S. Odd 11",
+        "capacidad": 120,
+        "precio": 0.0,
+        "gradaId": 5,
+        "activo": true,
+        "imagen": null
+    },
+    {
+        "id": 51,
+        "nombre": "Main Longside S. Odd 10",
+        "capacidad": 144,
+        "precio": 0.0,
+        "gradaId": 5,
+        "activo": true,
+        "imagen": null
+    },
+    {
+        "id": 52,
+        "nombre": "Main Longside S. Odd 9",
+        "capacidad": 144,
+        "precio": 0.0,
+        "gradaId": 5,
+        "activo": true,
+        "imagen": null
+    },
+    {
+        "id": 53,
+        "nombre": "Main Longside S. Odd 8",
+        "capacidad": 72,
+        "precio": 0.0,
+        "gradaId": 5,
+        "activo": true,
+        "imagen": null
+    },
+    {
+        "id": 54,
+        "nombre": "Main Longside S. Even 7",
+        "capacidad": 72,
+        "precio": 0.0,
+        "gradaId": 5,
+        "activo": true,
+        "imagen": null
+    },
+    {
+        "id": 55,
+        "nombre": "Main Longside S. Even 6",
+        "capacidad": 144,
+        "precio": 0.0,
+        "gradaId": 5,
+        "activo": true,
+        "imagen": null
+    },
+    {
+        "id": 56,
+        "nombre": "Main Longside S. Even 5",
+        "capacidad": 144,
+        "precio": 0.0,
+        "gradaId": 5,
+        "activo": true,
+        "imagen": null
+    },
+    {
+        "id": 57,
+        "nombre": "Main Longside S. Even 4",
+        "capacidad": 144,
+        "precio": 0.0,
+        "gradaId": 5,
+        "activo": true,
+        "imagen": null
+    },
+    {
+        "id": 58,
+        "nombre": "Main Longside S. Even 3",
+        "capacidad": 144,
+        "precio": 0.0,
+        "gradaId": 5,
+        "activo": true,
+        "imagen": null
+    },
+    {
+        "id": 59,
+        "nombre": "Main Longside S. Even 2",
+        "capacidad": 105,
+        "precio": 0.0,
+        "gradaId": 5,
+        "activo": true,
+        "imagen": null
+    },
+    {
+        "id": 60,
+        "nombre": "Main Longside S. Even 1",
+        "capacidad": 91,
+        "precio": 0.0,
+        "gradaId": 5,
+        "activo": true,
+        "imagen": null
+    }
+]

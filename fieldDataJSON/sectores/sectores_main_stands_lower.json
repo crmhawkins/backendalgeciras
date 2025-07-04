@@ -1,0 +1,128 @@
+[
+  {
+    "id": 10,
+    "nombre": "Main S. - Lower Odd 14",
+    "capacidad": 48,
+    "precio": 0,
+    "gradaId": 2,
+    "activo": true,
+    "imagen": null
+  },
+  {
+    "id": 11,
+    "nombre": "Main S. - Lower Odd 13",
+    "capacidad": 90,
+    "precio": 0,
+    "gradaId": 2,
+    "activo": true,
+    "imagen": null
+  },
+  {
+    "id": 12,
+    "nombre": "Main S. - Lower Odd 12",
+    "capacidad": 90,
+    "precio": 0,
+    "gradaId": 2,
+    "activo": true,
+    "imagen": null
+  },
+  {
+    "id": 13,
+    "nombre": "Main S. - Lower Odd 11",
+    "capacidad": 90,
+    "precio": 0,
+    "gradaId": 2,
+    "activo": true,
+    "imagen": null
+  },
+  {
+    "id": 14,
+    "nombre": "Main S. - Lower Odd 10",
+    "capacidad": 90,
+    "precio": 0,
+    "gradaId": 2,
+    "activo": true,
+    "imagen": null
+  },
+  {
+    "id": 15,
+    "nombre": "Main S. - Lower Odd 9",
+    "capacidad": 108,
+    "precio": 0,
+    "gradaId": 2,
+    "activo": true,
+    "imagen": null
+  },
+  {
+    "id": 16,
+    "nombre": "Main S. - Lower Odd 8",
+    "capacidad": 45,
+    "precio": 0,
+    "gradaId": 2,
+    "activo": 0,
+    "imagen": null
+  },
+  {
+    "id": 17,
+    "nombre": "Main S. - Lower Even 7",
+    "capacidad": 45,
+    "precio": 0,
+    "gradaId": 2,
+    "activo": true,
+    "imagen": null
+  },
+  {
+    "id": 18,
+    "nombre": "Main S. - Lower Even 6",
+    "capacidad": 108,
+    "precio": 0,
+    "gradaId": 2,
+    "activo": true,
+    "imagen": null
+  },
+  {
+    "id": 19,
+    "nombre": "Main S. - Lower Even 5",
+    "capacidad": 90,
+    "precio": 0,
+    "gradaId": 2,
+    "activo": true,
+    "imagen": null
+  },
+  {
+    "id": 20,
+    "nombre": "Main S. - Lower Even 4",
+    "capacidad": 90,
+    "precio": 0,
+    "gradaId": 2,
+    "activo": true,
+    "imagen": null
+  },
+  {
+    "id": 21,
+    "nombre": "Main S. - Lower Even 3",
+    "capacidad": 90,
+    "precio": 0,
+    "gradaId": 2,
+    "activo": true,
+    "imagen": null
+  },
+  {
+    "id": 22,
+    "nombre": "Main S. - Lower Even 2",
+    "capacidad": 90,
+    "precio": 0,
+    "gradaId": 2,
+    "activo": true,
+    "imagen": null
+  },
+  {
+    "id": 23,
+    "nombre": "Main S. - Lower Even 1",
+    "capacidad": 48,
+    "precio": 0,
+    "gradaId": 2,
+    "activo": true,
+    "imagen": null
+  }
+]

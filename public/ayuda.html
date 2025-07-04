@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Partidos - Algeciras CF</title>
+    <link rel="stylesheet" href="./ayudastyle.css">
+    <link rel="icon" type="image/png" href="./imagenes/escudo.png">
+</head>
+
+<body>
+
+    <header></header>
+
+    <div class="banner">
+        <h1>POLÍTICA DE PRIVACIDAD</h1>
+    </div>
+
+    <section class="red-banner">
+        <div class="info-box">
+            <strong>100%</strong>
+            <p>Página web oficial</p>
+        </div>
+        <div class="info-box">
+            <div class="icon-placeholder"><img src="imagenes/personascreciendo.png" alt=""></div>
+            <p>Reserva online y evita cola</p>
+        </div>
+        <div class="info-box">
+            <div class="icon-placeholder"><img src="imagenes/campana.png" alt=""></div>
+            <p>Los mejores asientos disponibles</p>
+        </div>
+        <div class="info-box">
+            <div class="icon-placeholder"><img src="imagenes/candado.png" alt=""></div>
+            <p>Web 100% segura</p>
+        </div>
+    </section>
+
+    <main class="ayuda-main">
+        <div class="ayuda-box">
+            <form id="ayudaForm">
+                <label for="email">EMAIL</label>
+                <input type="email" id="email" name="email" placeholder="Email" required>
+    
+                <label for="titulo">TÍTULO</label>
+                <input type="text" id="titulo" name="titulo" placeholder="Título" required>
+    
+                <label for="mensaje">MENSAJE</label>
+                <textarea id="mensaje" name="mensaje" rows="5" placeholder="Mensaje" required></textarea>
+    
+                <div class="captcha-placeholder">
+                    <div class="g-recaptcha" data-sitekey="TU_CLAVE_PUBLICA_AQUI"></div>
+                </div>
+    
+                <button type="submit" class="btn-enviar">ENVIAR</button>
+            </form>
+        </div>
+    </main>
+    
+    <script src="https://www.google.com/recaptcha/api.js" async defer></script>
+    
+    <footer></footer>
+
+    <script src="./js/ayudascript.js"></script>
+    <script src="js/loadLayout.js" defer></script>
+
+</body>
+
+</html>

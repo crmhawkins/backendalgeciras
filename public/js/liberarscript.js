@@ -10,7 +10,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   }
 
   try {
-    const abonosRes = await fetch(`https://backend-algeciras.hawkins.es:8446/api/abonos/usuario/${usuario.id}`,{
+    const abonosRes = await fetch(`http://backend-algeciras.hawkins.es:8446/api/abonos/usuario/${usuario.id}`,{
         headers: {
           Authorization: `Bearer ${token}`
         }
@@ -56,7 +56,7 @@ document.addEventListener("DOMContentLoaded", async () => {
       const btn = document.createElement("button");
       btn.classList.add("btn-liberar");
 
-      const entradaRes = await fetch(`https://backend-algeciras.hawkins.es:8446/api/entradas/buscar-liberada?asientoId=${asientoId}&partidoId=${partido.id}`);
+      const entradaRes = await fetch(`http://backend-algeciras.hawkins.es:8446/api/entradas/buscar-liberada?asientoId=${asientoId}&partidoId=${partido.id}`);
       const entradaData = await entradaRes.json();
       const entrada = entradaData.entrada;
 
@@ -69,7 +69,7 @@ document.addEventListener("DOMContentLoaded", async () => {
           if (!confirm("¿Seguro que quieres cancelar la liberación de tu asiento para este partido?")) return;
 
           try {
-            const res = await fetch("https://backend-algeciras.hawkins.es:8446/api/abonos/cancelar-liberacion", {
+            const res = await fetch("http://backend-algeciras.hawkins.es:8446/api/abonos/cancelar-liberacion", {
               method: "POST",
               headers: { "Content-Type": "application/json" },
               body: JSON.stringify({ asientoId, partidoId: partido.id, usuarioId: usuario.id })
@@ -94,7 +94,7 @@ document.addEventListener("DOMContentLoaded", async () => {
           if (!confirm("¿Estás seguro que no asistirás a este partido? Liberarás tu asiento para su venta.")) return;
 
           try {
-            const res = await fetch("https://backend-algeciras.hawkins.es:8446/api/abonos/liberar", {
+            const res = await fetch("http://backend-algeciras.hawkins.es:8446/api/abonos/liberar", {
               method: "POST",
               headers: { "Content-Type": "application/json" },
               body: JSON.stringify({

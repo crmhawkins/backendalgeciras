@@ -42,7 +42,7 @@ document.addEventListener("DOMContentLoaded", function() {
             submitBtn.textContent = "Cargando...";
             submitBtn.disabled = true;
 
-            const res = await fetch('https://backend-algeciras.hawkins.es:8446/api/authenticate/login', {
+            const res = await fetch('http://backend-algeciras.hawkins.es:8446/api/authenticate/login', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ email, password })

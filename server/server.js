@@ -6,6 +6,8 @@ const i18n = require('../lib/i18nConfigure');
 const { dbConnection, wpDBConnection } = require('../database/config');
 const { insertGradas,insertSectores,insertAsientos } = require('../services/initFieldData');
 
+// Importar las relaciones
+require('../models/associations');
 
 class Server {
 

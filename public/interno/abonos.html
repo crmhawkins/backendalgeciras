@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Abonos Internos - Algeciras CF</title>
+    <link rel="stylesheet" href="../nuevostyle.css">
+    <link rel="icon" type="image/png" href="../imagenes/escudo.png">
+    <style>
+        .internal-header {
+            background: #1a365d;
+            color: white;
+            padding: 1rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .internal-header button {
+            background: #e53e3e;
+            color: white;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        .vip-tag {
+            background: #d4af37;
+            color: white;
+            padding: 0.25rem 0.5rem;
+            border-radius: 4px;
+            margin-left: 0.5rem;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="internal-header">
+        <h1>GESTIÓN DE ABONOS INTERNOS</h1>
+        <button onclick="logout()">Cerrar Sesión</button>
+    </div>
+
+    <div class="banner">
+        <h1>ABONO VIP TEMPORADA 2025/2026</h1>
+    </div>
+
+    <main class="seleccion-sector" id="contenedor-principal">
+        <section class="mapa-sector">
+          <h2>SELECCIONAR SECTOR</h2>
+          <p>A) Selecciona el sector pinchando en el mapa:</p>
+          <div class="svg-container" id="mapaSVG"></div>
+          <div id="menu"></div>
+        </section>
+      
+        <section class="tabla-sector">
+            <p>B) O en la siguiente tabla:</p>
+            <input type="text" id="busquedaSector" placeholder="Buscar...">
+            
+            <div class="tabla-scroll">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>SECTOR</th>
+                            <th>DESDE</th>
+                            <th>LIBRES</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tablaSectores"></tbody>
+                </table>
+            </div>
+        </section>
+    </main>
+      
+    <div id="formulario-container" style="display:none;">
+        <h2>DATOS DEL ABONADO VIP</h2>
+        <form id="formulario-abono">
+            <div id="lista-asientos-seleccionados"></div>
+    
+            <div id="campos-usuario">
+                <label>Nombre: <input type="text" name="nombre" required /></label>
+                <label>Apellidos: <input type="text" name="apellidos" required /></label>
+                <label>DNI: <input type="text" name="dni" required /></label>
+                <label>Email: <input type="email" name="email" required /></label>
+                <label>Teléfono: <input type="tel" name="telefono" required /></label>
+                <label>Motivo VIP: <textarea name="motivoVIP" required></textarea></label>
+                <label>Autorizado por: <input type="text" name="autorizadoPor" required /></label>
+            </div>
+    
+            <button type="submit">REGISTRAR ABONO VIP</button>
+        </form>
+    </div>
+
+    <div id="toast-container"></div>
+
+    <script src="auth.js"></script>
+    <script src="abonos.js"></script>
+
+</body>
+
+</html> 

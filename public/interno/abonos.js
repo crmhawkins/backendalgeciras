@@ -61,7 +61,6 @@ const traduccionesSectores = {
     "Main Longside S. Even 1": "PREFERENTE PAR 1"
 };
 
-
 function mostrarToast(mensaje) {
     const toast = document.createElement("div");
     toast.className = "toast";
@@ -82,15 +81,18 @@ function mostrarToast(mensaje) {
     }, 2000);
 }
 
-
-
 document.addEventListener("DOMContentLoaded", async () => {
+    // Verificar autenticación
+    if (!sessionStorage.getItem('internalAuth')) {
+        window.location.href = 'login.html';
+        return;
+    }
+
     const mapaContainer = document.getElementById("mapaSVG");
     const mainContainer = document.getElementById("contenedor-principal");
     const tabla = document.getElementById("tablaSectores");
     const filtro = document.getElementById("busquedaSector");
     const menu = document.getElementById("menu");
-
 
     let asientosSeleccionados = [];
 
@@ -98,7 +100,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     renderSectores(sectores);
 
     try {
-        const res = await fetch("imagenes/campo.svg");
+        const res = await fetch("../imagenes/campo.svg");
         const svgText = await res.text();
         mapaContainer.innerHTML = svgText;
 
@@ -135,17 +137,13 @@ document.addEventListener("DOMContentLoaded", async () => {
                         fillable.setAttribute("fill", "#2ecc71");
                     }
 
-                    const precioFormateado = Number(sector.precio).toFixed(2);
                     menu.innerHTML = `
                         <strong>${traduccionesSectores[sector.nombre] || sector.nombre}</strong>
                         ${Number(sector.activo) !== 1
                             ? `<div style="margin-top: 8px; font-weight: bold; color: #c6001a;">No disponible</div>`
                             : `
                                 <div>Libres: ${sector.libres}</div>
-                                <ul style="margin: 8px 0 0 0; padding-left: 16px;">
-                                    <li>INFANTIL - ${precioFormateado} €</li>
-                                    <li>ADULTO - ${precioFormateado} €</li>
-                                </ul>
+                                <div style="margin-top: 8px; font-weight: bold; color: #d4af37;">ABONO VIP</div>
                             `
                         }
                     `;
@@ -163,11 +161,8 @@ document.addEventListener("DOMContentLoaded", async () => {
                     }
                     menu.classList.remove("visible");
                 });
-            } else {
-                console.warn(`No se encontró el sector con id ${sectorId}`);
             }
         });
-
 
     } catch (err) {
         console.error("Error cargando SVG:", err);
@@ -186,7 +181,7 @@ document.addEventListener("DOMContentLoaded", async () => {
                 const row = document.createElement("tr");
                 row.innerHTML = `
                     <td>${traduccionesSectores[s.nombre] || s.nombre}</td>
-                    <td>${Number(s.precio).toFixed(2)} €</td>
+                    <td><span class="vip-tag">VIP</span></td>
                     <td>${s.libres}</td>
                 `;
 
@@ -196,7 +191,6 @@ document.addEventListener("DOMContentLoaded", async () => {
             }
         });
     }
-
 
     async function fetchSectores() {
         try {
@@ -243,7 +237,7 @@ document.addEventListener("DOMContentLoaded", async () => {
                 ${sector.imagen ? `<img src="${sector.imagen}" alt="Zona Seleccionada">` : ''}
                 
                 <div class="resumen-abonos">
-                <h3>TUS ASIENTOS</h3>
+                <h3>ABONOS VIP</h3>
                 <div id="listaAbonos"></div>
                 </div>
             </section>
@@ -261,7 +255,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     
                 <div class="acciones-abono">
                 <p id="infoAsiento">Selecciona uno o varios asientos</p>
-                <button id="continuarCompra" disabled>CONTINUAR COMPRA</button>
+                <button id="continuarCompra" disabled>CONTINUAR</button>
                 </div>
             </div>
             </section>
@@ -277,20 +271,18 @@ document.addEventListener("DOMContentLoaded", async () => {
         const formContainer = document.getElementById("formulario-container");
         renderAsientosConFila(asientos, container);
 
-
         function agruparPorFila(asientos) {
             const filas = {};
             asientos.forEach(a => {
                 if (!filas[a.fila]) filas[a.fila] = [];
                 filas[a.fila].push(a);
             });
-
             return filas;
         }
 
         function getOrdenCorrecto(asientos) {
             const porFila = agruparPorFila(asientos);
-            const primeraFila = Object.values(porFila)[0]; // Tomamos la primera fila como referencia
+            const primeraFila = Object.values(porFila)[0];
 
             if (!primeraFila || primeraFila.length < 2) {
                 return Array.from(new Set(asientos.map(a => a.numero))).sort((a, b) => a - b);
@@ -306,12 +298,12 @@ document.addEventListener("DOMContentLoaded", async () => {
 
         function actualizarResumenAbonos() {
             const contenedor = document.getElementById("listaAbonos");
-            contenedor.innerHTML = ""; // Limpia antes de volver a renderizar
+            contenedor.innerHTML = "";
 
             asientosSeleccionados.forEach((asiento, index) => {
                 const box = document.createElement("div");
                 box.classList.add("abono-box");
-                box.innerHTML = `<span style ="font-weight:bold;">abono ${index + 1}. ${traduccionesSectores[sector.nombre] || sector.nombre}</span> Fila: ${asiento.fila} /Butaca: ${asiento.numero}`;
+                box.innerHTML = `<span style="font-weight:bold;">ABONO VIP ${index + 1}. ${traduccionesSectores[sector.nombre] || sector.nombre}</span> Fila: ${asiento.fila} /Butaca: ${asiento.numero}`;
                 contenedor.appendChild(box);
             });
         }
@@ -321,7 +313,7 @@ document.addEventListener("DOMContentLoaded", async () => {
             const ordenFilas = Object.keys(filas).sort((a, b) => parseInt(a) - parseInt(b));
             const sectorEspecifico = sector.nombre === "North Goal Odd 9";
 
-            const numerosUnicosGlobal = getOrdenCorrecto(asientos); // solo se usa si NO es el sector especial
+            const numerosUnicosGlobal = getOrdenCorrecto(asientos);
             const maxColumnas = Math.max(...Object.values(filas).map(fila => fila.length));
 
             ordenFilas.forEach(fila => {
@@ -344,8 +336,6 @@ document.addEventListener("DOMContentLoaded", async () => {
                 grid.style.display = "grid";
                 grid.style.gap = "5px";
                 grid.style.minWidth = "fit-content";
-
-
 
                 const mapa = new Map(filas[fila].map(a => [a.numero, a]));
 
@@ -382,7 +372,6 @@ document.addEventListener("DOMContentLoaded", async () => {
                 const btn = document.createElement("button");
                 btn.textContent = a.numero;
                 btn.classList.add("asiento");
-                console.log("estado del asiento", a.estado, "id", a.id);
 
                 if (a.estado === "ocupado") {
                     btn.classList.add("ocupado");
@@ -391,11 +380,6 @@ document.addEventListener("DOMContentLoaded", async () => {
 
                 btn.addEventListener("click", () => {
                     if (!btn.classList.contains("seleccionado")) {
-                        if (asientosSeleccionados.length >= 6) {
-                            mostrarToast("Ya no es posible adquirir más abonos, se ha superado el límite.");
-                            return;
-                        }
-
                         btn.classList.add("seleccionado");
                         if (!asientosSeleccionados.some(s => s.id === a.id)) {
                             asientosSeleccionados.push({ id: a.id, fila: a.fila, numero: a.numero });
@@ -410,75 +394,68 @@ document.addEventListener("DOMContentLoaded", async () => {
                     continuar.disabled = asientosSeleccionados.length === 0;
                 });
 
-
-
                 return btn;
             }
         }
 
-
-
         continuar.addEventListener("click", () => {
             if (!asientosSeleccionados.length) return;
 
-            formContainer.innerHTML = `<h2>COMPLETA TUS DATOS</h2><form id="formulario-abono"></form>`;
+            formContainer.innerHTML = `<h2>DATOS DEL ABONADO VIP</h2><form id="formulario-abono"></form>`;
             formContainer.style.display = "block";
 
             const form = document.getElementById("formulario-abono");
             asientosSeleccionados.forEach((asiento, index) => {
                 form.innerHTML += `
-            <fieldset>
-                <legend>Abono ${index + 1} - Fila ${asiento.fila}, Butaca ${asiento.numero}</legend>
-                <input type="hidden" name="asientoId-${index}" value="${asiento.id}" />
-                <div class="form-grid">
-                <label>Nombre:
-                    <input name="nombre-${index}" required />
-                </label>
-                <label>Apellidos:
-                    <input name="apellidos-${index}" required />
-                </label>
-                <label>Género:
-                    <select name="genero-${index}" required>
-                    <option value="">Seleccione</option>
-                    <option value="masculino">Masculino</option>
-                    <option value="femenino">Femenino</option>
-                    </select>
-                </label>
-                <label>DNI:
-                    <input name="dni-${index}" pattern="^[0-9]{8}[A-Z]$" required title="Formato: 12345678A" />
-                </label>
-                <label>Fecha de nacimiento:
-                    <input type="date" name="fechaNacimiento-${index}" required />
-                </label>
-                <label>Email:
-                    <input type="email" name="email-${index}" required />
-                </label>
-                <label>Teléfono:
-                    <input type="tel" name="telefono-${index}" required pattern="^\\+?\\d{9,15}$" title="Número válido" />
-                </label>
-                <label>País:
-                    <input name="pais-${index}" required />
-                </label>
-                <label>Provincia:
-                    <input name="provincia-${index}" required />
-                </label>
-                <label>Localidad:
-                    <input name="localidad-${index}" required />
-                </label>
-                <label>Domicilio:
-                    <input name="domicilio-${index}" required />
-                </label>
-                <label>Código Postal:
-                    <input name="codigoPostal-${index}" required pattern="\\d{5}" title="5 dígitos" />
-                </label>
-                </div>
-            </fieldset>
+                <fieldset>
+                    <legend>Abono VIP ${index + 1} - Fila ${asiento.fila}, Butaca ${asiento.numero}</legend>
+                    <input type="hidden" name="asientoId-${index}" value="${asiento.id}" />
+                    <div class="form-grid">
+                        <label>Nombre:
+                            <input name="nombre-${index}" required />
+                        </label>
+                        <label>Apellidos:
+                            <input name="apellidos-${index}" required />
+                        </label>
+                        <label>Género:
+                            <select name="genero-${index}" required>
+                                <option value="">Seleccione</option>
+                                <option value="masculino">Masculino</option>
+                                <option value="femenino">Femenino</option>
+                            </select>
+                        </label>
+                        <label>DNI:
+                            <input name="dni-${index}" pattern="^[0-9]{8}[A-Z]$" required title="Formato: 12345678A" />
+                        </label>
+                        <label>Fecha de nacimiento:
+                            <input type="date" name="fechaNacimiento-${index}" required />
+                        </label>
+                        <label>Email:
+                            <input type="email" name="email-${index}" required />
+                        </label>
+                        <label>Teléfono:
+                            <input type="tel" name="telefono-${index}" required pattern="^\\+?\\d{9,15}$" title="Número válido" />
+                        </label>
+                        <label>País:
+                            <input name="pais-${index}" value="España" required />
+                        </label>
+                        <label>Provincia:
+                            <input name="provincia-${index}" value="Cádiz" required />
+                        </label>
+                        <label>Localidad:
+                            <input name="localidad-${index}" value="Algeciras" required />
+                        </label>
+                        <label>Domicilio:
+                            <input name="domicilio-${index}" required />
+                        </label>
+                        <label>Código Postal:
+                            <input name="codigoPostal-${index}" required pattern="\\d{5}" title="5 dígitos" />
+                        </label>
+                    </div>
+                </fieldset>
             `;
-
-
-
             });
-            form.innerHTML += `<button type="submit">CONFIRMAR COMPRA</button>`;
+            form.innerHTML += `<button type="submit">REGISTRAR ABONO VIP</button>`;
 
             form.addEventListener("submit", async (e) => {
                 e.preventDefault();
@@ -506,17 +483,18 @@ document.addEventListener("DOMContentLoaded", async () => {
                     };
 
                     if (!/^[0-9]{8}[A-Z]$/.test(abono.dni)) {
-                        alert(`DNI inválido en abono ${i + 1}`);
+                        mostrarToast(`DNI inválido en abono ${i + 1}`);
                         return;
                     }
                     if (!/^\S+@\S+\.\S+$/.test(abono.email)) {
-                        alert(`Email inválido en abono ${i + 1}`);
+                        mostrarToast(`Email inválido en abono ${i + 1}`);
                         return;
                     }
                     if (!/^\+?\d{9,15}$/.test(abono.telefono)) {
-                        alert(`Teléfono inválido en abono ${i + 1}`);
+                        mostrarToast(`Teléfono inválido en abono ${i + 1}`);
                         return;
                     }
+
                     try {
                         const res = await fetch("http://backend-algeciras.hawkins.es:8446/api/abonos/create", {
                             method: "POST",
@@ -528,21 +506,16 @@ document.addEventListener("DOMContentLoaded", async () => {
                             const error = await res.json();
                             throw new Error(error.msg || 'Error en la solicitud');
                         }
-
-                        const result = await res.json();
-                        // Procesar resultado
                     } catch (error) {
                         console.error('Error al crear abono:', error);
-                        alert(`Error al crear abono ${i + 1}: ${error.message}`);
+                        mostrarToast(`Error al crear abono ${i + 1}: ${error.message}`);
                         return;
                     }
-
                 }
 
-                alert("¡Compra completada con éxito!");
-                window.location.reload();
+                mostrarToast("¡Abonos VIP registrados correctamente!");
+                setTimeout(() => window.location.reload(), 2000);
             });
-
         });
     }
-});
+}); 

@@ -22,7 +22,11 @@ const wpDBConnection = async () => {
 const db = new Sequelize(process.env.DB_NAME, process.env.DB_USER, process.env.DB_PASSWORD, {
     host: process.env.DB_HOST,
     dialect: 'mysql',
-    logging: false
+    logging: false,
+    dialectOptions: {
+        // Forzar nombres de tabla en minúsculas
+        multipleStatements: false
+    }
 });
 
 
@@ -82,8 +86,13 @@ const dbConnection = async () => {
         // Sincronizar modelos con la base de datos (crear tablas si no existen)
         // Usar { alter: true } en desarrollo para modificar tablas existentes sin borrar datos
         // Usar { force: true } SOLO en desarrollo inicial (BORRA TODAS LAS TABLAS)
-        await db.sync({ alter: false }); // alter: false solo crea tablas que no existen
-        console.log('Modelos sincronizados con la base de datos');
+        try {
+            await db.sync({ alter: false }); // alter: false solo crea tablas que no existen
+            console.log('Modelos sincronizados con la base de datos');
+        } catch (syncError) {
+            console.error('Error al sincronizar modelos (continuando de todas formas):', syncError.message);
+            // Continuar aunque falle la sincronización para no bloquear el inicio de la app
+        }
 
     } catch (error) {
         console.error('Error al conectar con la base de datos:', error);

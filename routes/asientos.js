@@ -22,14 +22,21 @@ router.get('/sector/:id', async (req, res) => {
         let entradas = [];
         if (partidoId === "proximos") {
             const hoy = new Date();
-            entradas = await Entrada.findAll({
-                include: [{
-                    model: Partido,
-                    where: {
-                        fecha: { [Op.gte]: hoy }
-                    }
-                }]
+            // Primero obtener los partidos futuros
+            const partidosFuturos = await Partido.findAll({
+                where: {
+                    fecha: { [Op.gte]: hoy }
+                }
             });
+            const partidosIds = partidosFuturos.map(p => p.id);
+            // Luego obtener las entradas para esos partidos
+            if (partidosIds.length > 0) {
+                entradas = await Entrada.findAll({
+                    where: {
+                        partidoId: { [Op.in]: partidosIds }
+                    }
+                });
+            }
         } else if (partidoId) {
             entradas = await Entrada.findAll({ where: { partidoId } });
         }
@@ -70,8 +77,11 @@ router.get('/sector/:id', async (req, res) => {
 
         res.json({ asientos: resultado });
     } catch (error) {
-        console.error(error);
-        res.status(500).json({ msg: 'Error al obtener los asientos del sector' });
+        console.error('Error al obtener los asientos del sector:', error);
+        res.status(500).json({ 
+            msg: 'Error al obtener los asientos del sector',
+            error: process.env.NODE_ENV === 'development' ? error.message : undefined
+        });
     }
 });
 

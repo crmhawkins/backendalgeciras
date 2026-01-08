@@ -296,13 +296,27 @@
                 });
         }
 
+        let lastLogCount = 0;
+        let shouldAutoScroll = true;
+
         function displayLogs(logs) {
             const container = document.getElementById('logsContainer');
             
             if (logs.length === 0) {
                 container.innerHTML = '<div style="color: #858585; text-align: center; padding: 20px;">No hay logs disponibles</div>';
+                lastLogCount = 0;
                 return;
             }
+
+            // Verificar si hay nuevos logs (más logs que antes)
+            const hasNewLogs = logs.length > lastLogCount;
+            const wasAtBottom = container.scrollHeight - container.scrollTop <= container.clientHeight + 10;
+            
+            // Si el usuario está cerca del final, mantener el scroll abajo
+            shouldAutoScroll = wasAtBottom || hasNewLogs;
+
+            // Guardar el scroll position antes de actualizar
+            const oldScrollHeight = container.scrollHeight;
 
             container.innerHTML = logs.map(log => {
                 const timestamp = new Date(log.timestamp).toLocaleString('es-ES');
@@ -324,8 +338,15 @@
                 `;
             }).join('');
 
-            // Scroll al final
-            container.scrollTop = container.scrollHeight;
+            // Scroll al final solo si shouldAutoScroll es true
+            if (shouldAutoScroll) {
+                // Usar setTimeout para asegurar que el DOM se actualizó
+                setTimeout(() => {
+                    container.scrollTop = container.scrollHeight;
+                }, 0);
+            }
+
+            lastLogCount = logs.length;
         }
 
         function updateStats(logs) {
@@ -385,6 +406,14 @@
             div.textContent = text;
             return div.innerHTML;
         }
+
+        // Detectar cuando el usuario hace scroll manualmente
+        const logsContainer = document.getElementById('logsContainer');
+        logsContainer.addEventListener('scroll', () => {
+            const container = logsContainer;
+            const isAtBottom = container.scrollHeight - container.scrollTop <= container.clientHeight + 10;
+            shouldAutoScroll = isAtBottom;
+        });
 
         // Cargar logs al iniciar
         loadLogs();

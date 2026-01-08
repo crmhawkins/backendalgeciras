@@ -22,7 +22,7 @@ router.get('/', (req, res) => {
     
     res.json({
         total: logs.length,
-        logs: logs.reverse() // Mostrar los más recientes primero
+        logs: logs // Mantener orden cronológico (más antiguos primero, más nuevos al final)
     });
 });
 

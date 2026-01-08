@@ -145,6 +145,13 @@ document.addEventListener("DOMContentLoaded", async () => {
       if (zona) {
         zona.style.display = "block";
         await renderMapaYCompra(zona, partidoId);
+        
+        // Scroll automático al mapa en móvil
+        if (window.innerWidth <= 768) {
+          setTimeout(() => {
+            zona.scrollIntoView({ behavior: 'smooth', block: 'start' });
+          }, 100);
+        }
       }
     }
   });
@@ -207,6 +214,13 @@ async function renderMapaYCompra(container, partidoId) {
         zona.addEventListener("click", () => {
           if (Number(sector.activo) === 1) {
             cargarVistaAsientos(mainContainer, sector, partidoId);
+            
+            // Scroll automático a la vista de asientos en móvil
+            if (window.innerWidth <= 768) {
+              setTimeout(() => {
+                mainContainer.scrollIntoView({ behavior: 'smooth', block: 'start' });
+              }, 100);
+            }
           }
         });
 
@@ -455,6 +469,13 @@ async function cargarVistaAsientos(container, sector, partidoId) {
 
     formContainer.innerHTML = `<h2>COMPLETA TUS DATOS</h2><form id="formulario-entrada"></form>`;
     formContainer.style.display = "block";
+    
+    // Scroll automático al formulario en móvil
+    if (window.innerWidth <= 768) {
+      setTimeout(() => {
+        formContainer.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }, 100);
+    }
     
     // Aplicar estilos responsive al contenedor
     if (window.innerWidth <= 768) {

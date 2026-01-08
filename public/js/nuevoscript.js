@@ -139,6 +139,16 @@ document.addEventListener("DOMContentLoaded", async () => {
                 zona.addEventListener("click", () => {
                     if (Number(sector.activo) === 1) {
                         cargarVistaAsientos(sector);
+                        
+                        // Scroll automático a la vista de asientos en móvil
+                        if (window.innerWidth <= 768) {
+                            setTimeout(() => {
+                                const selectorAsientos = document.querySelector('.selector-asientos');
+                                if (selectorAsientos) {
+                                    selectorAsientos.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                                }
+                            }, 100);
+                        }
                     }
                 });
 
@@ -204,7 +214,19 @@ document.addEventListener("DOMContentLoaded", async () => {
                 `;
 
                 row.style.cursor = "pointer";
-                row.addEventListener("click", () => cargarVistaAsientos(s));
+                row.addEventListener("click", () => {
+                    cargarVistaAsientos(s);
+                    
+                    // Scroll automático a la vista de asientos en móvil
+                    if (window.innerWidth <= 768) {
+                        setTimeout(() => {
+                            const selectorAsientos = document.querySelector('.selector-asientos');
+                            if (selectorAsientos) {
+                                selectorAsientos.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                            }
+                        }, 100);
+                    }
+                });
                 tabla.appendChild(row);
             }
         });
@@ -451,6 +473,13 @@ document.addEventListener("DOMContentLoaded", async () => {
 
             formContainer.innerHTML = `<h2>COMPLETA TUS DATOS</h2><form id="formulario-abono"></form>`;
             formContainer.style.display = "block";
+            
+            // Scroll automático al formulario en móvil
+            if (window.innerWidth <= 768) {
+                setTimeout(() => {
+                    formContainer.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                }, 100);
+            }
             
             // Aplicar estilos responsive al contenedor
             if (window.innerWidth <= 768) {

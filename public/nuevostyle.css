@@ -697,30 +697,55 @@ fieldset legend {
 
 /* Formulario responsive - una columna en móvil y tablet */
 @media (max-width: 1024px) {
-  .form-grid {
+  .form-grid,
+  #formulario-entrada .form-grid,
+  #formulario-abono .form-grid,
+  fieldset .form-grid,
+  #formulario-container .form-grid,
+  .compra-zona .form-grid,
+  [id^="zona-compra-"] .form-grid {
     display: grid !important;
     grid-template-columns: 1fr !important;
     gap: 1rem !important;
     width: 100% !important;
+    max-width: 100% !important;
   }
 }
 
 @media (max-width: 768px) {
   /* Formulario responsive - una columna en móvil */
-  .form-grid {
+  .form-grid,
+  #formulario-entrada .form-grid,
+  #formulario-abono .form-grid,
+  fieldset .form-grid,
+  #formulario-container .form-grid,
+  .compra-zona .form-grid,
+  [id^="zona-compra-"] .form-grid {
     display: grid !important;
     grid-template-columns: 1fr !important;
     gap: 1rem !important;
     width: 100% !important;
+    max-width: 100% !important;
   }
 
-  #formulario-container {
+  #formulario-container,
+  .compra-zona #formulario-container,
+  [id^="zona-compra-"] #formulario-container {
     padding: 1rem;
     margin: 1rem;
     overflow-x: hidden;
     overflow-y: auto;
     max-height: calc(100vh - 2rem);
     width: calc(100% - 2rem);
+    max-width: 100%;
+    box-sizing: border-box;
+  }
+
+  .compra-zona,
+  [id^="zona-compra-"] {
+    width: 100%;
+    max-width: 100%;
+    overflow-x: hidden;
     box-sizing: border-box;
   }
 
@@ -760,10 +785,18 @@ fieldset legend {
 
 /* Media query adicional para pantallas muy pequeñas */
 @media (max-width: 480px) {
-  .form-grid {
+  .form-grid,
+  #formulario-entrada .form-grid,
+  #formulario-abono .form-grid,
+  fieldset .form-grid,
+  #formulario-container .form-grid,
+  .compra-zona .form-grid,
+  [id^="zona-compra-"] .form-grid {
     display: grid !important;
     grid-template-columns: 1fr !important;
     gap: 0.8rem !important;
+    width: 100% !important;
+    max-width: 100% !important;
   }
 
   #formulario-container {

@@ -213,7 +213,10 @@ document.addEventListener("DOMContentLoaded", async () => {
 
     async function fetchSectores() {
         try {
-            const res = await fetch("http://backend-algeciras.hawkins.es:8446/api/sectores/");
+            const res = await fetch("/api/sectores");
+            if (!res.ok) {
+                throw new Error(`Error HTTP: ${res.status}`);
+            }
             const data = await res.json();
             const sectores = await Promise.all(
                 data.sectores.map(async s => {
@@ -230,18 +233,30 @@ document.addEventListener("DOMContentLoaded", async () => {
 
     async function fetchLibresPorSector(sectorId) {
         try {
-            const res = await fetch(`http://backend-algeciras.hawkins.es:8446/api/asientos/sector/${sectorId}`);
+            const res = await fetch(`/api/asientos/sector/${sectorId}`);
+            if (!res.ok) {
+                throw new Error(`Error HTTP: ${res.status}`);
+            }
             const data = await res.json();
             return data.asientos.filter(a => a.estado === 'disponible').length;
-        } catch {
+        } catch (err) {
+            console.error(`Error al cargar asientos del sector ${sectorId}:`, err);
             return 0;
         }
     }
 
     async function fetchAsientos(sectorId) {
-        const res = await fetch(`http://backend-algeciras.hawkins.es:8446/api/asientos/sector/${sectorId}?partidoId=proximos`);
-        const data = await res.json();
-        return data.asientos;
+        try {
+            const res = await fetch(`/api/asientos/sector/${sectorId}?partidoId=proximos`);
+            if (!res.ok) {
+                throw new Error(`Error HTTP: ${res.status}`);
+            }
+            const data = await res.json();
+            return data.asientos;
+        } catch (err) {
+            console.error(`Error al cargar asientos del sector ${sectorId}:`, err);
+            return [];
+        }
     }
 
     async function cargarVistaAsientos(sector) {
@@ -582,7 +597,7 @@ document.addEventListener("DOMContentLoaded", async () => {
                         return;
                     }
                     try {
-                        const res = await fetch("http://backend-algeciras.hawkins.es:8446/api/abonos/create", {
+                        const res = await fetch("/api/abonos/create", {
                             method: "POST",
                             headers: { "Content-Type": "application/json" },
                             body: JSON.stringify(abono)

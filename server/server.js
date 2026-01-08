@@ -3,6 +3,9 @@ const cors = require('cors');
 const fileUpload = require('express-fileupload');
 const i18n = require('../lib/i18nConfigure');
 
+// Inicializar el sistema de logging (debe ser lo primero para capturar todos los logs)
+require('../helpers/logger');
+
 const { dbConnection, wpDBConnection } = require('../database/config');
 const { insertGradas,insertSectores,insertAsientos } = require('../services/initFieldData');
 
@@ -24,7 +27,8 @@ class Server {
             abonos: '/api/abonos',
             partidos: '/api/partidos',
             clasificacion: '/api/clasificacion',
-            pagos: '/api/pagos'
+            pagos: '/api/pagos',
+            logs: '/api/logs'
         };
         
 
@@ -97,6 +101,9 @@ class Server {
         const { router: pagosRouter, webhookRouter } = require('../routes/pagos');
         this.app.use(this.paths.pagos, pagosRouter);
         this.app.use(this.paths.pagos, webhookRouter);
+        
+        // Rutas de logs (solo para debugging)
+        this.app.use(this.paths.logs, require('../routes/logs'));
 
     }
 

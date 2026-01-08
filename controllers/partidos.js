@@ -28,11 +28,15 @@ module.exports = {
   eventosGet
 };
 
+const logger = require('../helpers/logger');
+
 const partidoGet = async (req, res) => {
     try {
       const partidos = await Partido.findAll();
+      logger.info('Partidos obtenidos correctamente', { count: partidos.length });
       res.json({ partidos });
     } catch (error) {
+      logger.error('Error en partidoGet', error);
       console.error('❌ Error en partidoGet:', error);
       res.status(500).json({ msg: 'Error al obtener los partidos', error });
     }

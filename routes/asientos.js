@@ -5,6 +5,7 @@ const { validarCampos } = require('../middlewares/validar-campos');
 const Entrada = require('../models/entrada');
 const Abono = require('../models/abono');
 const Partido = require('../models/partido');
+const logger = require('../helpers/logger');
 
 const router = Router();
 const Asiento = require('../models/asiento');
@@ -77,10 +78,13 @@ router.get('/sector/:id', async (req, res) => {
 
         res.json({ asientos: resultado });
     } catch (error) {
-        console.error('Error al obtener los asientos del sector:', error);
+        logger.error('Error al obtener los asientos del sector', error);
+        console.error('❌ Error al obtener los asientos del sector:', error);
+        console.error('Stack trace:', error.stack);
         res.status(500).json({ 
             msg: 'Error al obtener los asientos del sector',
-            error: process.env.NODE_ENV === 'development' ? error.message : undefined
+            error: error.message,
+            details: error.name
         });
     }
 });

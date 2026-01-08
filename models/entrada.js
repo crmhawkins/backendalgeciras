@@ -2,6 +2,11 @@ const { DataTypes } = require('sequelize');
 const { db } = require('../database/config');
 
 const Entrada = db.define('Entrada', {
+    token: {
+        type: DataTypes.STRING(64),
+        allowNull: false,
+        unique: true
+    },
     precio: {
         type: DataTypes.DECIMAL(10, 2),
         allowNull: false

@@ -13,46 +13,169 @@
 
         body {
             font-family: Arial, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: #DC143C;
             min-height: 100vh;
             display: flex;
             justify-content: center;
             align-items: center;
             padding: 20px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        /* Efecto de olas animadas */
+        .waves {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            z-index: 0;
+        }
+
+        .wave {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 200%;
+            height: 100px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 50%;
+            animation: wave 15s infinite linear;
+        }
+
+        .wave:nth-child(2) {
+            animation-delay: -5s;
+            opacity: 0.5;
+            height: 150px;
+        }
+
+        .wave:nth-child(3) {
+            animation-delay: -10s;
+            opacity: 0.3;
+            height: 200px;
+        }
+
+        @keyframes wave {
+            0% {
+                transform: translateX(0) translateY(0) rotate(0deg);
+            }
+            50% {
+                transform: translateX(-25%) translateY(-20px) rotate(180deg);
+            }
+            100% {
+                transform: translateX(-50%) translateY(0) rotate(360deg);
+            }
         }
 
         .container {
             background: white;
-            border-radius: 10px;
-            padding: 40px;
+            border-radius: 20px;
+            padding: 50px 40px;
             max-width: 500px;
             width: 100%;
             text-align: center;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            position: relative;
+            z-index: 1;
         }
 
-        .success-icon {
-            width: 80px;
-            height: 80px;
-            background: #4CAF50;
+        .check-container {
+            width: 120px;
+            height: 120px;
+            margin: 0 auto 30px;
+            position: relative;
+        }
+
+        .check-circle {
+            width: 120px;
+            height: 120px;
             border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin: 0 auto 20px;
-            font-size: 40px;
-            color: white;
+            border: 8px solid #DC143C;
+            position: relative;
+            animation: fillCheck 1.5s ease-in-out forwards;
+        }
+
+        .check-circle::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            border: 6px solid transparent;
+            border-left-color: #DC143C;
+            border-bottom-color: #DC143C;
+            transform: translate(-50%, -50%) rotate(-45deg);
+            animation: drawCheck 0.8s 0.8s ease-in-out forwards;
+        }
+
+        .check-mark {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 40px;
+            height: 20px;
+            border: 6px solid white;
+            border-top: none;
+            border-right: none;
+            transform: translate(-50%, -60%) rotate(-45deg);
+            opacity: 0;
+            animation: showCheck 0.5s 1.5s ease-in-out forwards;
+        }
+
+        @keyframes fillCheck {
+            0% {
+                background: transparent;
+                border-color: #DC143C;
+            }
+            50% {
+                background: rgba(220, 20, 60, 0.3);
+            }
+            100% {
+                background: #DC143C;
+                border-color: #DC143C;
+            }
+        }
+
+        @keyframes drawCheck {
+            0% {
+                width: 0;
+                height: 0;
+            }
+            50% {
+                width: 30px;
+                height: 15px;
+            }
+            100% {
+                width: 40px;
+                height: 20px;
+            }
+        }
+
+        @keyframes showCheck {
+            0% {
+                opacity: 0;
+                transform: translate(-50%, -60%) rotate(-45deg) scale(0);
+            }
+            100% {
+                opacity: 1;
+                transform: translate(-50%, -60%) rotate(-45deg) scale(1);
+            }
         }
 
         h1 {
             color: #333;
-            margin-bottom: 10px;
+            margin-bottom: 15px;
+            font-size: 28px;
         }
 
         p {
             color: #666;
-            margin-bottom: 20px;
+            margin-bottom: 30px;
             line-height: 1.6;
+            font-size: 16px;
         }
 
         .loading {
@@ -60,7 +183,7 @@
             width: 20px;
             height: 20px;
             border: 3px solid #f3f3f3;
-            border-top: 3px solid #667eea;
+            border-top: 3px solid #DC143C;
             border-radius: 50%;
             animation: spin 1s linear infinite;
             margin-left: 10px;
@@ -82,30 +205,62 @@
         .success {
             color: #4CAF50;
             background: #e8f5e9;
-            padding: 15px;
-            border-radius: 5px;
+            padding: 20px;
+            border-radius: 10px;
             margin-top: 20px;
         }
 
         .btn {
             display: inline-block;
-            padding: 12px 30px;
-            background: #667eea;
+            padding: 15px 40px;
+            background: #DC143C;
             color: white;
             text-decoration: none;
-            border-radius: 5px;
-            margin-top: 20px;
-            transition: background 0.3s;
+            border-radius: 8px;
+            margin: 15px 10px;
+            transition: all 0.3s;
+            font-weight: bold;
+            font-size: 16px;
+            border: 2px solid #DC143C;
+            cursor: pointer;
         }
 
         .btn:hover {
-            background: #5568d3;
+            background: #B22222;
+            border-color: #B22222;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(220, 20, 60, 0.4);
+        }
+
+        .btn-secondary {
+            background: transparent;
+            color: #DC143C;
+            border-color: #DC143C;
+        }
+
+        .btn-secondary:hover {
+            background: #DC143C;
+            color: white;
+        }
+
+        #status {
+            min-height: 50px;
         }
     </style>
 </head>
 <body>
+    <div class="waves">
+        <div class="wave"></div>
+        <div class="wave"></div>
+        <div class="wave"></div>
+    </div>
+
     <div class="container">
-        <div class="success-icon">✓</div>
+        <div class="check-container">
+            <div class="check-circle">
+                <div class="check-mark"></div>
+            </div>
+        </div>
         <h1>¡Pago Exitoso!</h1>
         <p>Estamos procesando tu compra...</p>
         <div id="status"></div>
@@ -115,6 +270,7 @@
         // Obtener el session_id de la URL
         const urlParams = new URLSearchParams(window.location.search);
         const sessionId = urlParams.get('session_id');
+        let entradaToken = null;
 
         if (!sessionId) {
             document.getElementById('status').innerHTML = 
@@ -126,14 +282,30 @@
                 .then(data => {
                     const statusDiv = document.getElementById('status');
                     if (data.msg && data.msg.includes('confirmado')) {
-                        statusDiv.innerHTML = `
+                        entradaToken = data.entradaToken;
+                        let html = `
                             <div class="success">
                                 <strong>¡Compra confirmada!</strong><br>
                                 ${data.nuevaCuenta ? 'Se ha creado una cuenta con tu email. Revisa tu correo para obtener tu contraseña.' : ''}
                                 <br><br>
-                                <a href="/" class="btn">Volver al inicio</a>
+                        `;
+                        
+                        // Si hay una entrada, mostrar botón de descarga
+                        if (entradaToken) {
+                            html += `
+                                <button class="btn" onclick="descargarEntrada('${entradaToken}')">
+                                    🎟️ Descarga tus entradas
+                                </button>
+                                <br>
+                            `;
+                        }
+                        
+                        html += `
+                                <a href="/" class="btn btn-secondary">Volver al inicio</a>
                             </div>
                         `;
+                        
+                        statusDiv.innerHTML = html;
                     } else {
                         statusDiv.innerHTML = `
                             <div class="error">
@@ -147,6 +319,16 @@
                     document.getElementById('status').innerHTML = 
                         '<div class="error">Error al procesar la confirmación. Por favor, contacta con soporte.</div>';
                 });
+        }
+
+        function descargarEntrada(token) {
+            if (!token) {
+                alert('No se encontró el token de la entrada');
+                return;
+            }
+            
+            // Abrir en nueva ventana para descargar el PDF
+            window.open(`/api/entradas/pdf/${token}`, '_blank');
         }
     </script>
 </body>

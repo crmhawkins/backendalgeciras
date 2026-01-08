@@ -33,6 +33,7 @@ const Asiento = require('../models/asiento');
 const Sector = require('../models/sector');
 const bcryptjs = require('bcryptjs');
 const generarPasswordAleatoria = require('../helpers/generarPasswordAleatoria');
+const generarIdUnico = require('../helpers/generarIdUnico');
 const nodemailer = require('nodemailer');
 const { actualizarJSONAsiento } = require('../services/updateJSON');
 
@@ -118,8 +119,8 @@ const crearSesionPagoEntrada = async (req, res = response) => {
                 },
             ],
             mode: 'payment',
-            success_url: `${process.env.FRONTEND_URL || 'http://localhost:3000'}/pago-exitoso?session_id={CHECKOUT_SESSION_ID}`,
-            cancel_url: `${process.env.FRONTEND_URL || 'http://localhost:3000'}/pago-cancelado`,
+            success_url: `https://backend-algeciras.hawkins.es/pago-exitoso?session_id={CHECKOUT_SESSION_ID}`,
+            cancel_url: `https://backend-algeciras.hawkins.es/pago-cancelado`,
             customer_email: email,
             metadata: {
                 tipo: 'entrada',
@@ -240,8 +241,8 @@ const crearSesionPagoAbono = async (req, res = response) => {
                 },
             ],
             mode: 'payment',
-            success_url: `${process.env.FRONTEND_URL || 'http://localhost:3000'}/pago-exitoso?session_id={CHECKOUT_SESSION_ID}`,
-            cancel_url: `${process.env.FRONTEND_URL || 'http://localhost:3000'}/pago-cancelado`,
+            success_url: `https://backend-algeciras.hawkins.es/pago-exitoso?session_id={CHECKOUT_SESSION_ID}`,
+            cancel_url: `https://backend-algeciras.hawkins.es/pago-cancelado`,
             customer_email: email,
             metadata: {
                 tipo: 'abono',
@@ -358,8 +359,29 @@ const confirmarPago = async (req, res = response) => {
         let resultado = null;
 
         if (pagoSession.tipo === 'entrada') {
+            // Generar token único para la entrada
+            // Asegurar que el token sea único (muy poco probable que se repita, pero por seguridad)
+            let token = null;
+            let entradaExistente = null;
+            let intentos = 0;
+            const maxIntentos = 10; // Límite de seguridad para evitar bucles infinitos
+            
+            do {
+                token = generarIdUnico();
+                entradaExistente = await Entrada.findOne({ where: { token } });
+                intentos++;
+                
+                if (intentos >= maxIntentos) {
+                    console.error('Error: No se pudo generar un token único después de múltiples intentos');
+                    return res.status(500).json({ 
+                        msg: 'Error al generar el token de la entrada. Por favor, intenta nuevamente.' 
+                    });
+                }
+            } while (entradaExistente);
+            
             // Crear entrada
             const entrada = await Entrada.create({
+                token: token,
                 partidoId: datosCompra.partidoId,
                 asientoId: datosCompra.asientoId,
                 precio: datosCompra.precio,
@@ -483,6 +505,7 @@ const confirmarPago = async (req, res = response) => {
 
         res.json({
             msg: 'Pago confirmado correctamente',
+            entradaToken: resultado.entrada ? resultado.entrada.token : null,
             ...resultado
         });
 

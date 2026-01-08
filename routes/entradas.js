@@ -1,6 +1,6 @@
 const { Router } = require('express');
 const { check } = require('express-validator');
-const { entradaGet, entradaPost, buscarEntradaLiberada } = require('../controllers/entradas');
+const { entradaGet, entradaPost, buscarEntradaLiberada, generarPDFEntrada } = require('../controllers/entradas');
 const { validarCampos } = require('../middlewares/validar-campos');
 const Entrada = require('../models/entrada');
 const Usuario = require('../models/usuario');
@@ -78,6 +78,9 @@ router.get('/buscar-liberada', [
     res.status(500).json({ msg: 'Error al buscar la entrada liberada' });
   }
 });
+
+// Ruta para generar PDF de entrada con QR
+router.get('/pdf/:entradaId', generarPDFEntrada);
 
 module.exports = router;
 

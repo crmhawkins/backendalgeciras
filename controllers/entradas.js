@@ -1,218 +1,201 @@
 const { response } = require('express');
-const { validationResult } = require('express-validator');
-const Entrada = require('../models/entrada');
-const Usuario = require('../models/usuario');
-const Partido = require('../models/partido');
-const Asiento = require('../models/asiento');
-const Abono = require('../models/abono');
-const bcryptjs = require('bcryptjs');
-const generarPasswordAleatoria = require('../helpers/generarPasswordAleatoria');
-const nodemailer = require('nodemailer');
 
-const entradaGet = async (req, res = response) => {
-    const { id } = req.query;
-
+const generarPDFEntrada = async (req, res = response) => {
+    const { entradaId } = req.params; // entradaId es el token en la URL
+    
     try {
-        const entradas = await Entrada.findAll({
-            where: { usuarioId: id },
+        const QRCode = require('qrcode');
+        const PDFDocument = require('pdfkit');
+        const Entrada = require('../models/entrada');
+        const Partido = require('../models/partido');
+        const Asiento = require('../models/asiento');
+        const Sector = require('../models/sector');
+        const Usuario = require('../models/usuario');
+        
+        // Buscar la entrada por token
+        const entrada = await Entrada.findOne({ 
+            where: { token: entradaId },
             include: [
                 {
-                    model: Partido
+                    model: Partido,
+                    attributes: ['equipoLocal', 'equipoVisitante', 'fecha', 'hora', 'escudoLocal', 'escudoVisitante']
                 },
                 {
                     model: Asiento,
-                    attributes: ['numero', 'fila', 'sectorId']
+                    attributes: ['numero', 'fila'],
+                    include: [{
+                        model: Sector,
+                        attributes: ['nombre']
+                    }]
+                },
+                {
+                    model: Usuario,
+                    attributes: ['nombre', 'email']
                 }
             ]
         });
-
-        if (!entradas.length) {
-            return res.status(404).json({
-                msg: `No hay entradas encontradas para el usuario con ID ${id}`
-            });
-        }
-
-        res.json({
-            msg: 'Entrada encontrada',
-            entrada
-        });
-
-    } catch (error) {
-        console.error(error);
-        res.status(500).json({
-            msg: 'Error al buscar la entrada',
-            error
-        });
-    }
-};
-
-const entradaPost = async (req, res = response) => {
-    const errors = validationResult(req);
-    if (!errors.isEmpty()) {
-        return res.status(400).json(errors);
-    }
-
-    const {
-        partidoId,
-        asientoId,
-        precio,
-        nombre,
-        apellidos,
-        genero,
-        dni,
-        fechaNacimiento,
-        email,
-        telefono,
-        pais,
-        provincia,
-        localidad,
-        domicilio,
-        codigoPostal
-    } = req.body;
-
-    try {
-        // Verificar si el asiento existe y su estado
-        const asiento = await Asiento.findByPk(asientoId);
         
-        if (!asiento) {
-            return res.status(400).json({ msg: 'El asiento no existe.' });
+        if (!entrada) {
+            return res.status(404).json({ msg: 'Entrada no encontrada' });
         }
-
-        // Verificar si existe una entrada para este partido y asiento
-        const existente = await Entrada.findOne({ where: { partidoId, asientoId } });
-
-        if (existente) {
-            if (existente.usuarioId === 1) {
-                // Es una entrada liberada, se puede comprar
-                await existente.destroy();
-            } else {
-                return res.status(400).json({ msg: 'Este asiento ya está reservado para este partido.' });
-            }
-        } else {
-            // Si no hay entrada existente, verificar si el asiento está ocupado por un abono
-            if (asiento.estado === 'ocupado') {
-                // Verificar si hay un abono activo para este asiento
-                const abonoActivo = await Abono.findOne({
-                    where: { 
-                        asientoId,
-                        activo: true
-                    }
-                });
-
-                if (abonoActivo) {
-                    return res.status(400).json({ 
-                        msg: 'Este asiento está ocupado por un abono activo. No se puede comprar una entrada.' 
-                    });
-                }
-            }
-        }
-
-        let usuario = await Usuario.findOne({ where: { email } });
-
-        let nuevaCuenta = false;
-        let passwordPlano = '';
-        if (!usuario) {
-            passwordPlano = generarPasswordAleatoria(10);
-            const salt = bcryptjs.genSaltSync();
-            const hashedPassword = bcryptjs.hashSync(passwordPlano, salt);
-
-            usuario = await Usuario.create({
-                nombre,
-                email,
-                profileImage: 'default_profile_photo.png',
-                password: hashedPassword,
-                dni
-            });
-
-            nuevaCuenta = true;
-        } else {
-            console.log(`[ENTRADA] Usuario existente con ID: ${usuario.id}`);
-        }
-
-        const entrada = await Entrada.create({
-            partidoId,
-            asientoId,
-            precio,
-            usuarioId: usuario.id
+        
+        // Generar QR code como buffer
+        const qrBuffer = await QRCode.toBuffer(entradaId, {
+            errorCorrectionLevel: 'H',
+            type: 'png',
+            width: 300,
+            margin: 1
         });
-
-        // Actualizar el estado del asiento a ocupado si no lo está ya
-        if (asiento.estado !== 'ocupado') {
-            asiento.estado = 'ocupado';
-            await asiento.save();
-        }
-
-        if (nuevaCuenta) {
-            const partido = await Partido.findByPk(partidoId);
-            const asientoDetalle = await Asiento.findByPk(asientoId);
-
-            const transporter = nodemailer.createTransport({
-                host: process.env.EMAIL_HOST,
-                port: process.env.EMAIL_PORT,
-                secure: process.env.EMAIL_ENCRYPTION === 'ssl',
-                auth: {
-                    user: process.env.EMAIL_USER,
-                    pass: process.env.EMAIL_PASS
-                }
-            });
-
-            await transporter.sendMail({
-                from: `"Algeciras CF" <${process.env.EMAIL_USER}>`,
-                to: email,
-                subject: '🎟️ Entrada comprada - Algeciras CF',
-                html: `
-                    <h2>¡Gracias por tu compra en Algeciras CF!</h2>
-                    <p>Te hemos creado una cuenta para que puedas acceder a tu perfil y consultar tus entradas.</p>
-                    <p><strong>Email de acceso:</strong> ${email}</p>
-                    <p><strong>Contraseña generada:</strong> ${passwordPlano}</p>
-                    <hr/>
-                    <h3>📅 Detalles de tu entrada:</h3>
-                    <p><strong>Partido:</strong> ${partido.equipoLocal} vs ${partido.equipoVisitante}</p>
-                    <p><strong>Fecha:</strong> ${new Date(partido.fecha).toLocaleDateString()}</p>
-                    <p><strong>Hora:</strong> ${partido.hora || 'Por determinar'}</p>
-                    <p><strong>Asiento:</strong> Fila ${asientoDetalle.fila}, Butaca ${asientoDetalle.numero}</p>
-                    <p><strong>Precio:</strong> ${precio} €</p>
-                    <hr/>
-                    <p>⚽ Puedes acceder a tu cuenta desde nuestra web para revisar tus compras o renovar tus entradas.</p>
-                    <p><strong>algecirascf.com</strong></p>
-                `
-            });
-        }
-
-        res.status(201).json({
-            msg: 'Entrada creada correctamente',
-            entrada,
-            nuevaCuenta
+        
+        // Generar QR pequeño para las esquinas
+        const qrSmallBuffer = await QRCode.toBuffer(entradaId, {
+            errorCorrectionLevel: 'H',
+            type: 'png',
+            width: 100,
+            margin: 1
         });
-
+        
+        // Crear PDF
+        const doc = new PDFDocument({
+            size: 'A4',
+            margin: 50
+        });
+        
+        // Configurar headers para descarga
+        res.setHeader('Content-Type', 'application/pdf');
+        res.setHeader('Content-Disposition', `attachment; filename="entrada-${token.substring(0, 8)}.pdf"`);
+        
+        // Pipe del PDF a la respuesta
+        doc.pipe(res);
+        
+        // Fondo rojo (simulado con rectángulo)
+        doc.rect(0, 0, doc.page.width, doc.page.height)
+           .fillColor('#DC143C')
+           .fill();
+        
+        // QR codes en las esquinas (sobre fondo blanco)
+        const qrSize = 80;
+        const margin = 20;
+        
+        // Esquina superior izquierda
+        doc.save();
+        doc.rect(margin, margin, qrSize, qrSize)
+           .fillColor('white')
+           .fill();
+        doc.image(qrSmallBuffer, margin + 10, margin + 10, { width: qrSize - 20, height: qrSize - 20 });
+        doc.restore();
+        
+        // Esquina superior derecha
+        doc.save();
+        doc.rect(doc.page.width - margin - qrSize, margin, qrSize, qrSize)
+           .fillColor('white')
+           .fill();
+        doc.image(qrSmallBuffer, doc.page.width - margin - qrSize + 10, margin + 10, { width: qrSize - 20, height: qrSize - 20 });
+        doc.restore();
+        
+        // Esquina inferior izquierda
+        doc.save();
+        doc.rect(margin, doc.page.height - margin - qrSize, qrSize, qrSize)
+           .fillColor('white')
+           .fill();
+        doc.image(qrSmallBuffer, margin + 10, doc.page.height - margin - qrSize + 10, { width: qrSize - 20, height: qrSize - 20 });
+        doc.restore();
+        
+        // Esquina inferior derecha
+        doc.save();
+        doc.rect(doc.page.width - margin - qrSize, doc.page.height - margin - qrSize, qrSize, qrSize)
+           .fillColor('white')
+           .fill();
+        doc.image(qrSmallBuffer, doc.page.width - margin - qrSize + 10, doc.page.height - margin - qrSize + 10, { width: qrSize - 20, height: qrSize - 20 });
+        doc.restore();
+        
+        // Contenido central
+        const centerX = doc.page.width / 2;
+        const centerY = doc.page.height / 2;
+        
+        // Fondo blanco para el contenido central
+        const contentWidth = 400;
+        const contentHeight = 500;
+        doc.rect(centerX - contentWidth / 2, centerY - contentHeight / 2, contentWidth, contentHeight)
+           .fillColor('white')
+           .fill();
+        
+        // QR grande en el centro
+        const qrLargeSize = 250;
+        doc.image(qrBuffer, centerX - qrLargeSize / 2, centerY - qrLargeSize / 2 - 100, { 
+            width: qrLargeSize, 
+            height: qrLargeSize 
+        });
+        
+        // Texto del partido
+        doc.fillColor('black')
+           .fontSize(24)
+           .font('Helvetica-Bold')
+           .text(`${entrada.Partido.equipoLocal} vs ${entrada.Partido.equipoVisitante}`, 
+                 centerX, centerY + qrLargeSize / 2 + 20, { align: 'center' });
+        
+        // Fecha y hora
+        const fechaPartido = new Date(entrada.Partido.fecha);
+        const fechaStr = fechaPartido.toLocaleDateString('es-ES', { 
+            weekday: 'long', 
+            year: 'numeric', 
+            month: 'long', 
+            day: 'numeric' 
+        });
+        doc.fontSize(14)
+           .font('Helvetica')
+           .text(fechaStr, centerX, centerY + qrLargeSize / 2 + 60, { align: 'center' });
+        
+        if (entrada.Partido.hora) {
+            doc.text(`Hora: ${entrada.Partido.hora}`, centerX, centerY + qrLargeSize / 2 + 80, { align: 'center' });
+        }
+        
+        // Datos del titular
+        doc.fontSize(16)
+           .font('Helvetica-Bold')
+           .text('Titular:', centerX, centerY + qrLargeSize / 2 + 120, { align: 'center' });
+        doc.fontSize(14)
+           .font('Helvetica')
+           .text(`${entrada.Usuario.nombre}`, centerX, centerY + qrLargeSize / 2 + 145, { align: 'center' });
+        
+        // Datos del asiento
+        doc.fontSize(12)
+           .text(`Sector: ${entrada.Asiento.Sector.nombre}`, centerX, centerY + qrLargeSize / 2 + 170, { align: 'center' });
+        doc.text(`Fila: ${entrada.Asiento.fila} - Butaca: ${entrada.Asiento.numero}`, 
+                 centerX, centerY + qrLargeSize / 2 + 190, { align: 'center' });
+        
+        // Token de la entrada (pequeño)
+        doc.fontSize(8)
+           .fillColor('#666')
+           .text(`Token: ${token}`, centerX, centerY + qrLargeSize / 2 + 220, { align: 'center' });
+        
+        // Finalizar PDF
+        doc.end();
+        
     } catch (error) {
-        res.status(500).json({
-            msg: 'Error al crear la entrada',
-            error
+        console.error('Error al generar PDF:', error);
+        res.status(500).json({ 
+            msg: 'Error al generar el PDF de la entrada',
+            error: error.message 
         });
     }
 };
 
+// Funciones placeholder para mantener compatibilidad con routes
+const entradaGet = async (req, res) => {
+    res.status(501).json({ msg: 'Función no implementada aún' });
+};
+
+const entradaPost = async (req, res) => {
+    res.status(501).json({ msg: 'Función no implementada aún. Use /api/pagos/entrada para comprar entradas.' });
+};
 
 const buscarEntradaLiberada = async (req, res) => {
-    const { asientoId, partidoId } = req.query;
-
-    try {
-        const entrada = await Entrada.findOne({
-            where: {
-                asientoId,
-                partidoId
-            }
-        });
-
-        res.json({ entrada });
-    } catch (error) {
-        console.error(error);
-        res.status(500).json({ msg: 'Error al buscar la entrada liberada' });
-    }
+    res.status(501).json({ msg: 'Función no implementada aún' });
 };
 
 module.exports = {
+    generarPDFEntrada,
     entradaGet,
     entradaPost,
     buscarEntradaLiberada

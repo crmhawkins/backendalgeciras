@@ -545,13 +545,21 @@ document.addEventListener("DOMContentLoaded", async () => {
                 const inputs = form.querySelectorAll('.form-grid input, .form-grid select');
                 inputs.forEach(input => {
                     input.style.width = '100%';
+                    input.style.maxWidth = '100%';
+                    input.style.minWidth = '0';
                     input.style.boxSizing = 'border-box';
+                    input.style.padding = '0.7rem';
+                    input.style.fontSize = '1rem';
                 });
                 
                 const labels = form.querySelectorAll('.form-grid label');
                 labels.forEach(label => {
                     label.style.width = '100%';
+                    label.style.maxWidth = '100%';
+                    label.style.minWidth = '0';
                     label.style.boxSizing = 'border-box';
+                    label.style.display = 'flex';
+                    label.style.flexDirection = 'column';
                 });
                 
                 if (isMobile) {

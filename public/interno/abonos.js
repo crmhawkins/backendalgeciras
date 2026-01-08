@@ -194,7 +194,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 
     async function fetchSectores() {
         try {
-            const res = await fetch("http://backend-algeciras.hawkins.es:8446/api/sectores/");
+            const res = await fetch("http://backend-algeciras.hawkins.es/api/sectores/");
             const data = await res.json();
             const sectores = await Promise.all(
                 data.sectores.map(async s => {
@@ -211,7 +211,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 
     async function fetchLibresPorSector(sectorId) {
         try {
-            const res = await fetch(`http://backend-algeciras.hawkins.es:8446/api/asientos/sector/${sectorId}`);
+            const res = await fetch(`http://backend-algeciras.hawkins.es/api/asientos/sector/${sectorId}`);
             const data = await res.json();
             return data.asientos.filter(a => a.estado === 'disponible').length;
         } catch {
@@ -220,7 +220,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     }
 
     async function fetchAsientos(sectorId) {
-        const res = await fetch(`http://backend-algeciras.hawkins.es:8446/api/asientos/sector/${sectorId}?partidoId=proximos`);
+        const res = await fetch(`http://backend-algeciras.hawkins.es/api/asientos/sector/${sectorId}?partidoId=proximos`);
         const data = await res.json();
         return data.asientos;
     }
@@ -496,7 +496,7 @@ document.addEventListener("DOMContentLoaded", async () => {
                     }
 
                     try {
-                        const res = await fetch("http://backend-algeciras.hawkins.es:8446/api/abonos/create", {
+                        const res = await fetch("http://backend-algeciras.hawkins.es/api/abonos/create", {
                             method: "POST",
                             headers: { "Content-Type": "application/json" },
                             body: JSON.stringify(abono)

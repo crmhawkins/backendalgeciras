@@ -7,7 +7,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     const container = document.getElementById("abonosWrapper");
   
     try {
-      const res = await fetch(`http://backend-algeciras.hawkins.es:8446/api/abonos/usuario/${usuario.id}`,{
+      const res = await fetch(`http://backend-algeciras.hawkins.es/api/abonos/usuario/${usuario.id}`,{
         headers: {
           Authorization: `Bearer ${token}`
         }
@@ -63,7 +63,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         }).join('');
       }
   
-      const entradasRes = await fetch(`http://backend-algeciras.hawkins.es:8446/api/entradas/usuario/${usuario.id}`,{
+      const entradasRes = await fetch(`http://backend-algeciras.hawkins.es/api/entradas/usuario/${usuario.id}`,{
         headers: {
           Authorization: `Bearer ${token}`
         }

@@ -51,23 +51,23 @@ Home, muestra todos los anuncios, a esta URL podremos aplicar filtros y paginaci
 * Tags (pudiendo separar los tags por comas y encontrando todos los anuncios que tengan uno u otro tag).
 
 Algunos ejemplos de filtros pueden ser:
-* https://backend-algeciras.hawkins.es:8446/api/anuncios?nombre=c&minPrice=80&maxPrice=2000
-* https://backend-algeciras.hawkins.es:8446/api/anuncios?sort=asc&limite=2&desde=1
-* https://backend-algeciras.hawkins.es:8446/api/anuncios?tags=mobile&venta=false
-* https://backend-algeciras.hawkins.es:8446/api/anuncios?tags=clothing,lifestyle
+* https://backend-algeciras.hawkins.es/api/anuncios?nombre=c&minPrice=80&maxPrice=2000
+* https://backend-algeciras.hawkins.es/api/anuncios?sort=asc&limite=2&desde=1
+* https://backend-algeciras.hawkins.es/api/anuncios?tags=mobile&venta=false
+* https://backend-algeciras.hawkins.es/api/anuncios?tags=clothing,lifestyle
 
 ## Rutas del API
 
-* https://backend-algeciras.hawkins.es:8446/api/anuncios
+* https://backend-algeciras.hawkins.es/api/anuncios
 
 Devuelve un json con todos los anuncios existentes. Sobre esta url podremos aplicar filtros para modificar la búsqueda.
 
 El método y filtros son los mismos explicados con anterioridad en las rutas de la Web.
 
 Mediante POST podemos añadir un nuevo anuncio. 
-Con DELETE podremos eliminar un anuncio, introduciendo su ID al final de la ruta, 'https://backend-algeciras.hawkins.es:8446/api/anuncios/:id'.
+Con DELETE podremos eliminar un anuncio, introduciendo su ID al final de la ruta, 'https://backend-algeciras.hawkins.es/api/anuncios/:id'.
 
-* https://backend-algeciras.hawkins.es:8446/api/anuncios/tags
+* https://backend-algeciras.hawkins.es/api/anuncios/tags
 
 Busca entre todos los anuncios y devuelve una lista de todos los tags utilizados.
 

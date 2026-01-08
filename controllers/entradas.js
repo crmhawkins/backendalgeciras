@@ -4,6 +4,7 @@ const Entrada = require('../models/entrada');
 const Usuario = require('../models/usuario');
 const Partido = require('../models/partido');
 const Asiento = require('../models/asiento');
+const Abono = require('../models/abono');
 const bcryptjs = require('bcryptjs');
 const generarPasswordAleatoria = require('../helpers/generarPasswordAleatoria');
 const nodemailer = require('nodemailer');
@@ -70,13 +71,39 @@ const entradaPost = async (req, res = response) => {
     } = req.body;
 
     try {
+        // Verificar si el asiento existe y su estado
+        const asiento = await Asiento.findByPk(asientoId);
+        
+        if (!asiento) {
+            return res.status(400).json({ msg: 'El asiento no existe.' });
+        }
+
+        // Verificar si existe una entrada para este partido y asiento
         const existente = await Entrada.findOne({ where: { partidoId, asientoId } });
 
         if (existente) {
             if (existente.usuarioId === 1) {
+                // Es una entrada liberada, se puede comprar
                 await existente.destroy();
             } else {
                 return res.status(400).json({ msg: 'Este asiento ya está reservado para este partido.' });
+            }
+        } else {
+            // Si no hay entrada existente, verificar si el asiento está ocupado por un abono
+            if (asiento.estado === 'ocupado') {
+                // Verificar si hay un abono activo para este asiento
+                const abonoActivo = await Abono.findOne({
+                    where: { 
+                        asientoId,
+                        activo: true
+                    }
+                });
+
+                if (abonoActivo) {
+                    return res.status(400).json({ 
+                        msg: 'Este asiento está ocupado por un abono activo. No se puede comprar una entrada.' 
+                    });
+                }
             }
         }
 
@@ -109,8 +136,8 @@ const entradaPost = async (req, res = response) => {
             usuarioId: usuario.id
         });
 
-        const asiento = await Asiento.findByPk(asientoId);
-        if (asiento) {
+        // Actualizar el estado del asiento a ocupado si no lo está ya
+        if (asiento.estado !== 'ocupado') {
             asiento.estado = 'ocupado';
             await asiento.save();
         }

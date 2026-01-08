@@ -102,7 +102,11 @@ document.addEventListener("DOMContentLoaded", async () => {
         const svgText = await res.text();
         mapaContainer.innerHTML = svgText;
 
-        const zonas = document.querySelectorAll(".recinto-zona");
+        // Esperar un momento para que el SVG se renderice completamente
+        await new Promise(resolve => setTimeout(resolve, 50));
+
+        // Buscar las zonas dentro del contenedor del mapa
+        const zonas = mapaContainer.querySelectorAll(".recinto-zona");
 
         zonas.forEach(zona => {
             const sectorId = parseInt(zona.dataset.sectorId);

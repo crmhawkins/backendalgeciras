@@ -354,7 +354,8 @@ table td {
     text-transform: uppercase;
 }
 
-#formulario-abono {
+#formulario-abono,
+#formulario-entrada {
     display: flex;
     flex-direction: column;
     gap: 2rem;
@@ -398,7 +399,8 @@ fieldset legend {
     font-size: 1rem;
 }
 
-#formulario-abono button[type="submit"] {
+#formulario-abono button[type="submit"],
+#formulario-entrada button[type="submit"] {
     align-self: flex-start;
     padding: 1rem 2rem;
     background-color: #c6001a;
@@ -412,7 +414,8 @@ fieldset legend {
     margin-top: 1rem;
 }
 
-#formulario-abono button[type="submit"]:hover {
+#formulario-abono button[type="submit"]:hover,
+#formulario-entrada button[type="submit"]:hover {
     background-color: #a00016;
 }
 
@@ -689,5 +692,38 @@ fieldset legend {
 
   .zona-info {
     order: 2;
+  }
+
+  /* Formulario responsive - una columna en móvil */
+  .form-grid {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+
+  #formulario-container {
+    padding: 1rem;
+    margin: 1rem;
+    overflow-x: hidden;
+    overflow-y: auto;
+    max-height: calc(100vh - 2rem);
+  }
+
+  #formulario-container h2 {
+    font-size: 1.5rem;
+  }
+
+  fieldset {
+    padding: 1rem;
+  }
+
+  fieldset legend {
+    font-size: 1.1rem;
+    margin-bottom: 1rem;
+  }
+
+  #formulario-abono button[type="submit"],
+  #formulario-entrada button[type="submit"] {
+    width: 100%;
+    margin-top: 1rem;
   }
 }

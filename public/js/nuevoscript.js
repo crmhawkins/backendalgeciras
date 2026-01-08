@@ -103,10 +103,19 @@ document.addEventListener("DOMContentLoaded", async () => {
         mapaContainer.innerHTML = svgText;
 
         // Esperar un momento para que el SVG se renderice completamente
-        await new Promise(resolve => setTimeout(resolve, 50));
+        await new Promise(resolve => setTimeout(resolve, 100));
 
         // Buscar las zonas dentro del contenedor del mapa
         const zonas = mapaContainer.querySelectorAll(".recinto-zona");
+        
+        console.log(`Encontradas ${zonas.length} zonas en el mapa`);
+
+        if (zonas.length === 0) {
+            console.error("No se encontraron zonas .recinto-zona en el SVG");
+            // Intentar buscar de otra manera
+            const todasLasZonas = document.querySelectorAll(".recinto-zona");
+            console.log(`Zonas encontradas en todo el documento: ${todasLasZonas.length}`);
+        }
 
         zonas.forEach(zona => {
             const sectorId = parseInt(zona.dataset.sectorId);
@@ -443,7 +452,7 @@ document.addEventListener("DOMContentLoaded", async () => {
             <fieldset>
                 <legend>Abono ${index + 1} - Fila ${asiento.fila}, Butaca ${asiento.numero}</legend>
                 <input type="hidden" name="asientoId-${index}" value="${asiento.id}" />
-                <div class="form-grid" style="display: grid; grid-template-columns: ${window.innerWidth <= 1024 ? '1fr' : 'repeat(3, 1fr)'}; gap: 1.5rem; width: 100%; box-sizing: border-box;">
+                <div class="form-grid">
                 <label>Nombre:
                     <input name="nombre-${index}" required />
                 </label>
@@ -502,6 +511,20 @@ document.addEventListener("DOMContentLoaded", async () => {
                     grid.style.gridTemplateColumns = isMobile ? '1fr' : 'repeat(3, 1fr)';
                     grid.style.width = '100%';
                     grid.style.boxSizing = 'border-box';
+                    grid.style.gap = '1.5rem';
+                });
+                
+                // Aplicar estilos a los inputs y labels también
+                const inputs = form.querySelectorAll('.form-grid input, .form-grid select');
+                inputs.forEach(input => {
+                    input.style.width = '100%';
+                    input.style.boxSizing = 'border-box';
+                });
+                
+                const labels = form.querySelectorAll('.form-grid label');
+                labels.forEach(label => {
+                    label.style.width = '100%';
+                    label.style.boxSizing = 'border-box';
                 });
                 
                 if (isMobile) {
@@ -513,8 +536,10 @@ document.addEventListener("DOMContentLoaded", async () => {
                 }
             };
 
-            // Aplicar estilos iniciales
-            updateFormGridStyles();
+            // Aplicar estilos iniciales después de un pequeño delay para asegurar que el DOM esté listo
+            setTimeout(() => {
+                updateFormGridStyles();
+            }, 10);
 
             // Actualizar cuando se redimensione la ventana
             window.addEventListener('resize', updateFormGridStyles);

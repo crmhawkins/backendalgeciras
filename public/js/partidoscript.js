@@ -472,7 +472,7 @@ async function cargarVistaAsientos(container, sector, partidoId) {
         <legend>Entrada ${index + 1} - Fila ${asiento.fila}, Butaca ${asiento.numero}</legend>
         <input type="hidden" name="asientoId-${index}" value="${asiento.id}" />
         <input type="hidden" name="partidoId-${index}" value="${partidoId}" />
-        <div class="form-grid" style="display: grid; grid-template-columns: ${window.innerWidth <= 1024 ? '1fr' : 'repeat(3, 1fr)'}; gap: 1.5rem; width: 100%; box-sizing: border-box;">
+        <div class="form-grid">
           <label>Nombre:
             <input name="nombre-${index}" required />
           </label>
@@ -528,6 +528,20 @@ async function cargarVistaAsientos(container, sector, partidoId) {
         grid.style.gridTemplateColumns = isMobile ? '1fr' : 'repeat(3, 1fr)';
         grid.style.width = '100%';
         grid.style.boxSizing = 'border-box';
+        grid.style.gap = '1.5rem';
+      });
+      
+      // Aplicar estilos a los inputs y labels también
+      const inputs = form.querySelectorAll('.form-grid input, .form-grid select');
+      inputs.forEach(input => {
+        input.style.width = '100%';
+        input.style.boxSizing = 'border-box';
+      });
+      
+      const labels = form.querySelectorAll('.form-grid label');
+      labels.forEach(label => {
+        label.style.width = '100%';
+        label.style.boxSizing = 'border-box';
       });
       
       if (isMobile) {
@@ -539,8 +553,10 @@ async function cargarVistaAsientos(container, sector, partidoId) {
       }
     };
 
-    // Aplicar estilos iniciales
-    updateFormGridStyles();
+    // Aplicar estilos iniciales después de un pequeño delay para asegurar que el DOM esté listo
+    setTimeout(() => {
+      updateFormGridStyles();
+    }, 10);
 
     // Actualizar cuando se redimensione la ventana
     window.addEventListener('resize', updateFormGridStyles);

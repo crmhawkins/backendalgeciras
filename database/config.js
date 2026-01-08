@@ -23,6 +23,9 @@ const db = new Sequelize(process.env.DB_NAME, process.env.DB_USER, process.env.D
     host: process.env.DB_HOST,
     dialect: 'mysql',
     logging: false,
+    define: {
+        freezeTableName: true, // Evita que Sequelize pluralice o cambie mayúsculas en los nombres de tabla
+    }
 });
 
 
@@ -37,6 +40,7 @@ const dbConnection = async () => {
         require('../models/grada');
         require('../models/sector');
         require('../models/abono');
+        require('../models/pagoSession');
 
         const Usuario = require('../models/usuario');
         const Entrada = require('../models/entrada');
@@ -46,6 +50,7 @@ const dbConnection = async () => {
         const Abono = require('../models/abono');
         const Partido = require('../models/partido');
         const EventoPartido = require('../models/eventoPartido');
+        const PagoSession = require('../models/pagoSession');
 
         Partido.hasMany(EventoPartido, { foreignKey: 'partidoId', onDelete: 'CASCADE' });
         EventoPartido.belongsTo(Partido, { foreignKey: 'partidoId' });
@@ -77,7 +82,10 @@ const dbConnection = async () => {
         Sector.hasMany(Entrada, { foreignKey: 'sectorId' });
         Entrada.belongsTo(Sector, { foreignKey: 'sectorId' });
 
-        //await db.sync({ force: true });
+        // Sincronizar modelos con la base de datos (crear tablas si no existen)
+        // Usar { alter: true } en desarrollo para modificar tablas existentes sin borrar datos
+        // Usar { force: true } SOLO en desarrollo inicial (BORRA TODAS LAS TABLAS)
+        await db.sync({ alter: false }); // alter: false solo crea tablas que no existen
         console.log('Modelos sincronizados con la base de datos');
 
     } catch (error) {

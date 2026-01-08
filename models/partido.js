@@ -30,6 +30,10 @@ const Partido = db.define('Partido', {
     type: DataTypes.STRING,
     allowNull: true
   }
+}, {
+  tableName: 'partidos',
+  freezeTableName: true,
+  timestamps: true
 });
 
 module.exports = Partido;

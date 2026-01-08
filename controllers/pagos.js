@@ -1,5 +1,29 @@
 const { response } = require('express');
-const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY || 'sk_test_placeholder');
+
+// Inicializar Stripe solo si hay una clave válida
+let stripe = null;
+try {
+    if (process.env.STRIPE_SECRET_KEY && process.env.STRIPE_SECRET_KEY !== 'sk_test_placeholder') {
+        stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
+    } else {
+        console.warn('⚠️  STRIPE_SECRET_KEY no configurada. El sistema de pagos no funcionará hasta que se configure.');
+        // Crear un objeto mock para evitar errores
+        stripe = {
+            checkout: {
+                sessions: {
+                    create: () => Promise.reject(new Error('Stripe no está configurado')),
+                    retrieve: () => Promise.reject(new Error('Stripe no está configurado'))
+                }
+            },
+            webhooks: {
+                constructEvent: () => { throw new Error('Stripe no está configurado'); }
+            }
+        };
+    }
+} catch (error) {
+    console.error('Error al inicializar Stripe:', error);
+    throw error;
+}
 const PagoSession = require('../models/pagoSession');
 const Entrada = require('../models/entrada');
 const Abono = require('../models/abono');
@@ -16,6 +40,12 @@ const { actualizarJSONAsiento } = require('../services/updateJSON');
  * Crea una sesión de pago de Stripe para entradas
  */
 const crearSesionPagoEntrada = async (req, res = response) => {
+    if (!stripe || !process.env.STRIPE_SECRET_KEY || process.env.STRIPE_SECRET_KEY === 'sk_test_placeholder') {
+        return res.status(503).json({ 
+            msg: 'El sistema de pagos no está configurado. Por favor, contacta al administrador.' 
+        });
+    }
+    
     try {
         const {
             partidoId,
@@ -148,6 +178,12 @@ const crearSesionPagoEntrada = async (req, res = response) => {
  * Crea una sesión de pago de Stripe para abonos
  */
 const crearSesionPagoAbono = async (req, res = response) => {
+    if (!stripe || !process.env.STRIPE_SECRET_KEY || process.env.STRIPE_SECRET_KEY === 'sk_test_placeholder') {
+        return res.status(503).json({ 
+            msg: 'El sistema de pagos no está configurado. Por favor, contacta al administrador.' 
+        });
+    }
+    
     try {
         const {
             fechaInicio,
@@ -263,6 +299,12 @@ const crearSesionPagoAbono = async (req, res = response) => {
  * Confirma el pago y crea la entrada/abono correspondiente
  */
 const confirmarPago = async (req, res = response) => {
+    if (!stripe || !process.env.STRIPE_SECRET_KEY || process.env.STRIPE_SECRET_KEY === 'sk_test_placeholder') {
+        return res.status(503).json({ 
+            msg: 'El sistema de pagos no está configurado. Por favor, contacta al administrador.' 
+        });
+    }
+    
     try {
         const { session_id } = req.query;
 
@@ -457,8 +499,18 @@ const confirmarPago = async (req, res = response) => {
  * Webhook de Stripe para manejar eventos de pago
  */
 const webhookStripe = async (req, res) => {
+    if (!stripe || !process.env.STRIPE_SECRET_KEY || process.env.STRIPE_SECRET_KEY === 'sk_test_placeholder') {
+        return res.status(503).json({ 
+            msg: 'El sistema de pagos no está configurado.' 
+        });
+    }
+    
     const sig = req.headers['stripe-signature'];
     const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET;
+
+    if (!webhookSecret) {
+        return res.status(400).json({ msg: 'STRIPE_WEBHOOK_SECRET no configurado' });
+    }
 
     let event;
 

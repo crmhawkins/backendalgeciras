@@ -40,7 +40,7 @@ const EventoPartido = db.define('EventoPartido', {
   partidoId: {
     type: DataTypes.INTEGER,
     references: {
-      model: 'Partidos',
+      model: 'partidos',
       key: 'id'
     },
     onDelete: 'CASCADE'

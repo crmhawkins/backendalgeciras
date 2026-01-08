@@ -395,45 +395,50 @@ const confirmarPago = async (req, res = response) => {
                 await asiento.save();
             }
 
-            // Enviar email de confirmación
-            const partido = await Partido.findByPk(datosCompra.partidoId);
-            const asientoDetalle = await Asiento.findByPk(datosCompra.asientoId, {
-                include: { model: Sector, attributes: ['nombre'] }
-            });
-
-            if (nuevaCuenta) {
-                const transporter = nodemailer.createTransport({
-                    host: process.env.EMAIL_HOST,
-                    port: process.env.EMAIL_PORT,
-                    secure: process.env.EMAIL_ENCRYPTION === 'ssl',
-                    auth: {
-                        user: process.env.EMAIL_USER,
-                        pass: process.env.EMAIL_PASS
-                    }
+            // Enviar email de confirmación (no crítico - si falla, el pago ya está confirmado)
+            try {
+                const partido = await Partido.findByPk(datosCompra.partidoId);
+                const asientoDetalle = await Asiento.findByPk(datosCompra.asientoId, {
+                    include: { model: Sector, attributes: ['nombre'] }
                 });
 
-                await transporter.sendMail({
-                    from: `"Algeciras CF" <${process.env.EMAIL_USER}>`,
-                    to: datosCompra.email,
-                    subject: '🎟️ Entrada comprada - Algeciras CF',
-                    html: `
-                        <h2>¡Gracias por tu compra en Algeciras CF!</h2>
-                        <p>Te hemos creado una cuenta para que puedas acceder a tu perfil y consultar tus entradas.</p>
-                        <p><strong>Email de acceso:</strong> ${datosCompra.email}</p>
-                        <p><strong>Contraseña generada:</strong> ${passwordPlano}</p>
-                        <hr/>
-                        <h3>📅 Detalles de tu entrada:</h3>
-                        <p><strong>Partido:</strong> ${partido.equipoLocal} vs ${partido.equipoVisitante}</p>
-                        <p><strong>Fecha:</strong> ${new Date(partido.fecha).toLocaleDateString()}</p>
-                        <p><strong>Hora:</strong> ${partido.hora || 'Por determinar'}</p>
-                        <p><strong>Asiento:</strong> Fila ${asientoDetalle.fila}, Butaca ${asientoDetalle.numero}</p>
-                        <p><strong>Sector:</strong> ${asientoDetalle.Sector?.nombre || 'N/A'}</p>
-                        <p><strong>Precio:</strong> ${datosCompra.precio} €</p>
-                        <hr/>
-                        <p>⚽ Puedes acceder a tu cuenta desde nuestra web para revisar tus compras o renovar tus entradas.</p>
-                        <p><strong>algecirascf.com</strong></p>
-                    `
-                });
+                if (nuevaCuenta && partido && asientoDetalle) {
+                    const transporter = nodemailer.createTransport({
+                        host: process.env.EMAIL_HOST,
+                        port: process.env.EMAIL_PORT,
+                        secure: process.env.EMAIL_ENCRYPTION === 'ssl',
+                        auth: {
+                            user: process.env.EMAIL_USER,
+                            pass: process.env.EMAIL_PASS
+                        }
+                    });
+
+                    await transporter.sendMail({
+                        from: `"Algeciras CF" <${process.env.EMAIL_USER}>`,
+                        to: datosCompra.email,
+                        subject: '🎟️ Entrada comprada - Algeciras CF',
+                        html: `
+                            <h2>¡Gracias por tu compra en Algeciras CF!</h2>
+                            <p>Te hemos creado una cuenta para que puedas acceder a tu perfil y consultar tus entradas.</p>
+                            <p><strong>Email de acceso:</strong> ${datosCompra.email}</p>
+                            <p><strong>Contraseña generada:</strong> ${passwordPlano}</p>
+                            <hr/>
+                            <h3>📅 Detalles de tu entrada:</h3>
+                            <p><strong>Partido:</strong> ${partido.equipoLocal} vs ${partido.equipoVisitante}</p>
+                            <p><strong>Fecha:</strong> ${new Date(partido.fecha).toLocaleDateString()}</p>
+                            <p><strong>Hora:</strong> ${partido.hora || 'Por determinar'}</p>
+                            <p><strong>Asiento:</strong> Fila ${asientoDetalle.fila}, Butaca ${asientoDetalle.numero}</p>
+                            <p><strong>Sector:</strong> ${asientoDetalle.Sector?.nombre || 'N/A'}</p>
+                            <p><strong>Precio:</strong> ${datosCompra.precio} €</p>
+                            <hr/>
+                            <p>⚽ Puedes acceder a tu cuenta desde nuestra web para revisar tus compras o renovar tus entradas.</p>
+                            <p><strong>algecirascf.com</strong></p>
+                        `
+                    });
+                }
+            } catch (emailError) {
+                // El email falló, pero el pago ya está confirmado - solo registramos el error
+                console.error('⚠️  Error al enviar email de confirmación (pago confirmado de todas formas):', emailError.message);
             }
 
             resultado = { entrada, nuevaCuenta };
@@ -468,33 +473,38 @@ const confirmarPago = async (req, res = response) => {
             await asiento.save();
             actualizarJSONAsiento(datosCompra.asientoId, 'ocupado');
 
-            // Enviar email de confirmación
-            const transporter = nodemailer.createTransport({
-                host: process.env.EMAIL_HOST,
-                port: process.env.EMAIL_PORT,
-                secure: process.env.EMAIL_ENCRYPTION === 'ssl',
-                auth: {
-                    user: process.env.EMAIL_USER,
-                    pass: process.env.EMAIL_PASS
-                }
-            });
+            // Enviar email de confirmación (no crítico - si falla, el pago ya está confirmado)
+            try {
+                const transporter = nodemailer.createTransport({
+                    host: process.env.EMAIL_HOST,
+                    port: process.env.EMAIL_PORT,
+                    secure: process.env.EMAIL_ENCRYPTION === 'ssl',
+                    auth: {
+                        user: process.env.EMAIL_USER,
+                        pass: process.env.EMAIL_PASS
+                    }
+                });
 
-            await transporter.sendMail({
-                from: `"Algeciras CF" <${process.env.EMAIL_USER}>`,
-                to: datosCompra.email,
-                subject: 'Abono confirmado - Algeciras CF',
-                html: `
-                    <h2>¡Gracias por adquirir tu abono!</h2>
-                    <p><strong>Nombre:</strong> ${datosCompra.nombre} ${datosCompra.apellidos}</p>
-                    <p><strong>Zona:</strong> Sector ${asiento.Sector.nombre} - Fila ${asiento.fila}, Butaca ${asiento.numero}</p>
-                    <p><strong>Email de acceso:</strong> ${datosCompra.email}</p>
-                    ${nuevaCuenta ? `<p><strong>Contraseña generada:</strong> ${passwordPlano}</p>` : ''}
-                    <p><strong>Código de abono:</strong> ${abono.id}</p>
-                    <p><strong>Precio del abono:</strong> ${pagoSession.monto} €</p>
-                    <hr/>
-                    <p>⚽ Algeciras CF</p>
-                `
-            });
+                await transporter.sendMail({
+                    from: `"Algeciras CF" <${process.env.EMAIL_USER}>`,
+                    to: datosCompra.email,
+                    subject: 'Abono confirmado - Algeciras CF',
+                    html: `
+                        <h2>¡Gracias por adquirir tu abono!</h2>
+                        <p><strong>Nombre:</strong> ${datosCompra.nombre} ${datosCompra.apellidos}</p>
+                        <p><strong>Zona:</strong> Sector ${asiento.Sector.nombre} - Fila ${asiento.fila}, Butaca ${asiento.numero}</p>
+                        <p><strong>Email de acceso:</strong> ${datosCompra.email}</p>
+                        ${nuevaCuenta ? `<p><strong>Contraseña generada:</strong> ${passwordPlano}</p>` : ''}
+                        <p><strong>Código de abono:</strong> ${abono.id}</p>
+                        <p><strong>Precio del abono:</strong> ${pagoSession.monto} €</p>
+                        <hr/>
+                        <p>⚽ Algeciras CF</p>
+                    `
+                });
+            } catch (emailError) {
+                // El email falló, pero el pago ya está confirmado - solo registramos el error
+                console.error('⚠️  Error al enviar email de confirmación (pago confirmado de todas formas):', emailError.message);
+            }
 
             resultado = { abono, nuevaCuenta };
         }

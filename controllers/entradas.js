@@ -12,35 +12,70 @@ const generarPDFEntrada = async (req, res = response) => {
         const Sector = require('../models/sector');
         const Usuario = require('../models/usuario');
         
-        // Buscar la entrada por token
+        // Buscar la entrada por token (sin required para no fallar si falta alguna relación)
         const entrada = await Entrada.findOne({ 
             where: { token: entradaId },
             include: [
                 {
                     model: Partido,
-                    attributes: ['equipoLocal', 'equipoVisitante', 'fecha', 'hora', 'escudoLocal', 'escudoVisitante']
+                    attributes: ['equipoLocal', 'equipoVisitante', 'fecha', 'hora', 'escudoLocal', 'escudoVisitante'],
+                    required: false
                 },
                 {
                     model: Asiento,
-                    attributes: ['numero', 'fila'],
+                    attributes: ['numero', 'fila', 'sectorId'],
+                    required: false,
                     include: [{
                         model: Sector,
-                        attributes: ['nombre']
+                        attributes: ['nombre'],
+                        required: false
                     }]
                 },
                 {
                     model: Usuario,
-                    attributes: ['nombre', 'email']
+                    attributes: ['nombre', 'email'],
+                    required: false
                 }
             ]
         });
         
         if (!entrada) {
-            return res.status(404).json({ msg: 'Entrada no encontrada' });
+            return res.status(404).json({ msg: 'Entrada no encontrada con ese token' });
         }
         
+        // Verificar que todos los datos relacionados existen
+        if (!entrada.Partido) {
+            console.error('Error: Partido no encontrado para entrada', entrada.id);
+            return res.status(500).json({ 
+                msg: 'Error: No se encontró el partido asociado a esta entrada. Por favor, contacta con soporte.' 
+            });
+        }
+        
+        if (!entrada.Asiento) {
+            console.error('Error: Asiento no encontrado para entrada', entrada.id);
+            return res.status(500).json({ 
+                msg: 'Error: No se encontró el asiento asociado a esta entrada. Por favor, contacta con soporte.' 
+            });
+        }
+        
+        if (!entrada.Asiento.Sector) {
+            console.error('Error: Sector no encontrado para asiento', entrada.Asiento.id);
+            return res.status(500).json({ 
+                msg: 'Error: No se encontró el sector asociado al asiento. Por favor, contacta con soporte.' 
+            });
+        }
+        
+        if (!entrada.Usuario) {
+            console.error('Error: Usuario no encontrado para entrada', entrada.id);
+            return res.status(500).json({ 
+                msg: 'Error: No se encontró el usuario asociado a esta entrada. Por favor, contacta con soporte.' 
+            });
+        }
+        
+        const token = entrada.token;
+        
         // Generar QR code como buffer
-        const qrBuffer = await QRCode.toBuffer(entradaId, {
+        const qrBuffer = await QRCode.toBuffer(token, {
             errorCorrectionLevel: 'H',
             type: 'png',
             width: 300,
@@ -48,7 +83,7 @@ const generarPDFEntrada = async (req, res = response) => {
         });
         
         // Generar QR pequeño para las esquinas
-        const qrSmallBuffer = await QRCode.toBuffer(entradaId, {
+        const qrSmallBuffer = await QRCode.toBuffer(token, {
             errorCorrectionLevel: 'H',
             type: 'png',
             width: 100,
@@ -174,10 +209,21 @@ const generarPDFEntrada = async (req, res = response) => {
         
     } catch (error) {
         console.error('Error al generar PDF:', error);
-        res.status(500).json({ 
-            msg: 'Error al generar el PDF de la entrada',
-            error: error.message 
-        });
+        console.error('Stack trace:', error.stack);
+        
+        // Si la respuesta ya fue enviada (por ejemplo, si el PDF empezó a generarse), no intentar enviar JSON
+        if (!res.headersSent) {
+            res.status(500).json({ 
+                msg: 'Error al generar el PDF de la entrada',
+                error: error.message,
+                details: process.env.NODE_ENV === 'development' ? error.stack : undefined
+            });
+        } else {
+            // Si ya se enviaron headers, finalizar el stream de PDF
+            if (res && typeof res.end === 'function') {
+                res.end();
+            }
+        }
     }
 };
 

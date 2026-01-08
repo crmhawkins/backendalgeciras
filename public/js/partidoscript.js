@@ -601,6 +601,7 @@ async function cargarVistaAsientos(container, sector, partidoId) {
         const entrada = {
           asientoId: formData.get(`asientoId-${i}`),
           partidoId: formData.get(`partidoId-${i}`),
+          precio: Number(sector.precio),
           nombre: formData.get(`nombre-${i}`),
           apellidos: formData.get(`apellidos-${i}`),
           genero: formData.get(`genero-${i}`),

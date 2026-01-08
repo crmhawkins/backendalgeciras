@@ -165,12 +165,20 @@ const generarPDFEntrada = async (req, res = response) => {
         
         // Título del partido (arriba)
         doc.fillColor('#DC143C')
-           .fontSize(28)
-           .font('Helvetica-Bold')
-           .text(`${entrada.Partido.equipoLocal} vs ${entrada.Partido.equipoVisitante}`, 
-                 centerX, contentTop + 30, { align: 'center' });
+           .fontSize(24)
+           .font('Helvetica-Bold');
         
-        // Fecha y hora (debajo del título)
+        const partidoText = `${entrada.Partido.equipoLocal} vs ${entrada.Partido.equipoVisitante}`;
+        const partidoY = contentTop + 40;
+        
+        // Dibujar el texto del partido y obtener su altura real
+        const partidoHeight = doc.heightOfString(partidoText, { width: contentWidth - 80 });
+        doc.text(partidoText, centerX, partidoY, { 
+            align: 'center',
+            width: contentWidth - 80
+        });
+        
+        // Fecha y hora (debajo del título con espacio suficiente)
         const fechaPartido = new Date(entrada.Partido.fecha);
         const fechaStr = fechaPartido.toLocaleDateString('es-ES', { 
             weekday: 'long', 
@@ -178,18 +186,29 @@ const generarPDFEntrada = async (req, res = response) => {
             month: 'long', 
             day: 'numeric' 
         });
-        doc.fillColor('black')
-           .fontSize(16)
-           .font('Helvetica')
-           .text(fechaStr, centerX, contentTop + 70, { align: 'center' });
         
+        // Calcular posición de la fecha (dejando espacio suficiente después del título)
+        const fechaY = partidoY + partidoHeight + 35;
+        
+        doc.fillColor('black')
+           .fontSize(14)
+           .font('Helvetica');
+        
+        const fechaHeight = doc.heightOfString(fechaStr, { width: contentWidth - 80 });
+        doc.text(fechaStr, centerX, fechaY, { 
+            align: 'center',
+            width: contentWidth - 80
+        });
+        
+        let horaY = fechaY + fechaHeight + 20;
         if (entrada.Partido.hora) {
-            doc.fontSize(14)
-               .text(`Hora: ${entrada.Partido.hora}`, centerX, contentTop + 95, { align: 'center' });
+            doc.fontSize(13)
+               .text(`Hora: ${entrada.Partido.hora}`, centerX, horaY, { align: 'center' });
+            horaY += 20;
         }
         
-        // Línea separadora
-        const separatorY = contentTop + 120;
+        // Línea separadora (con más espacio después de la hora)
+        const separatorY = horaY + 20;
         doc.moveTo(contentLeft + 40, separatorY)
            .lineTo(contentLeft + contentWidth - 40, separatorY)
            .strokeColor('#DC143C')

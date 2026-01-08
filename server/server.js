@@ -23,7 +23,8 @@ class Server {
             sectores: '/api/sectores',
             abonos: '/api/abonos',
             partidos: '/api/partidos',
-            clasificacion: '/api/clasificacion'
+            clasificacion: '/api/clasificacion',
+            pagos: '/api/pagos'
         };
         
 
@@ -59,6 +60,9 @@ class Server {
         // CORS
         this.app.use( cors() );
 
+        // Webhook de Stripe necesita el body raw, así que lo excluimos del parseo JSON
+        this.app.use('/api/pagos/webhook', express.raw({ type: 'application/json' }));
+
         // Lectura y parseo del body
         this.app.use( express.json() );
         
@@ -88,6 +92,11 @@ class Server {
         this.app.use(this.paths.abonos, require('../routes/abonos'));
         this.app.use(this.paths.partidos, require('../routes/partidos'));
         this.app.use(this.paths.clasificacion,require('../routes/clasificacion'));
+        
+        // Rutas de pagos
+        const { router: pagosRouter, webhookRouter } = require('../routes/pagos');
+        this.app.use(this.paths.pagos, pagosRouter);
+        this.app.use(this.paths.pagos, webhookRouter);
 
     }
 

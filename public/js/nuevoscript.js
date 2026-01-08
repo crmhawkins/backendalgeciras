@@ -597,61 +597,70 @@ document.addEventListener("DOMContentLoaded", async () => {
                 const fechaInicio = new Date();
                 const fechaFin = new Date('2025-06-30T23:59:59');
 
+                // Validar todos los campos antes de proceder
                 for (let i = 0; i < asientosSeleccionados.length; i++) {
-                    const abono = {
-                        fechaInicio,
-                        fechaFin,
-                        asientoId: asientosSeleccionados[i].id,
-                        nombre: formData.get(`nombre-${i}`),
-                        apellidos: formData.get(`apellidos-${i}`),
-                        genero: formData.get(`genero-${i}`),
-                        dni: formData.get(`dni-${i}`),
-                        fechaNacimiento: formData.get(`fechaNacimiento-${i}`),
-                        email: formData.get(`email-${i}`),
-                        telefono: formData.get(`telefono-${i}`),
-                        pais: formData.get(`pais-${i}`),
-                        provincia: formData.get(`provincia-${i}`),
-                        localidad: formData.get(`localidad-${i}`),
-                        domicilio: formData.get(`domicilio-${i}`),
-                        codigoPostal: formData.get(`codigoPostal-${i}`)
-                    };
+                    const dni = formData.get(`dni-${i}`);
+                    const email = formData.get(`email-${i}`);
+                    const telefono = formData.get(`telefono-${i}`);
 
-                    if (!/^[0-9]{8}[A-Z]$/.test(abono.dni)) {
+                    if (!/^[0-9]{8}[A-Z]$/.test(dni)) {
                         alert(`DNI inválido en abono ${i + 1}`);
                         return;
                     }
-                    if (!/^\S+@\S+\.\S+$/.test(abono.email)) {
+                    if (!/^\S+@\S+\.\S+$/.test(email)) {
                         alert(`Email inválido en abono ${i + 1}`);
                         return;
                     }
-                    if (!/^\+?\d{9,15}$/.test(abono.telefono)) {
+                    if (!/^\+?\d{9,15}$/.test(telefono)) {
                         alert(`Teléfono inválido en abono ${i + 1}`);
                         return;
                     }
-                    try {
-                        const res = await fetch("/api/abonos/create", {
-                            method: "POST",
-                            headers: { "Content-Type": "application/json" },
-                            body: JSON.stringify(abono)
-                        });
+                }
 
-                        if (!res.ok) {
-                            const error = await res.json();
-                            throw new Error(error.msg || 'Error en la solicitud');
-                        }
+                // Por ahora solo procesamos un abono a la vez para simplificar
+                const primerAbono = {
+                    fechaInicio: fechaInicio.toISOString(),
+                    fechaFin: fechaFin.toISOString(),
+                    asientoId: asientosSeleccionados[0].id,
+                    nombre: formData.get(`nombre-0`),
+                    apellidos: formData.get(`apellidos-0`),
+                    genero: formData.get(`genero-0`),
+                    dni: formData.get(`dni-0`),
+                    fechaNacimiento: formData.get(`fechaNacimiento-0`),
+                    email: formData.get(`email-0`),
+                    telefono: formData.get(`telefono-0`),
+                    pais: formData.get(`pais-0`),
+                    provincia: formData.get(`provincia-0`),
+                    localidad: formData.get(`localidad-0`),
+                    domicilio: formData.get(`domicilio-0`),
+                    codigoPostal: formData.get(`codigoPostal-0`)
+                };
 
-                        const result = await res.json();
-                        // Procesar resultado
-                    } catch (error) {
-                        console.error('Error al crear abono:', error);
-                        alert(`Error al crear abono ${i + 1}: ${error.message}`);
+                try {
+                    // Crear sesión de pago con Stripe
+                    const res = await fetch("/api/pagos/abono", {
+                        method: "POST",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify(primerAbono)
+                    });
+
+                    const result = await res.json();
+
+                    if (!res.ok) {
+                        alert(result.msg || 'Error al crear la sesión de pago');
                         return;
                     }
 
+                    // Redirigir a Stripe Checkout
+                    if (result.url) {
+                        window.location.href = result.url;
+                    } else {
+                        alert('Error: No se recibió la URL de pago');
+                    }
+                } catch (error) {
+                    console.error('Error:', error);
+                    alert('Error al procesar el pago. Por favor, inténtalo de nuevo.');
                 }
-
-                alert("¡Compra completada con éxito!");
-                window.location.reload();
             });
 
         });

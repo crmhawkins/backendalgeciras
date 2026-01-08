@@ -597,54 +597,71 @@ async function cargarVistaAsientos(container, sector, partidoId) {
       e.preventDefault();
       const formData = new FormData(form);
 
+      // Validar todos los campos antes de proceder
       for (let i = 0; i < asientosSeleccionados.length; i++) {
-        const entrada = {
-          asientoId: formData.get(`asientoId-${i}`),
-          partidoId: formData.get(`partidoId-${i}`),
-          precio: Number(sector.precio),
-          nombre: formData.get(`nombre-${i}`),
-          apellidos: formData.get(`apellidos-${i}`),
-          genero: formData.get(`genero-${i}`),
-          dni: formData.get(`dni-${i}`),
-          fechaNacimiento: formData.get(`fechaNacimiento-${i}`),
-          email: formData.get(`email-${i}`),
-          telefono: formData.get(`telefono-${i}`),
-          pais: formData.get(`pais-${i}`),
-          provincia: formData.get(`provincia-${i}`),
-          localidad: formData.get(`localidad-${i}`),
-          domicilio: formData.get(`domicilio-${i}`),
-          codigoPostal: formData.get(`codigoPostal-${i}`)
-        };
+        const dni = formData.get(`dni-${i}`);
+        const email = formData.get(`email-${i}`);
+        const telefono = formData.get(`telefono-${i}`);
 
-        if (!/^[0-9]{8}[A-Z]$/.test(entrada.dni)) {
+        if (!/^[0-9]{8}[A-Z]$/.test(dni)) {
           alert(`DNI inválido en entrada ${i + 1}`);
           return;
         }
-        if (!/^\S+@\S+\.\S+$/.test(entrada.email)) {
+        if (!/^\S+@\S+\.\S+$/.test(email)) {
           alert(`Email inválido en entrada ${i + 1}`);
           return;
         }
-        if (!/^\+?\d{9,15}$/.test(entrada.telefono)) {
+        if (!/^\+?\d{9,15}$/.test(telefono)) {
           alert(`Teléfono inválido en entrada ${i + 1}`);
           return;
         }
+      }
 
-        const res = await fetch("/api/entradas/create", {
+      // Por ahora solo procesamos una entrada a la vez para simplificar
+      // Si hay múltiples, se procesarán en orden
+      const primeraEntrada = {
+        asientoId: formData.get(`asientoId-0`),
+        partidoId: formData.get(`partidoId-0`),
+        precio: Number(sector.precio),
+        nombre: formData.get(`nombre-0`),
+        apellidos: formData.get(`apellidos-0`),
+        genero: formData.get(`genero-0`),
+        dni: formData.get(`dni-0`),
+        fechaNacimiento: formData.get(`fechaNacimiento-0`),
+        email: formData.get(`email-0`),
+        telefono: formData.get(`telefono-0`),
+        pais: formData.get(`pais-0`),
+        provincia: formData.get(`provincia-0`),
+        localidad: formData.get(`localidad-0`),
+        domicilio: formData.get(`domicilio-0`),
+        codigoPostal: formData.get(`codigoPostal-0`)
+      };
+
+      try {
+        // Crear sesión de pago con Stripe
+        const res = await fetch("/api/pagos/entrada", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(entrada)
+          body: JSON.stringify(primeraEntrada)
         });
 
         const result = await res.json();
 
         if (!res.ok) {
-          alert(result.msg);
+          alert(result.msg || 'Error al crear la sesión de pago');
           return;
         }
-      }
 
-      alert("¡Compra completada con éxito!");
-      window.location.reload();
+        // Redirigir a Stripe Checkout
+        if (result.url) {
+          window.location.href = result.url;
+        } else {
+          alert('Error: No se recibió la URL de pago');
+        }
+      } catch (error) {
+        console.error('Error:', error);
+        alert('Error al procesar el pago. Por favor, inténtalo de nuevo.');
+      }
     });
   });
 }

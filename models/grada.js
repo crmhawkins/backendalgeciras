@@ -10,6 +10,9 @@ const Grada = db.define('Grada', {
     nombre: { type: DataTypes.STRING, allowNull: false },
     imagen: { type: DataTypes.STRING }, 
     descripcion: { type: DataTypes.STRING }
+}, {
+    tableName: 'gradas',
+    freezeTableName: true
 });
 
 module.exports = Grada;

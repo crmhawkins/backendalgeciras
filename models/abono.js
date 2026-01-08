@@ -23,6 +23,9 @@ const Abono = db.define('Abono', {
     usuarioId: { type: DataTypes.INTEGER, allowNull: false },
     asientoId: { type: DataTypes.INTEGER, allowNull: false },
     precio: { type: DataTypes.DECIMAL(10, 2), allowNull: false }
+}, {
+    tableName: 'abonos',
+    freezeTableName: true
 });
 
 module.exports = Abono;

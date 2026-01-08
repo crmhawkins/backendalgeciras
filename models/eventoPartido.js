@@ -47,6 +47,7 @@ const EventoPartido = db.define('EventoPartido', {
   },
 }, {
   tableName: 'evento_partidos',
+  freezeTableName: true,
   timestamps: false
 });
 

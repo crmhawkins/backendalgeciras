@@ -14,7 +14,8 @@ const Sector = db.define('Sector', {
     activo: { type: DataTypes.BOOLEAN, defaultValue: true },
     imagen: { type: DataTypes.STRING },
   }, {
-    tableName: 'sectores', 
+    tableName: 'sectores',
+    freezeTableName: true,
     timestamps: false
   });
   

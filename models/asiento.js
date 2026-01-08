@@ -16,6 +16,8 @@ const Asiento = db.define('Asiento', {
     sectorId: { type: DataTypes.INTEGER, allowNull: false },
     partidoId: { type: DataTypes.INTEGER, allowNull: true } 
 }, {
+    tableName: 'asientos',
+    freezeTableName: true,
     timestamps: false
 });
 

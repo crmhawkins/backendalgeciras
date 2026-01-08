@@ -36,6 +36,7 @@ const PagoSession = db.define('PagoSession', {
     }
 }, {
     tableName: 'pago_sessions',
+    freezeTableName: true,
     timestamps: true
 });
 

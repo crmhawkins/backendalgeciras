@@ -20,6 +20,7 @@ const Entrada = db.define('Entrada', {
     }
 }, {
     tableName: 'entradas',
+    freezeTableName: true,
     timestamps: false
 });
 

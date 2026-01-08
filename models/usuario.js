@@ -33,6 +33,7 @@ const Usuario = db.define('Usuario', {
     }
 }, {
     tableName: 'usuarios',
+    freezeTableName: true,
     timestamps: true
 });
 

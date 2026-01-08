@@ -32,7 +32,8 @@ const Clasificacion = db.define('Clasificacion', {
     allowNull: false
   }
 },{
-    tableName: 'clasificacion', 
-  });
+    tableName: 'clasificacion',
+    freezeTableName: true
+});
 
 module.exports = Clasificacion;

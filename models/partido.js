@@ -32,7 +32,15 @@ const Partido = db.define('Partido', {
   }
 }, {
   tableName: 'partidos',
+
+  freezeTableName: true,
   timestamps: true
 });
+
+// Forzar el nombre de la tabla después de la definición
+Partido.tableName = 'partidos';
+
+// Log para verificar (puedes eliminarlo después)
+console.log(`[Partido Model] Table name configurado: ${Partido.tableName}`);
 
 module.exports = Partido;

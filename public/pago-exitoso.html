@@ -356,35 +356,26 @@
             const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
             
             if (isMobile) {
-                // En móvil, usar fetch + blob para forzar descarga
+                // En móvil, abrir directamente en el navegador del sistema
+                // Esto funciona mejor en apps que usan WebView o iframe
                 const url = `/api/entradas/pdf/${token}`;
-                fetch(url)
-                    .then(response => {
-                        if (!response.ok) {
-                            throw new Error('Error al descargar el PDF');
-                        }
-                        return response.blob();
-                    })
-                    .then(blob => {
-                        // Crear URL temporal del blob
-                        const blobUrl = window.URL.createObjectURL(blob);
-                        
-                        // Crear enlace temporal y hacer clic para descargar
-                        const link = document.createElement('a');
-                        link.href = blobUrl;
-                        link.download = `entrada-${token.substring(0, 8)}.pdf`;
-                        link.style.display = 'none';
-                        document.body.appendChild(link);
-                        link.click();
-                        
-                        // Limpiar
-                        document.body.removeChild(link);
-                        window.URL.revokeObjectURL(blobUrl);
-                    })
-                    .catch(error => {
-                        console.error('Error al descargar PDF:', error);
-                        alert('Error al descargar el PDF. Por favor, intenta de nuevo.');
-                    });
+                
+                // Intentar abrir en nueva pestaña/ventana del navegador
+                // Si estamos en un iframe o WebView, esto abrirá el navegador del sistema
+                try {
+                    // Primero intentar con window.open
+                    const newWindow = window.open(url, '_blank');
+                    
+                    // Si window.open falla (bloqueado o en iframe), usar location
+                    if (!newWindow || newWindow.closed || typeof newWindow.closed === 'undefined') {
+                        // Fallback: redirigir directamente
+                        window.location.href = url;
+                    }
+                } catch (e) {
+                    // Si hay error, usar location.href como fallback
+                    console.log('Error al abrir ventana, usando location.href:', e);
+                    window.location.href = url;
+                }
             } else {
                 // En desktop, abrir en nueva ventana (el header attachment forzará la descarga)
                 window.open(`/api/entradas/pdf/${token}`, '_blank');

@@ -427,6 +427,15 @@ document.addEventListener("DOMContentLoaded", async () => {
 
             formContainer.innerHTML = `<h2>COMPLETA TUS DATOS</h2><form id="formulario-abono"></form>`;
             formContainer.style.display = "block";
+            
+            // Aplicar estilos responsive al contenedor
+            if (window.innerWidth <= 1024) {
+                formContainer.style.width = "100%";
+                formContainer.style.maxWidth = "100%";
+                formContainer.style.padding = "1rem";
+                formContainer.style.margin = "1rem";
+                formContainer.style.boxSizing = "border-box";
+            }
 
             const form = document.getElementById("formulario-abono");
             asientosSeleccionados.forEach((asiento, index) => {
@@ -434,7 +443,7 @@ document.addEventListener("DOMContentLoaded", async () => {
             <fieldset>
                 <legend>Abono ${index + 1} - Fila ${asiento.fila}, Butaca ${asiento.numero}</legend>
                 <input type="hidden" name="asientoId-${index}" value="${asiento.id}" />
-                <div class="form-grid">
+                <div class="form-grid" style="display: grid; grid-template-columns: ${window.innerWidth <= 1024 ? '1fr' : 'repeat(3, 1fr)'}; gap: 1.5rem; width: 100%; box-sizing: border-box;">
                 <label>Nombre:
                     <input name="nombre-${index}" required />
                 </label>
@@ -483,6 +492,32 @@ document.addEventListener("DOMContentLoaded", async () => {
 
             });
             form.innerHTML += `<button type="submit">CONFIRMAR COMPRA</button>`;
+
+            // Función para actualizar estilos responsive
+            const updateFormGridStyles = () => {
+                const formGrids = form.querySelectorAll('.form-grid');
+                const isMobile = window.innerWidth <= 1024;
+                formGrids.forEach(grid => {
+                    grid.style.display = 'grid';
+                    grid.style.gridTemplateColumns = isMobile ? '1fr' : 'repeat(3, 1fr)';
+                    grid.style.width = '100%';
+                    grid.style.boxSizing = 'border-box';
+                });
+                
+                if (isMobile) {
+                    formContainer.style.width = '100%';
+                    formContainer.style.maxWidth = '100%';
+                    formContainer.style.padding = '1rem';
+                    formContainer.style.margin = '1rem';
+                    formContainer.style.boxSizing = 'border-box';
+                }
+            };
+
+            // Aplicar estilos iniciales
+            updateFormGridStyles();
+
+            // Actualizar cuando se redimensione la ventana
+            window.addEventListener('resize', updateFormGridStyles);
 
             form.addEventListener("submit", async (e) => {
                 e.preventDefault();

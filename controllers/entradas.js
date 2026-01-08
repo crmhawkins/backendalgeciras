@@ -147,30 +147,30 @@ const generarPDFEntrada = async (req, res = response) => {
         
         // Contenido central
         const centerX = doc.page.width / 2;
-        const centerY = doc.page.height / 2;
+        const pageHeight = doc.page.height;
         
-        // Fondo blanco para el contenido central
-        const contentWidth = 400;
-        const contentHeight = 500;
-        doc.rect(centerX - contentWidth / 2, centerY - contentHeight / 2, contentWidth, contentHeight)
+        // Fondo blanco para el contenido central con mejor posicionamiento
+        const contentWidth = 450;
+        const contentTop = 120;
+        const contentHeight = pageHeight - contentTop - 120;
+        const contentLeft = centerX - contentWidth / 2;
+        
+        // Fondo blanco con borde
+        doc.rect(contentLeft, contentTop, contentWidth, contentHeight)
            .fillColor('white')
-           .fill();
+           .fill()
+           .strokeColor('#DC143C')
+           .lineWidth(3)
+           .stroke();
         
-        // QR grande en el centro
-        const qrLargeSize = 250;
-        doc.image(qrBuffer, centerX - qrLargeSize / 2, centerY - qrLargeSize / 2 - 100, { 
-            width: qrLargeSize, 
-            height: qrLargeSize 
-        });
-        
-        // Texto del partido
-        doc.fillColor('black')
-           .fontSize(24)
+        // Título del partido (arriba)
+        doc.fillColor('#DC143C')
+           .fontSize(28)
            .font('Helvetica-Bold')
            .text(`${entrada.Partido.equipoLocal} vs ${entrada.Partido.equipoVisitante}`, 
-                 centerX, centerY + qrLargeSize / 2 + 20, { align: 'center' });
+                 centerX, contentTop + 30, { align: 'center' });
         
-        // Fecha y hora
+        // Fecha y hora (debajo del título)
         const fechaPartido = new Date(entrada.Partido.fecha);
         const fechaStr = fechaPartido.toLocaleDateString('es-ES', { 
             weekday: 'long', 
@@ -178,32 +178,85 @@ const generarPDFEntrada = async (req, res = response) => {
             month: 'long', 
             day: 'numeric' 
         });
-        doc.fontSize(14)
+        doc.fillColor('black')
+           .fontSize(16)
            .font('Helvetica')
-           .text(fechaStr, centerX, centerY + qrLargeSize / 2 + 60, { align: 'center' });
+           .text(fechaStr, centerX, contentTop + 70, { align: 'center' });
         
         if (entrada.Partido.hora) {
-            doc.text(`Hora: ${entrada.Partido.hora}`, centerX, centerY + qrLargeSize / 2 + 80, { align: 'center' });
+            doc.fontSize(14)
+               .text(`Hora: ${entrada.Partido.hora}`, centerX, contentTop + 95, { align: 'center' });
         }
         
-        // Datos del titular
-        doc.fontSize(16)
+        // Línea separadora
+        const separatorY = contentTop + 120;
+        doc.moveTo(contentLeft + 40, separatorY)
+           .lineTo(contentLeft + contentWidth - 40, separatorY)
+           .strokeColor('#DC143C')
+           .lineWidth(2)
+           .stroke();
+        
+        // QR grande en el centro (más abajo)
+        const qrLargeSize = 220;
+        const qrTop = separatorY + 30;
+        const qrLeft = centerX - qrLargeSize / 2;
+        doc.image(qrBuffer, qrLeft, qrTop, { 
+            width: qrLargeSize, 
+            height: qrLargeSize 
+        });
+        
+        // Línea separadora después del QR
+        const separatorY2 = qrTop + qrLargeSize + 20;
+        doc.moveTo(contentLeft + 40, separatorY2)
+           .lineTo(contentLeft + contentWidth - 40, separatorY2)
+           .strokeColor('#DC143C')
+           .lineWidth(2)
+           .stroke();
+        
+        // Información del titular y asiento (debajo del QR)
+        const infoStartY = separatorY2 + 30;
+        const infoLeft = contentLeft + 50;
+        const infoRight = contentLeft + contentWidth - 50;
+        const lineHeight = 22;
+        
+        // Titular
+        doc.fillColor('black')
+           .fontSize(14)
            .font('Helvetica-Bold')
-           .text('Titular:', centerX, centerY + qrLargeSize / 2 + 120, { align: 'center' });
+           .text('Titular:', infoLeft, infoStartY);
         doc.fontSize(14)
            .font('Helvetica')
-           .text(`${entrada.Usuario.nombre}`, centerX, centerY + qrLargeSize / 2 + 145, { align: 'center' });
+           .text(entrada.Usuario.nombre, infoLeft + 80, infoStartY);
         
-        // Datos del asiento
-        doc.fontSize(12)
-           .text(`Sector: ${entrada.Asiento.Sector.nombre}`, centerX, centerY + qrLargeSize / 2 + 170, { align: 'center' });
-        doc.text(`Fila: ${entrada.Asiento.fila} - Butaca: ${entrada.Asiento.numero}`, 
-                 centerX, centerY + qrLargeSize / 2 + 190, { align: 'center' });
+        // Sector
+        doc.fontSize(14)
+           .font('Helvetica-Bold')
+           .text('Sector:', infoLeft, infoStartY + lineHeight);
+        doc.fontSize(14)
+           .font('Helvetica')
+           .text(entrada.Asiento.Sector.nombre, infoLeft + 80, infoStartY + lineHeight);
         
-        // Token de la entrada (pequeño)
-        doc.fontSize(8)
+        // Fila y Butaca
+        doc.fontSize(14)
+           .font('Helvetica-Bold')
+           .text('Fila:', infoLeft, infoStartY + lineHeight * 2);
+        doc.fontSize(14)
+           .font('Helvetica')
+           .text(entrada.Asiento.fila, infoLeft + 50, infoStartY + lineHeight * 2);
+        
+        doc.fontSize(14)
+           .font('Helvetica-Bold')
+           .text('Butaca:', infoLeft + 120, infoStartY + lineHeight * 2);
+        doc.fontSize(14)
+           .font('Helvetica')
+           .text(entrada.Asiento.numero, infoLeft + 180, infoStartY + lineHeight * 2);
+        
+        // Token de la entrada (al final, pequeño)
+        const tokenY = contentTop + contentHeight - 40;
+        doc.fontSize(9)
            .fillColor('#666')
-           .text(`Token: ${token}`, centerX, centerY + qrLargeSize / 2 + 220, { align: 'center' });
+           .font('Helvetica')
+           .text(`Token: ${token}`, centerX, tokenY, { align: 'center' });
         
         // Finalizar PDF
         doc.end();

@@ -352,8 +352,43 @@
                 return;
             }
             
-            // Abrir en nueva ventana para descargar el PDF
-            window.open(`/api/entradas/pdf/${token}`, '_blank');
+            // Detectar si es móvil
+            const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+            
+            if (isMobile) {
+                // En móvil, usar fetch + blob para forzar descarga
+                const url = `/api/entradas/pdf/${token}`;
+                fetch(url)
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error('Error al descargar el PDF');
+                        }
+                        return response.blob();
+                    })
+                    .then(blob => {
+                        // Crear URL temporal del blob
+                        const blobUrl = window.URL.createObjectURL(blob);
+                        
+                        // Crear enlace temporal y hacer clic para descargar
+                        const link = document.createElement('a');
+                        link.href = blobUrl;
+                        link.download = `entrada-${token.substring(0, 8)}.pdf`;
+                        link.style.display = 'none';
+                        document.body.appendChild(link);
+                        link.click();
+                        
+                        // Limpiar
+                        document.body.removeChild(link);
+                        window.URL.revokeObjectURL(blobUrl);
+                    })
+                    .catch(error => {
+                        console.error('Error al descargar PDF:', error);
+                        alert('Error al descargar el PDF. Por favor, intenta de nuevo.');
+                    });
+            } else {
+                // En desktop, abrir en nueva ventana (el header attachment forzará la descarga)
+                window.open(`/api/entradas/pdf/${token}`, '_blank');
+            }
         }
     </script>
 </body>

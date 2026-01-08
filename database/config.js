@@ -22,12 +22,7 @@ const wpDBConnection = async () => {
 const db = new Sequelize(process.env.DB_NAME, process.env.DB_USER, process.env.DB_PASSWORD, {
     host: process.env.DB_HOST,
     dialect: 'mysql',
-    logging: false,
-    quoteIdentifiers: true, // Usa backticks para nombres de tablas y columnas
-    define: {
-        freezeTableName: true, // Evita que Sequelize pluralice o cambie mayúsculas en los nombres de tabla
-        underscored: false
-    }
+    logging: false
 });
 
 

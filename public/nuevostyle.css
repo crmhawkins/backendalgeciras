@@ -693,11 +693,25 @@ fieldset legend {
   .zona-info {
     order: 2;
   }
+}
 
+/* Formulario responsive - una columna en móvil y tablet */
+@media (max-width: 1024px) {
+  .form-grid {
+    display: grid !important;
+    grid-template-columns: 1fr !important;
+    gap: 1rem !important;
+    width: 100% !important;
+  }
+}
+
+@media (max-width: 768px) {
   /* Formulario responsive - una columna en móvil */
   .form-grid {
-    grid-template-columns: 1fr;
-    gap: 1rem;
+    display: grid !important;
+    grid-template-columns: 1fr !important;
+    gap: 1rem !important;
+    width: 100% !important;
   }
 
   #formulario-container {
@@ -706,6 +720,8 @@ fieldset legend {
     overflow-x: hidden;
     overflow-y: auto;
     max-height: calc(100vh - 2rem);
+    width: calc(100% - 2rem);
+    box-sizing: border-box;
   }
 
   #formulario-container h2 {
@@ -714,6 +730,8 @@ fieldset legend {
 
   fieldset {
     padding: 1rem;
+    width: 100%;
+    box-sizing: border-box;
   }
 
   fieldset legend {
@@ -721,9 +739,45 @@ fieldset legend {
     margin-bottom: 1rem;
   }
 
+  .form-grid label {
+    width: 100%;
+    box-sizing: border-box;
+  }
+
+  .form-grid input,
+  .form-grid select {
+    width: 100%;
+    box-sizing: border-box;
+  }
+
   #formulario-abono button[type="submit"],
   #formulario-entrada button[type="submit"] {
     width: 100%;
     margin-top: 1rem;
+    box-sizing: border-box;
+  }
+}
+
+/* Media query adicional para pantallas muy pequeñas */
+@media (max-width: 480px) {
+  .form-grid {
+    display: grid !important;
+    grid-template-columns: 1fr !important;
+    gap: 0.8rem !important;
+  }
+
+  #formulario-container {
+    padding: 0.75rem;
+    margin: 0.5rem;
+  }
+
+  fieldset {
+    padding: 0.75rem;
+  }
+
+  .form-grid input,
+  .form-grid select {
+    padding: 0.6rem 0.8rem;
+    font-size: 0.95rem;
   }
 }

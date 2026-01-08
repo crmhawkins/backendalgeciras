@@ -8,6 +8,14 @@ html, body {
   width: 100%;
   max-width: 100%;
   overflow-x: hidden;
+  -webkit-overflow-scrolling: touch;
+  position: relative;
+}
+
+/* Asegurar que funcione bien en iframe */
+body {
+  min-height: 100vh;
+  box-sizing: border-box;
 }
 
 body {
@@ -177,11 +185,14 @@ footer {
 }
 
 .seleccion-sector {
-    width:100vw;
+    width: 100%;
+    max-width: 100%;
     display: flex;
     flex-wrap: wrap;
     justify-content: space-between;
     padding: 2rem;
+    box-sizing: border-box;
+    overflow-x: hidden;
 }
 
 .mapa-sector {
@@ -196,10 +207,35 @@ footer {
     border-radius: 8px;
 }
 
+#mapaSVG {
+    overflow: visible;
+    touch-action: pan-x pan-y;
+    -webkit-overflow-scrolling: touch;
+    width: 100%;
+    max-width: 100%;
+}
+
 #mapaSVG svg {
     width: 100%;
     height: auto;
     max-width: 100%;
+    touch-action: pan-x pan-y;
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    user-select: none;
+}
+
+@media (max-width: 768px) {
+    #mapaSVG {
+        width: 100%;
+        overflow-x: auto;
+        overflow-y: visible;
+        -webkit-overflow-scrolling: touch;
+    }
+    
+    #mapaSVG svg {
+        min-width: 100%;
+    }
 }
 
 table {
@@ -421,6 +457,10 @@ fieldset legend {
     cursor: pointer;
     transition: background 0.3s ease;
     margin-top: 1rem;
+    min-height: 48px;
+    min-width: 150px;
+    touch-action: manipulation;
+    -webkit-tap-highlight-color: transparent;
 }
 
 #formulario-abono button[type="submit"]:hover,
@@ -485,6 +525,9 @@ fieldset legend {
   .seleccion-sector {
     flex-direction: column;
     padding: 1rem;
+    width: 100%;
+    max-width: 100%;
+    box-sizing: border-box;
   }
 
 
@@ -645,6 +688,8 @@ fieldset legend {
   justify-content: center;
   font-size: 12px;
   flex-shrink: 0; /* Evita que se encojan */
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
 }
 
 .asiento.ocupado {
@@ -659,14 +704,18 @@ fieldset legend {
 @media (max-width: 768px) {
   .contenedor-asientos {
     flex-direction: column;
+    width: 100%;
+    max-width: 100%;
+    box-sizing: border-box;
   }
 
   .asiento {
-    width: 20px;
-    height: 20px;
-    min-width: 20px;
-    min-height: 20px;
-    font-size: 10px;
+    width: 32px;
+    height: 32px;
+    min-width: 32px;
+    min-height: 32px;
+    font-size: 11px;
+    margin: 0 2px;
   }
   .selector-asientos {
     width:100%;
@@ -885,6 +934,15 @@ fieldset legend {
     width: 100%;
     margin-top: 1rem;
     box-sizing: border-box;
+    min-height: 48px;
+    font-size: 16px;
+  }
+  
+  /* Mejorar scroll en móvil */
+  #formulario-container {
+    -webkit-overflow-scrolling: touch;
+    overflow-y: auto;
+    overflow-x: hidden;
   }
 }
 

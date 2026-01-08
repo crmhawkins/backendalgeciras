@@ -2,7 +2,8 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes">
+    <meta name="mobile-web-app-capable" content="yes">
     <title>Pago Cancelado - Algeciras CF</title>
     <style>
         * {
@@ -19,6 +20,8 @@
             justify-content: center;
             align-items: center;
             padding: 20px;
+            overflow-x: hidden;
+            -webkit-overflow-scrolling: touch;
         }
 
         .container {
@@ -64,10 +67,30 @@
             border-radius: 5px;
             margin-top: 20px;
             transition: background 0.3s;
+            min-height: 44px;
+            min-width: 120px;
+            touch-action: manipulation;
+            -webkit-tap-highlight-color: transparent;
         }
 
-        .btn:hover {
+        .btn:hover,
+        .btn:active {
             background: #5568d3;
+        }
+        
+        @media (max-width: 768px) {
+            .container {
+                padding: 30px 20px;
+                margin: 10px;
+            }
+            
+            .btn {
+                display: block;
+                width: 100%;
+                margin: 10px 0;
+                padding: 16px 20px;
+                font-size: 16px;
+            }
         }
 
         .btn-secondary {

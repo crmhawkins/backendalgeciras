@@ -2,7 +2,8 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes">
+    <meta name="mobile-web-app-capable" content="yes">
     <title>Pago Exitoso - Algeciras CF</title>
     <style>
         * {
@@ -79,6 +80,15 @@
             box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
             position: relative;
             z-index: 1;
+            box-sizing: border-box;
+        }
+        
+        @media (max-width: 768px) {
+            .container {
+                padding: 30px 20px;
+                margin: 10px;
+                border-radius: 15px;
+            }
         }
 
         .check-container {
@@ -223,13 +233,28 @@
             font-size: 16px;
             border: 2px solid #DC143C;
             cursor: pointer;
+            min-height: 44px;
+            min-width: 120px;
+            touch-action: manipulation;
+            -webkit-tap-highlight-color: transparent;
         }
 
-        .btn:hover {
+        .btn:hover,
+        .btn:active {
             background: #B22222;
             border-color: #B22222;
             transform: translateY(-2px);
             box-shadow: 0 5px 15px rgba(220, 20, 60, 0.4);
+        }
+        
+        @media (max-width: 768px) {
+            .btn {
+                display: block;
+                width: 100%;
+                margin: 10px 0;
+                padding: 16px 20px;
+                font-size: 16px;
+            }
         }
 
         .btn-secondary {

@@ -43,16 +43,19 @@ const generarPDFEntrada = async (req, res = response) => {
             return res.status(404).json({ msg: 'Entrada no encontrada con ese token' });
         }
         
+        // Obtener el token de la entrada
+        const token = entrada.token || entradaId;
+        
         // Verificar que todos los datos relacionados existen
         if (!entrada.Partido) {
-            console.error('Error: Partido no encontrado para entrada', entrada.id);
+            console.error('Error: Partido no encontrado para entrada', token);
             return res.status(500).json({ 
                 msg: 'Error: No se encontró el partido asociado a esta entrada. Por favor, contacta con soporte.' 
             });
         }
         
         if (!entrada.Asiento) {
-            console.error('Error: Asiento no encontrado para entrada', entrada.id);
+            console.error('Error: Asiento no encontrado para entrada', token);
             return res.status(500).json({ 
                 msg: 'Error: No se encontró el asiento asociado a esta entrada. Por favor, contacta con soporte.' 
             });
@@ -66,13 +69,11 @@ const generarPDFEntrada = async (req, res = response) => {
         }
         
         if (!entrada.Usuario) {
-            console.error('Error: Usuario no encontrado para entrada', entrada.id);
+            console.error('Error: Usuario no encontrado para entrada', token);
             return res.status(500).json({ 
                 msg: 'Error: No se encontró el usuario asociado a esta entrada. Por favor, contacta con soporte.' 
             });
         }
-        
-        const token = entrada.token;
         
         // Generar QR code como buffer
         const qrBuffer = await QRCode.toBuffer(token, {

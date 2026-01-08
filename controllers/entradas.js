@@ -163,17 +163,18 @@ const generarPDFEntrada = async (req, res = response) => {
            .lineWidth(3)
            .stroke();
         
-        // Título del partido (arriba) - con más espacio
+        // Título del partido (arriba) - alineado a la izquierda
         doc.fillColor('#DC143C')
            .fontSize(22)
            .font('Helvetica-Bold');
         
         const partidoText = `${entrada.Partido.equipoLocal} vs ${entrada.Partido.equipoVisitante}`;
         const partidoY = contentTop + 45;
+        const textLeft = contentLeft + 50; // Mismo margen izquierdo que los textos de abajo
         
-        // Dibujar el texto del partido
-        doc.text(partidoText, centerX, partidoY, { 
-            align: 'center',
+        // Dibujar el texto del partido alineado a la izquierda
+        doc.text(partidoText, textLeft, partidoY, { 
+            align: 'left',
             width: contentWidth - 100
         });
         
@@ -181,7 +182,7 @@ const generarPDFEntrada = async (req, res = response) => {
         const partidoLineHeight = 28; // Altura aproximada para fuente de 22px
         const partidoHeight = partidoText.length > 40 ? partidoLineHeight * 2 : partidoLineHeight;
         
-        // Fecha y hora (debajo del título con MUCHO más espacio)
+        // Fecha y hora (debajo del título con MUCHO más espacio) - alineado a la izquierda
         const fechaPartido = new Date(entrada.Partido.fecha);
         const fechaStr = fechaPartido.toLocaleDateString('es-ES', { 
             weekday: 'long', 
@@ -201,15 +202,15 @@ const generarPDFEntrada = async (req, res = response) => {
         const fechaLineHeight = 18;
         const fechaHeight = fechaStr.length > 50 ? fechaLineHeight * 2 : fechaLineHeight;
         
-        doc.text(fechaStr, centerX, fechaY, { 
-            align: 'center',
+        doc.text(fechaStr, textLeft, fechaY, { 
+            align: 'left',
             width: contentWidth - 100
         });
         
         let horaY = fechaY + fechaHeight + 25; // Aumentado de 20 a 25
         if (entrada.Partido.hora) {
             doc.fontSize(12)
-               .text(`Hora: ${entrada.Partido.hora}`, centerX, horaY, { align: 'center' });
+               .text(`Hora: ${entrada.Partido.hora}`, textLeft, horaY, { align: 'left' });
             horaY += 25; // Aumentado de 20 a 25
         }
         

@@ -25,8 +25,27 @@ const validarJWT = async (req = request, res = response, next) => {
             req.uid = decoded.uid;
             return next();
         } catch (error) {
-            console.log('❌ JWT inválido:', error.message);
-            return res.status(401).json({ msg: 'Token JWT inválido' });
+            // Diferenciar entre diferentes tipos de errores de JWT
+            if (error.name === 'TokenExpiredError') {
+                console.log('❌ JWT expirado:', error.message);
+                return res.status(401).json({ 
+                    msg: 'Token JWT expirado. Por favor, inicia sesión nuevamente.',
+                    error: 'jwt_expired',
+                    expiredAt: error.expiredAt
+                });
+            } else if (error.name === 'JsonWebTokenError') {
+                console.log('❌ JWT inválido:', error.message);
+                return res.status(401).json({ 
+                    msg: 'Token JWT inválido',
+                    error: 'jwt_invalid'
+                });
+            } else {
+                console.log('❌ Error al verificar JWT:', error.message);
+                return res.status(401).json({ 
+                    msg: 'Error al verificar el token',
+                    error: 'jwt_error'
+                });
+            }
         }
     }
 

@@ -236,6 +236,10 @@ const logInWordpress = async (req, res = response) => {
       }
   
       // 3. Generar JWT temporal para WordPress (válido 2 minutos)
+      const expiresIn = '2m';
+      const expirationDate = new Date();
+      expirationDate.setMinutes(expirationDate.getMinutes() + 2);
+      
       const token = jwt.sign(
         {
           email: usuario.email,
@@ -243,13 +247,16 @@ const logInWordpress = async (req, res = response) => {
         },
         process.env.SECRET_KEY_WORDPRESS, // Usa una clave diferente a tu auth principal
         {
-          expiresIn: '2m'
+          expiresIn: expiresIn
         }
       );
-  
+
+      console.log(`✅ JWT temporal generado para WordPress (usuario: ${usuario.email})`);
+      console.log(`   Duración: ${expiresIn} (expira el ${expirationDate.toLocaleString('es-ES', { timeZone: 'Europe/Madrid' })})`);
+
       // 4. Crear URL de autologin en WordPress
       const autologinUrl = `https://tienda.algecirasclubdefutbol.com/wp-login-auto?token=${token}`;
-  
+
       return res.json({ autologinUrl });
   
     } catch (err) {

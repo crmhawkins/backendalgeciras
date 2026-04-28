@@ -1,6 +1,6 @@
 const { Router } = require('express');
 const { check } = require('express-validator');
-const { usuarioGet, usuarioPost, showUserImage, updateUserImage,showMyUserImage } = require('../controllers/usuarios');
+const { usuarioGet, usuarioPost, cambiarPassword, showUserImage, updateUserImage, showMyUserImage } = require('../controllers/usuarios');
 const { validarCampos } = require('../middlewares/validar-campos');
 const { validarJWT } = require('../middlewares/validar-jwt');
 const {upload} = require('../middlewares/subir-archivo');
@@ -29,6 +29,13 @@ router.post('/create-pagina', [
     check('dni', 'El DNI es obligatorio').not().isEmpty(),
     validarCampos
 ], usuarioPost);
+
+router.put('/change-password', [
+    validarJWT,
+    check('passwordActual', 'La contraseña actual es obligatoria').not().isEmpty(),
+    check('passwordNueva', 'La nueva contraseña debe tener al menos 6 caracteres').isLength({ min: 6 }),
+    validarCampos
+], cambiarPassword);
 
 router.put('/profile-image', [
     validarJWT,

@@ -6,124 +6,90 @@ const { mapWordpressToUser } = require('../helpers/mapper-wordpress');
 const path = require('path');
 
 const Usuario = require('../models/usuario');
-const WordpressUser = require('../models/usuarioWP'); // Importamos el modelo de WordPress
+const WordpressUser = require('../models/usuarioWP');
 
-// Función para obtener un usuario, primero en la base de datos principal y luego en WordPress
 const usuarioGet = async (req, res = response) => {
     const { uid } = req;
-
     try {
-        // Intentamos obtener el usuario desde la base de datos principal
         let usuario = await Usuario.findByPk(uid);
-
         if (!usuario) {
-            // Si no está, lo buscamos en la base de datos de WordPress
-            const wordpressUser = await WordpressUser.findOne({ where: { ID: uid } });
-
-            if (!wordpressUser) {
-                return res.status(404).json({ msg: `No existe un usuario con el id ${uid}` });
-            }
-
-            // Mapeamos los datos de WordPress al formato esperado
+            let wordpressUser = null;
+            try { wordpressUser = await WordpressUser.findOne({ where: { ID: uid } }); } catch (_) {}
+            if (!wordpressUser) return res.status(404).json({ msg: `No existe un usuario con el id ${uid}` });
             const mappedUser = mapWordpressToUser(wordpressUser);
-
-            // Creamos el usuario en nuestra base de datos principal
             usuario = await Usuario.create({
-                id: mappedUser.id,
-                nombre: mappedUser.nombre,
-                email: mappedUser.email,
-                dni: mappedUser.dni || null, // si no hay DNI en WP
-                password: '', // en blanco si viene de WP
-                profileImage: mappedUser.profileImage || null,
-                // puedes agregar más campos si tu modelo los requiere
+                id: mappedUser.id, nombre: mappedUser.nombre, email: mappedUser.email,
+                dni: mappedUser.dni || null, password: '', profileImage: mappedUser.profileImage || null,
             });
         }
-
-        res.json({
-            usuario: {
-                id: usuario.id,
-                nombre: usuario.nombre,
-                email: usuario.email,
-                dni: usuario.dni,
-                profileImage: usuario.profileImage
-            }
-        });
-
+        res.json({ usuario: { id: usuario.id, nombre: usuario.nombre, email: usuario.email, dni: usuario.dni, profileImage: usuario.profileImage } });
     } catch (error) {
         console.error(error);
         res.status(500).json({ msg: 'Error al obtener o sincronizar el usuario' });
     }
 };
 
-
-// Función para crear un nuevo usuario, primero en la base de datos principal y luego en WordPress
 const usuarioPost = async (req, res = response) => {
     const errors = validationResult(req);
     if (!errors.isEmpty()) return res.status(400).json(errors);
 
-    const { nombre, email, password,dni } = req.body;  // Ahora no necesitamos los campos relacionados con Google
-
+    const { nombre, email, password, dni } = req.body;
     try {
-        // Verificamos si el email ya existe en la base de datos principal (futbol_db)
         const existeEmail = await Usuario.findOne({ where: { email } });
+        if (existeEmail) return res.status(400).json({ msg: 'Ese correo ya está registrado' });
 
-        // Verificamos si el email ya existe en la base de datos de WordPress
-        const existeEmailWP = await WordpressUser.findOne({ where: { user_email: email } });
+        try {
+            const existeEmailWP = await WordpressUser.findOne({ where: { user_email: email } });
+            if (existeEmailWP) return res.status(400).json({ msg: 'Ese correo ya está registrado' });
+        } catch (_) {}
 
-        if (existeEmailWP || existeEmail) {
-            return res.status(400).json({ msg: 'Ese correo ya está registrado' });
-        }
-
-        // Encriptamos la contraseña
         const salt = bcryptjs.genSaltSync();
         const hashedPassword = bcryptjs.hashSync(password, salt);
-
-        // Creamos el usuario en la base de datos principal (futbol_db)
         const usuario = await Usuario.create({
-            nombre,
-            email,
-            profileImage:'default_profile_photo.png',
-            password: hashedPassword,
-            dni
+            nombre, email, profileImage: 'default_profile_photo.png', password: hashedPassword, dni
         });
-
-        // Respondemos con los datos del usuario recién creado
         res.status(201).json({ usuario });
-
     } catch (error) {
         console.error(error);
         res.status(500).json({ msg: 'Error al crear el usuario' });
     }
 };
 
+const cambiarPassword = async (req, res = response) => {
+    const { uid } = req;
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) return res.status(400).json(errors);
 
-// Cambiar imagen del usuario
-const updateUserImage = async (req, res = response) => {
-    const { uid } = req; // uid viene del middleware de validación JWT
-    console.log('🧠 req.uid recibido en controlador:', req.uid);
-
+    const { passwordActual, passwordNueva } = req.body;
     try {
         const usuario = await Usuario.findByPk(uid);
-        if (!usuario) {
-            return res.status(404).json({ msg: 'Usuario no encontrado' });
-        }
+        if (!usuario) return res.status(404).json({ msg: 'Usuario no encontrado' });
 
-        if (!req.file) {
-            return res.status(400).json({ msg: 'No se ha subido ninguna imagen' });
-        }
+        const valido = bcryptjs.compareSync(passwordActual, usuario.password);
+        if (!valido) return res.status(400).json({ msg: 'La contraseña actual no es correcta' });
 
-        // Eliminar imagen anterior si existe
+        const salt = bcryptjs.genSaltSync();
+        usuario.password = bcryptjs.hashSync(passwordNueva, salt);
+        await usuario.save();
+        res.json({ msg: 'Contraseña actualizada correctamente' });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ msg: 'Error al cambiar la contraseña' });
+    }
+};
+
+const updateUserImage = async (req, res = response) => {
+    const { uid } = req;
+    try {
+        const usuario = await Usuario.findByPk(uid);
+        if (!usuario) return res.status(404).json({ msg: 'Usuario no encontrado' });
+        if (!req.file) return res.status(400).json({ msg: 'No se ha subido ninguna imagen' });
         if (usuario.profileImage) {
             const pathAnterior = path.join(__dirname, '../uploads/perfiles', usuario.profileImage);
-            if (fs.existsSync(pathAnterior)) {
-                fs.unlinkSync(pathAnterior);
-            }
+            if (fs.existsSync(pathAnterior)) fs.unlinkSync(pathAnterior);
         }
-
-        // Guardar nuevo nombre de la imagen
         usuario.profileImage = req.file.filename;
         await usuario.save();
-       
         res.json({ msg: 'Imagen actualizada correctamente', profileImage: usuario.profileImage });
     } catch (error) {
         console.error(error);
@@ -134,44 +100,22 @@ const updateUserImage = async (req, res = response) => {
 const showUserImage = async (req, res = response) => {
     const { filename } = req.params;
     const filePath = path.join(__dirname, '../uploads/perfiles', filename);
-
-    if (fs.existsSync(filePath)) {
-        return res.sendFile(filePath);
-    }
-
-    return res.status(404).json({
-        msg: 'Imagen no encontrada'
-    });
+    if (fs.existsSync(filePath)) return res.sendFile(filePath);
+    return res.status(404).json({ msg: 'Imagen no encontrada' });
 };
 
 const showMyUserImage = async (req, res = response) => {
     try {
         const uid = req.uid;
-        const user = await User.findById(uid);
-
-        if (!user || !user.img) {
-            return res.status(404).json({ msg: 'Imagen no encontrada o usuario no tiene imagen' });
-        }
-
-        const filePath = path.join(__dirname, '../uploads/perfiles', user.img);
-
-        if (fs.existsSync(filePath)) {
-            return res.sendFile(filePath);
-        }
-
+        const user = await Usuario.findByPk(uid);
+        if (!user || !user.profileImage) return res.status(404).json({ msg: 'Imagen no encontrada' });
+        const filePath = path.join(__dirname, '../uploads/perfiles', user.profileImage);
+        if (fs.existsSync(filePath)) return res.sendFile(filePath);
         return res.status(404).json({ msg: 'Imagen no encontrada en el servidor' });
-
     } catch (error) {
         console.error(error);
         return res.status(500).json({ msg: 'Error del servidor' });
     }
 };
 
-
-module.exports = {
-    usuarioGet,
-    usuarioPost,
-    updateUserImage,
-    showUserImage,
-    showMyUserImage
-};
+module.exports = { usuarioGet, usuarioPost, cambiarPassword, updateUserImage, showUserImage, showMyUserImage };

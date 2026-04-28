@@ -5,7 +5,7 @@ const Sector = require('../models/sector');
 const Grada = require('../models/grada');
 
 async function insertGradas() {
-  const gradasData = JSON.parse(await fs.readFile('./fieldDataJSON/gradas.json', 'utf-8'));
+  const gradasData = JSON.parse(await fs.readFile(path.join(__dirname, '../fieldDataJSON/gradas.json'), 'utf-8'));
 
   for (const grada of gradasData) {
     await Grada.create(grada);
@@ -15,10 +15,10 @@ async function insertGradas() {
 }
 
 async function insertSectores() {
-  const sectorFiles = await fs.readdir('./fieldDataJSON/sectores');
+  const sectorFiles = await fs.readdir(path.join(__dirname, '../fieldDataJSON/sectores'));
 
   for (const file of sectorFiles) {
-    const data = JSON.parse(await fs.readFile(`./fieldDataJSON/sectores/${file}`, 'utf-8'));
+    const data = JSON.parse(await fs.readFile(path.join(__dirname, '../fieldDataJSON/sectores', file), 'utf-8'));
 
     for (const sector of data) {
       await Sector.create(sector);
@@ -29,10 +29,10 @@ async function insertSectores() {
 }
 
 async function insertAsientos() {
-  const zonas = await fs.readdir('./fieldDataJSON/asientos');
+  const zonas = await fs.readdir(path.join(__dirname, '../fieldDataJSON/asientos'));
 
   for (const zona of zonas) {
-    const zonaPath = path.join('./fieldDataJSON/asientos', zona);
+    const zonaPath = path.join(__dirname, '../fieldDataJSON/asientos', zona);
     const asientoFiles = await fs.readdir(zonaPath);
 
     for (const file of asientoFiles) {

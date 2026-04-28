@@ -9,6 +9,7 @@ const logger = require('../helpers/logger');
 
 const router = Router();
 const Asiento = require('../models/asiento');
+const { sincronizarZona } = require('../services/compralaentradaService');
 
 router.get('/sector/:id', async (req, res) => {
     const { id } = req.params;
@@ -16,6 +17,10 @@ router.get('/sector/:id', async (req, res) => {
     const { Op } = require("sequelize");
 
     try {
+        try {
+            await sincronizarZona(id);
+        } catch (_) {}
+
         const asientos = await Asiento.findAll({
             where: { sectorId: id }
         });

@@ -182,9 +182,67 @@ const sincronizarZonas = async () => {
     return resultados;
 };
 
+/**
+ * Sincroniza una sola zona por ID (más rápido que sincronizarZonas completo)
+ * @param {number|string} zonaId
+ */
+const sincronizarZona = async (zonaId) => {
+    try {
+        const url = `${BASE_URL}/zonas?renovacion=0&tid=${TID}`;
+        const res = await fetchConTimeout(url);
+        if (!res.ok) return;
+        const json = await res.json();
+        const zonas = json.data || [];
+        const zona = zonas.find(z => String(z.id) === String(zonaId));
+        if (!zona) return;
+
+        const sector = await Sector.findByPk(zona.id);
+        if (!sector) return;
+
+        // Update capacity if changed
+        if (sector.capacidad !== zona.total_asientos) {
+            sector.capacidad = zona.total_asientos;
+            await sector.save();
+        }
+
+        if (!zona.esta_disponible) return;
+
+        // If zone fully sold out, mark all as ocupado
+        if (zona.libres === 0) {
+            await Asiento.update({ estado: 'ocupado' }, { where: { sectorId: sector.id } });
+            return;
+        }
+
+        // Calculate how many should be ocupado
+        const ocupados = (zona.total_asientos || 0) - (zona.libres || 0);
+        if (ocupados <= 0) {
+            await Asiento.update({ estado: 'disponible' }, { where: { sectorId: sector.id } });
+            return;
+        }
+
+        // Mark first N as ocupado, rest as disponible
+        const asientosTodos = await Asiento.findAll({
+            where: { sectorId: sector.id },
+            order: [['fila', 'ASC'], ['numero', 'ASC']]
+        });
+
+        for (let i = 0; i < asientosTodos.length; i++) {
+            const nuevoEstado = i < ocupados ? 'ocupado' : 'disponible';
+            if (asientosTodos[i].estado !== nuevoEstado) {
+                asientosTodos[i].estado = nuevoEstado;
+                await asientosTodos[i].save();
+            }
+        }
+        console.log(`[sincronizarZona] Zona ${zonaId}: ${ocupados} ocupados / ${zona.total_asientos} total`);
+    } catch (err) {
+        console.warn(`[sincronizarZona] Error zona ${zonaId}:`, err.message);
+    }
+};
+
 module.exports = {
     obtenerZonas,
     verificarAsientoEnCompralaentrada,
     obtenerDisponibilidadZona,
-    sincronizarZonas
+    sincronizarZonas,
+    sincronizarZona
 };

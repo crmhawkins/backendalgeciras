@@ -36,7 +36,7 @@ const generarPasswordAleatoria = require('../helpers/generarPasswordAleatoria');
 const generarIdUnico = require('../helpers/generarIdUnico');
 const nodemailer = require('nodemailer');
 const { actualizarJSONAsiento } = require('../services/updateJSON');
-const { verificarAsientoEnCompralaentrada } = require('../services/compralaentradaService');
+const { verificarAsientoEnCompralaentrada, sincronizarZona } = require('../services/compralaentradaService');
 
 /**
  * Crea una sesión de pago de Stripe para entradas
@@ -530,6 +530,14 @@ const confirmarPago = async (req, res = response) => {
         pagoSession.estado = 'completado';
         await pagoSession.save();
 
+        // Sync compralaentrada zone immediately after confirming payment
+        try {
+            const asientoConfirmado = await Asiento.findByPk(datosCompra.asientoId);
+            if (asientoConfirmado && asientoConfirmado.sectorId) {
+                sincronizarZona(asientoConfirmado.sectorId).catch(() => {});
+            }
+        } catch (_) {}
+
         res.json({
             msg: 'Pago confirmado correctamente',
             entradaToken: resultado.entrada ? resultado.entrada.token : null,
@@ -574,16 +582,74 @@ const webhookStripe = async (req, res) => {
     // Manejar el evento checkout.session.completed
     if (event.type === 'checkout.session.completed') {
         const session = event.data.object;
-        
-        // Buscar la sesión de pago en la base de datos
-        const pagoSession = await PagoSession.findOne({
-            where: { stripeSessionId: session.id }
-        });
+        try {
+            const pagoSession = await PagoSession.findOne({ where: { stripeSessionId: session.id } });
+            if (pagoSession && pagoSession.estado === 'pendiente') {
+                const datosCompra = pagoSession.datosCompra;
 
-        if (pagoSession && pagoSession.estado === 'pendiente') {
-            // Aquí podrías procesar el pago automáticamente
-            // Por ahora, solo lo marcamos como completado si el usuario no completó la redirección
-            console.log(`Pago completado para sesión: ${session.id}`);
+                // Find or create usuario
+                let usuario = await Usuario.findOne({ where: { email: datosCompra.email } });
+                if (!usuario) {
+                    const salt = bcryptjs.genSaltSync();
+                    usuario = await Usuario.create({
+                        nombre: datosCompra.nombre,
+                        email: datosCompra.email,
+                        profileImage: 'default_profile_photo.png',
+                        password: bcryptjs.hashSync(generarPasswordAleatoria(10), salt),
+                        dni: datosCompra.dni || null
+                    });
+                }
+
+                let sectorId = null;
+
+                if (pagoSession.tipo === 'abono') {
+                    const abono = await Abono.create({
+                        fechaInicio: datosCompra.fechaInicio,
+                        fechaFin: datosCompra.fechaFin,
+                        nombre: datosCompra.nombre,
+                        apellidos: datosCompra.apellidos,
+                        genero: datosCompra.genero || null,
+                        dni: datosCompra.dni || null,
+                        fechaNacimiento: datosCompra.fechaNacimiento || null,
+                        email: datosCompra.email,
+                        telefono: datosCompra.telefono || null,
+                        pais: datosCompra.pais || null,
+                        provincia: datosCompra.provincia || null,
+                        localidad: datosCompra.localidad || null,
+                        domicilio: datosCompra.domicilio || null,
+                        codigoPostal: datosCompra.codigoPostal || null,
+                        usuarioId: usuario.id,
+                        asientoId: datosCompra.asientoId,
+                        precio: pagoSession.monto
+                    });
+                    const asiento = await Asiento.findByPk(datosCompra.asientoId);
+                    if (asiento) { asiento.estado = 'ocupado'; await asiento.save(); sectorId = asiento.sectorId; }
+                    actualizarJSONAsiento(datosCompra.asientoId, 'ocupado');
+                } else if (pagoSession.tipo === 'entrada') {
+                    const token = generarIdUnico();
+                    await Entrada.create({
+                        token,
+                        partidoId: datosCompra.partidoId,
+                        asientoId: datosCompra.asientoId,
+                        precio: datosCompra.precio,
+                        usuarioId: usuario.id
+                    });
+                    const asiento = await Asiento.findByPk(datosCompra.asientoId);
+                    if (asiento) { asiento.estado = 'ocupado'; await asiento.save(); sectorId = asiento.sectorId; }
+                }
+
+                pagoSession.estado = 'completado';
+                await pagoSession.save();
+
+                // Sync compralaentrada for this zone immediately
+                if (sectorId) {
+                    sincronizarZona(sectorId).catch(e => console.warn('[webhook] sync zona error:', e.message));
+                }
+
+                console.log(`[webhook] Pago procesado y zona sincronizada: session=${session.id}`);
+            }
+        } catch (err) {
+            console.error('[webhook] Error procesando checkout.session.completed:', err.message);
         }
     }
 

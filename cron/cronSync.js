@@ -26,7 +26,7 @@ const ejecutarSincronizacion = async () => {
     }
 };
 
-// Cada 5 minutos
-cron.schedule('*/5 * * * *', ejecutarSincronizacion);
+// Cada 1 minuto
+cron.schedule('* * * * *', ejecutarSincronizacion);
 
 module.exports = { ejecutarSincronizacion };

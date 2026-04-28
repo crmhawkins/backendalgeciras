@@ -28,7 +28,8 @@ class Server {
             partidos: '/api/partidos',
             clasificacion: '/api/clasificacion',
             pagos: '/api/pagos',
-            logs: '/api/logs'
+            logs: '/api/logs',
+            sync: '/api/sync'
         };
         
 
@@ -104,6 +105,9 @@ class Server {
         
         // Rutas de logs (solo para debugging)
         this.app.use(this.paths.logs, require('../routes/logs'));
+
+        // Rutas de sincronización con compralaentrada
+        this.app.use(this.paths.sync, require('../routes/sync'));
 
     }
 

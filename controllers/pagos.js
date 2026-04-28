@@ -36,6 +36,7 @@ const generarPasswordAleatoria = require('../helpers/generarPasswordAleatoria');
 const generarIdUnico = require('../helpers/generarIdUnico');
 const nodemailer = require('nodemailer');
 const { actualizarJSONAsiento } = require('../services/updateJSON');
+const { verificarAsientoEnCompralaentrada } = require('../services/compralaentradaService');
 
 /**
  * Crea una sesión de pago de Stripe para entradas
@@ -219,6 +220,22 @@ const crearSesionPagoAbono = async (req, res = response) => {
 
         if (asiento.estado === 'ocupado') {
             return res.status(400).json({ msg: 'El asiento no está disponible' });
+        }
+
+        // Verificación adicional contra compralaentrada (fail-open: si la API externa falla, no bloqueamos la compra)
+        try {
+            const libreEnCompralaentrada = await verificarAsientoEnCompralaentrada(
+                asiento.sectorId,
+                asiento.fila,
+                asiento.numero
+            );
+            if (!libreEnCompralaentrada) {
+                return res.status(409).json({
+                    msg: 'El asiento está ocupado en el sistema de venta externo (compralaentrada). Elige otro asiento.'
+                });
+            }
+        } catch (errCle) {
+            console.warn('[pagos] compralaentrada no disponible, se continúa sin verificación externa:', errCle.message);
         }
 
         const precio = Number(asiento.Sector.precio);

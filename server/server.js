@@ -44,19 +44,16 @@ class Server {
     }
     async conectarDB() {
         try {
-            // Connect to both databases
-            await dbConnection();  // Connect to your main MySQL database (futbol_db)
-            await wpDBConnection();  // Connect to WordPress MySQL database (furbo)
-            
-//            console.log('Insertando datos del campo...')
-//            await insertGradas();
-//            await insertSectores();
-//            await insertAsientos();
-
-            console.log('Conexión a las bases de datos establecidas correctamente');
+            await dbConnection();
+            console.log('Conexión a la base de datos principal establecida');
         } catch (error) {
-            console.error('Error al conectar a la base de datos:', error);
-            process.exit(1); // Stop the application if the database connection fails
+            console.error('Error al conectar a la base de datos principal:', error);
+            process.exit(1);
+        }
+        try {
+            await wpDBConnection();
+        } catch (error) {
+            console.warn('WP DB no disponible (no crítico):', error.message);
         }
     }
 

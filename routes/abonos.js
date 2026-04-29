@@ -1,12 +1,22 @@
 const { Router } = require('express');
 const { check } = require('express-validator');
+const rateLimit = require('express-rate-limit');
 const { abonoGet, abonoPost, renovarAbono, getAbonosPorUsuario, liberarAsiento, cancelarLiberacionAsiento  } = require('../controllers/abonos');
 const { validarCampos } = require('../middlewares/validar-campos');
 const {validarJWT} = require('../middlewares/validar-jwt');
+const { esAdmin } = require('../middlewares/es-admin');
+
+const renovarAbonoLimiter = rateLimit({
+    windowMs: 15 * 60 * 1000,
+    max: 5,
+    message: { msg: 'Demasiados intentos. Inténtalo de nuevo en 15 minutos.' },
+    standardHeaders: true,
+    legacyHeaders: false,
+});
 
 const router = Router();
 
-router.get('/', validarJWT, abonoGet);
+router.get('/', validarJWT, esAdmin, abonoGet);
 
 router.get('/usuario/:id', validarJWT, getAbonosPorUsuario);
 
@@ -35,7 +45,7 @@ router.post('/create', [
 
 router.post('/liberar', validarJWT, liberarAsiento);
 
-router.post('/renovar', [
+router.post('/renovar', renovarAbonoLimiter, [
     check('dni', 'El DNI es obligatorio').not().isEmpty(),
     check('codigo', 'El código de abonado debe ser un número').isInt(),
     validarCampos

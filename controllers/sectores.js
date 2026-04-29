@@ -1,9 +1,20 @@
 const { validationResult } = require('express-validator');
 const Sector = require('../models/sector');
+const Asiento = require('../models/asiento');
 
 const sectorGet = async (req, res) => {
     const sectores = await Sector.findAll();
-    res.json({ sectores });
+
+    const sectoresConDisponibles = await Promise.all(
+        sectores.map(async (sector) => {
+            const asientosDisponibles = await Asiento.count({
+                where: { sectorId: sector.id, estado: 'disponible' }
+            });
+            return { ...sector.toJSON(), asientosDisponibles };
+        })
+    );
+
+    res.json({ sectores: sectoresConDisponibles });
 };
 
 const sectorPost = async (req, res) => {

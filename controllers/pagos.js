@@ -33,6 +33,7 @@ const Asiento = require('../models/asiento');
 const Sector = require('../models/sector');
 const bcryptjs = require('bcryptjs');
 const generarPasswordAleatoria = require('../helpers/generarPasswordAleatoria');
+const { generarJWT } = require('../helpers/generarJWT');
 const generarIdUnico = require('../helpers/generarIdUnico');
 const nodemailer = require('nodemailer');
 const { actualizarJSONAsiento } = require('../services/updateJSON');
@@ -120,8 +121,8 @@ const crearSesionPagoEntrada = async (req, res = response) => {
                 },
             ],
             mode: 'payment',
-            success_url: `https://backend-algeciras.hawkins.es/pago-exitoso?session_id={CHECKOUT_SESSION_ID}`,
-            cancel_url: `https://backend-algeciras.hawkins.es/pago-cancelado`,
+            success_url: `${process.env.BACKEND_URL || 'https://backend-algeciras.hawkins.es'}/api/pagos/pago-exitoso?session_id={CHECKOUT_SESSION_ID}`,
+            cancel_url: `${process.env.BACKEND_URL || 'https://backend-algeciras.hawkins.es'}/api/pagos/pago-cancelado`,
             customer_email: email,
             metadata: {
                 tipo: 'entrada',
@@ -258,8 +259,8 @@ const crearSesionPagoAbono = async (req, res = response) => {
                 },
             ],
             mode: 'payment',
-            success_url: `https://backend-algeciras.hawkins.es/pago-exitoso?session_id={CHECKOUT_SESSION_ID}`,
-            cancel_url: `https://backend-algeciras.hawkins.es/pago-cancelado`,
+            success_url: `${process.env.BACKEND_URL || 'https://backend-algeciras.hawkins.es'}/api/pagos/pago-exitoso?session_id={CHECKOUT_SESSION_ID}`,
+            cancel_url: `${process.env.BACKEND_URL || 'https://backend-algeciras.hawkins.es'}/api/pagos/pago-cancelado`,
             customer_email: email,
             metadata: {
                 tipo: 'abono',
@@ -438,7 +439,7 @@ const confirmarPago = async (req, res = response) => {
                             <h2>¡Gracias por tu compra en Algeciras CF!</h2>
                             <p>Te hemos creado una cuenta para que puedas acceder a tu perfil y consultar tus entradas.</p>
                             <p><strong>Email de acceso:</strong> ${datosCompra.email}</p>
-                            <p><strong>Contraseña generada:</strong> ${passwordPlano}</p>
+                            <p>Para acceder a tu cuenta, <a href="${process.env.BACKEND_URL || 'https://backend-algeciras.hawkins.es'}/acceso?token=${await generarJWT(usuario.id)}">haz clic aquí</a> (válido 1 hora).</p>
                             <hr/>
                             <h3>📅 Detalles de tu entrada:</h3>
                             <p><strong>Partido:</strong> ${partido.equipoLocal} vs ${partido.equipoVisitante}</p>
@@ -511,7 +512,7 @@ const confirmarPago = async (req, res = response) => {
                         <p><strong>Nombre:</strong> ${datosCompra.nombre} ${datosCompra.apellidos}</p>
                         <p><strong>Zona:</strong> Sector ${asiento.Sector.nombre} - Fila ${asiento.fila}, Butaca ${asiento.numero}</p>
                         <p><strong>Email de acceso:</strong> ${datosCompra.email}</p>
-                        ${nuevaCuenta ? `<p><strong>Contraseña generada:</strong> ${passwordPlano}</p>` : ''}
+                        ${nuevaCuenta ? `<p>Para acceder a tu cuenta, <a href="${process.env.BACKEND_URL || 'https://backend-algeciras.hawkins.es'}/acceso?token=${await generarJWT(usuario.id)}">haz clic aquí</a> (válido 1 hora).</p>` : ''}
                         <p><strong>Código de abono:</strong> ${abono.id}</p>
                         <p><strong>Precio del abono:</strong> ${pagoSession.monto} €</p>
                         <hr/>
@@ -656,9 +657,134 @@ const webhookStripe = async (req, res) => {
     res.json({ received: true });
 };
 
+/**
+ * Crea una sesión de pago unificada para la app móvil
+ */
+const crearSesionPagoUnificada = async (req, res = response) => {
+    if (!stripe || !process.env.STRIPE_SECRET_KEY || process.env.STRIPE_SECRET_KEY === 'sk_test_placeholder') {
+        return res.status(503).json({
+            msg: 'El sistema de pagos no está configurado. Por favor, contacta al administrador.'
+        });
+    }
+
+    try {
+        const {
+            asientoId,
+            dni,
+            tipo = 'abono',
+            partidoId,
+            email,
+            nombre
+        } = req.body;
+
+        const asiento = await Asiento.findByPk(asientoId, {
+            include: { model: Sector, attributes: ['nombre', 'precio'] }
+        });
+
+        if (!asiento) {
+            return res.status(400).json({ msg: 'El asiento no existe.' });
+        }
+
+        if (!asiento.Sector) {
+            return res.status(400).json({ msg: 'El sector del asiento no existe.' });
+        }
+
+        if (asiento.estado === 'ocupado') {
+            return res.status(400).json({ msg: 'El asiento no está disponible.' });
+        }
+
+        const precio = Number(asiento.Sector.precio);
+        const montoCentavos = Math.round(precio * 100);
+
+        const sessionParams = {
+            payment_method_types: ['card'],
+            billing_address_collection: 'auto',
+            line_items: [
+                {
+                    price_data: {
+                        currency: 'eur',
+                        product_data: {
+                            name: tipo === 'abono' ? `Abono de Temporada - Algeciras CF` : `Entrada - Algeciras CF`,
+                            description: `Sector ${asiento.Sector.nombre} - Fila ${asiento.fila}, Butaca ${asiento.numero}`,
+                        },
+                        unit_amount: montoCentavos,
+                    },
+                    quantity: 1,
+                },
+            ],
+            mode: 'payment',
+            success_url: `${process.env.BACKEND_URL || 'https://backend-algeciras.hawkins.es'}/api/pagos/pago-exitoso?session_id={CHECKOUT_SESSION_ID}`,
+            cancel_url: `${process.env.BACKEND_URL || 'https://backend-algeciras.hawkins.es'}/api/pagos/pago-cancelado`,
+            metadata: {
+                tipo,
+                asientoId: String(asientoId),
+                dni,
+                ...(partidoId ? { partidoId: String(partidoId) } : {})
+            }
+        };
+
+        if (email) {
+            sessionParams.customer_email = email;
+        }
+
+        const session = await stripe.checkout.sessions.create(sessionParams);
+
+        const fechaExpiracion = new Date();
+        fechaExpiracion.setMinutes(fechaExpiracion.getMinutes() + 30);
+
+        await PagoSession.create({
+            stripeSessionId: session.id,
+            tipo,
+            estado: 'pendiente',
+            datosCompra: { asientoId, dni, email, nombre, tipo, partidoId },
+            monto: precio,
+            fechaExpiracion
+        });
+
+        res.json({ sessionId: session.id, url: session.url });
+
+    } catch (error) {
+        console.error('Error al crear sesión de pago unificada:', error);
+        res.status(500).json({
+            msg: 'Error al crear la sesión de pago',
+            error: error.message
+        });
+    }
+};
+
+const paginaPagoExitoso = (req, res) => {
+    res.send(`<!DOCTYPE html><html><head><meta charset="utf-8"><title>Pago exitoso</title>
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <style>body{font-family:sans-serif;text-align:center;padding:40px;background:#f5f5f5}
+    .card{background:#fff;border-radius:12px;padding:32px;max-width:400px;margin:0 auto;box-shadow:0 2px 8px rgba(0,0,0,.1)}
+    h1{color:#C8102E}p{color:#555}.icon{font-size:64px}</style></head>
+    <body><div class="card"><div class="icon">✅</div>
+    <h1>¡Pago completado!</h1>
+    <p>Tu abono ha sido procesado correctamente.</p>
+    <p>Recibirás un email de confirmación en breve.</p>
+    <p style="margin-top:24px;font-size:13px;color:#999">Puedes cerrar esta ventana y volver a la app.</p>
+    </div></body></html>`);
+};
+
+const paginaPagoCancelado = (req, res) => {
+    res.send(`<!DOCTYPE html><html><head><meta charset="utf-8"><title>Pago cancelado</title>
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <style>body{font-family:sans-serif;text-align:center;padding:40px;background:#f5f5f5}
+    .card{background:#fff;border-radius:12px;padding:32px;max-width:400px;margin:0 auto;box-shadow:0 2px 8px rgba(0,0,0,.1)}
+    h1{color:#C8102E}p{color:#555}.icon{font-size:64px}</style></head>
+    <body><div class="card"><div class="icon">❌</div>
+    <h1>Pago cancelado</h1>
+    <p>No se ha realizado ningún cargo.</p>
+    <p>Puedes cerrar esta ventana y volver a la app para intentarlo de nuevo.</p>
+    </div></body></html>`);
+};
+
 module.exports = {
     crearSesionPagoEntrada,
     crearSesionPagoAbono,
     confirmarPago,
-    webhookStripe
+    webhookStripe,
+    crearSesionPagoUnificada,
+    paginaPagoExitoso,
+    paginaPagoCancelado
 };

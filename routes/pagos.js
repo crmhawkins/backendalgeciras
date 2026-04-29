@@ -1,12 +1,16 @@
 const { Router } = require('express');
 const { check } = require('express-validator');
-const { 
-    crearSesionPagoEntrada, 
-    crearSesionPagoAbono, 
+const {
+    crearSesionPagoEntrada,
+    crearSesionPagoAbono,
     confirmarPago,
-    webhookStripe 
+    webhookStripe,
+    crearSesionPagoUnificada,
+    paginaPagoExitoso,
+    paginaPagoCancelado
 } = require('../controllers/pagos');
 const { validarCampos } = require('../middlewares/validar-campos');
+const { validarJWTOpcional } = require('../middlewares/validar-jwt-opcional');
 
 const router = Router();
 
@@ -59,5 +63,16 @@ router.get('/confirmar', [
     check('session_id', 'El session_id es requerido').notEmpty(),
     validarCampos
 ], confirmarPago);
+
+// Ruta unificada para la app móvil
+router.post('/create-checkout', [
+    check('asientoId', 'El asiento es obligatorio').isInt(),
+    check('dni', 'El DNI es obligatorio').notEmpty(),
+    validarCampos
+], crearSesionPagoUnificada);
+
+// Páginas de resultado de Stripe
+router.get('/pago-exitoso', paginaPagoExitoso);
+router.get('/pago-cancelado', paginaPagoCancelado);
 
 module.exports = { router, webhookRouter };

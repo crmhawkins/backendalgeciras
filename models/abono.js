@@ -24,7 +24,8 @@ const Abono = db.define('Abono', {
 
     usuarioId: { type: DataTypes.INTEGER, allowNull: true },
     asientoId: { type: DataTypes.INTEGER, allowNull: true },
-    precio: { type: DataTypes.DECIMAL(10, 2), allowNull: true }
+    precio: { type: DataTypes.DECIMAL(10, 2), allowNull: true },
+    codigoAcceso: { type: DataTypes.STRING(12), allowNull: true }
 }, {
     tableName: 'abonos',
     freezeTableName: true

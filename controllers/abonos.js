@@ -1,4 +1,5 @@
 const { validationResult } = require('express-validator');
+const crypto = require('crypto');
 const Abono = require('../models/abono');
 const Usuario = require('../models/usuario');
 const Asiento = require('../models/asiento');
@@ -97,6 +98,8 @@ const abonoPost = async (req, res) => {
             });
         }
 
+        const codigoAcceso = crypto.randomBytes(4).toString('hex').toUpperCase();
+
         const abono = await Abono.create({
             fechaInicio,
             fechaFin,
@@ -114,7 +117,8 @@ const abonoPost = async (req, res) => {
             codigoPostal,
             usuarioId: usuario.id,
             asientoId,
-            precio: sector.precio
+            precio: sector.precio,
+            codigoAcceso
         });
 
         asiento.estado = 'ocupado';

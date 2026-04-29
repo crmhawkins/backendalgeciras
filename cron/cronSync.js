@@ -1,5 +1,6 @@
 const cron = require('node-cron');
 const { sincronizarZonas } = require('../services/compralaentradaService');
+const { procesarNotificaciones } = require('../services/notificacionesService');
 
 /**
  * Ejecuta sincronización manual y loguea resultado
@@ -28,5 +29,10 @@ const ejecutarSincronizacion = async () => {
 
 // Cada 1 minuto
 cron.schedule('* * * * *', ejecutarSincronizacion);
+
+// Notificaciones de partidos — cada 5 minutos (desactivado por defecto via NOTIFICACIONES_ACTIVAS)
+cron.schedule('*/5 * * * *', async () => {
+    await procesarNotificaciones().catch(e => console.error('[notificaciones] Error:', e.message));
+});
 
 module.exports = { ejecutarSincronizacion };

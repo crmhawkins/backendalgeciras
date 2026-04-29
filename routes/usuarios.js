@@ -1,6 +1,6 @@
 const { Router } = require('express');
 const { check } = require('express-validator');
-const { usuarioGet, usuarioPost, cambiarPassword, showUserImage, updateUserImage, showMyUserImage } = require('../controllers/usuarios');
+const { usuarioGet, usuarioPost, cambiarPassword, showUserImage, updateUserImage, showMyUserImage, updatePushToken } = require('../controllers/usuarios');
 const { validarCampos } = require('../middlewares/validar-campos');
 const { validarJWT } = require('../middlewares/validar-jwt');
 const {upload} = require('../middlewares/subir-archivo');
@@ -45,5 +45,7 @@ router.put('/profile-image', [
 router.get('/profile-image-view/:filename', validarJWT, showUserImage);
 
 router.get('/profile-image-get', validarJWT, showMyUserImage);
+
+router.put('/push-token', validarJWT, updatePushToken);
 
 module.exports = router;

@@ -118,4 +118,15 @@ const showMyUserImage = async (req, res = response) => {
     }
 };
 
-module.exports = { usuarioGet, usuarioPost, cambiarPassword, updateUserImage, showUserImage, showMyUserImage };
+const updatePushToken = async (req, res = response) => {
+    const { expoPushToken } = req.body;
+    try {
+        await Usuario.update({ expoPushToken }, { where: { id: req.uid } });
+        res.json({ msg: 'Token push actualizado' });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ msg: 'Error al actualizar el token push' });
+    }
+};
+
+module.exports = { usuarioGet, usuarioPost, cambiarPassword, updateUserImage, showUserImage, showMyUserImage, updatePushToken };

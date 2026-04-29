@@ -30,6 +30,10 @@ const Usuario = db.define('Usuario', {
     resetTokenExpira: {
         type: DataTypes.DATE,
         allowNull: true
+    },
+    expoPushToken: {
+        type: DataTypes.STRING,
+        allowNull: true
     }
 }, {
     tableName: 'usuarios',

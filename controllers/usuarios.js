@@ -22,7 +22,7 @@ const usuarioGet = async (req, res = response) => {
                 dni: mappedUser.dni || null, password: '', profileImage: mappedUser.profileImage || null,
             });
         }
-        res.json({ usuario: { id: usuario.id, nombre: usuario.nombre, email: usuario.email, dni: usuario.dni, profileImage: usuario.profileImage } });
+        res.json({ usuario: { id: usuario.id, nombre: usuario.nombre, email: usuario.email, dni: usuario.dni, telefono: usuario.telefono, profileImage: usuario.profileImage } });
     } catch (error) {
         console.error(error);
         res.status(500).json({ msg: 'Error al obtener o sincronizar el usuario' });
@@ -130,4 +130,23 @@ const updatePushToken = async (req, res = response) => {
     }
 };
 
-module.exports = { usuarioGet, usuarioPost, cambiarPassword, updateUserImage, showUserImage, showMyUserImage, updatePushToken };
+const updateProfile = async (req, res = response) => {
+    const { uid } = req;
+    const { nombre, telefono, dni } = req.body;
+    try {
+        const usuario = await Usuario.findByPk(uid);
+        if (!usuario) return res.status(404).json({ msg: 'Usuario no encontrado' });
+        if (nombre !== undefined) usuario.nombre = nombre;
+        if (telefono !== undefined) usuario.telefono = telefono;
+        if (dni !== undefined) usuario.dni = dni;
+        await usuario.save();
+        const plain = usuario.get({ plain: true });
+        const { password, resetToken, resetTokenExpira, ...safe } = plain;
+        res.json({ msg: 'Perfil actualizado', usuario: safe });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ msg: 'Error al actualizar el perfil', error });
+    }
+};
+
+module.exports = { usuarioGet, usuarioPost, cambiarPassword, updateUserImage, showUserImage, showMyUserImage, updatePushToken, updateProfile };

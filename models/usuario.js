@@ -19,6 +19,10 @@ const Usuario = db.define('Usuario', {
         type: DataTypes.STRING,
         allowNull: true,
     },
+    telefono: {
+        type: DataTypes.STRING(20),
+        allowNull: true,
+    },
     profileImage: {
         type: DataTypes.STRING,
         allowNull: true

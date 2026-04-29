@@ -1,5 +1,7 @@
 const express = require('express');
 const cors = require('cors');
+const helmet = require('helmet');
+const rateLimit = require('express-rate-limit');
 const fileUpload = require('express-fileupload');
 const i18n = require('../lib/i18nConfigure');
 
@@ -11,6 +13,14 @@ const { insertGradas,insertSectores,insertAsientos } = require('../services/init
 
 // Importar las relaciones
 require('../models/associations');
+
+const loginLimiter = rateLimit({
+    windowMs: 15 * 60 * 1000,
+    max: 20,
+    standardHeaders: true,
+    legacyHeaders: false,
+    message: { msg: 'Demasiados intentos, espera 15 minutos' }
+});
 
 class Server {
 
@@ -59,6 +69,9 @@ class Server {
 
     middlewares() {
 
+        // Security headers
+        this.app.use(helmet());
+
         // CORS
         this.app.use( cors() );
 
@@ -85,7 +98,7 @@ class Server {
     }
 
     routes() {
-        this.app.use( this.paths.authenticate, require('../routes/auth'));
+        this.app.use( this.paths.authenticate, loginLimiter, require('../routes/auth'));
         this.app.use( this.paths.usuarios, require('../routes/usuarios'));
         this.app.use(this.paths.entradas, require('../routes/entradas'));
         this.app.use(this.paths.asientos, require('../routes/asientos'));

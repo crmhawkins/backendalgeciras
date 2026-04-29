@@ -154,7 +154,8 @@ const abonoPost = async (req, res) => {
             `
         });
 
-        res.status(201).json({ msg: 'Abono creado correctamente', abono });
+        const { dni: _d, telefono: _t, domicilio: _dom, codigoPostal: _cp, pais: _p, provincia: _pr, localidad: _loc, ...abonoSafe } = abono.get({ plain: true });
+        res.status(201).json({ msg: 'Abono creado correctamente', abono: abonoSafe });
 
     } catch (error) {
         res.status(500).json({ msg: 'Error al crear el abono', error });
@@ -214,6 +215,11 @@ const renovarAbono = async (req, res) => {
 
 const getAbonosPorUsuario = async (req, res) => {
     const { id } = req.params;
+
+    // Ownership check: user can only see their own abonos
+    if (String(req.uid) !== String(id)) {
+        return res.status(403).json({ msg: 'No autorizado para ver los abonos de otro usuario' });
+    }
 
     try {
         const abonos = await Abono.findAll({

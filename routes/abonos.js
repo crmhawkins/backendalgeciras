@@ -6,9 +6,9 @@ const {validarJWT} = require('../middlewares/validar-jwt');
 
 const router = Router();
 
-router.get('/', abonoGet);
+router.get('/', validarJWT, abonoGet);
 
-router.get('/usuario/:id',validarJWT, getAbonosPorUsuario);
+router.get('/usuario/:id', validarJWT, getAbonosPorUsuario);
 
 router.post('/create', [
     check('fechaInicio').isISO8601().withMessage('Fecha de inicio inválida'),
@@ -33,7 +33,7 @@ router.post('/create', [
     validarCampos
 ], abonoPost);
 
-router.post('/liberar', liberarAsiento);
+router.post('/liberar', validarJWT, liberarAsiento);
 
 router.post('/renovar', [
     check('dni', 'El DNI es obligatorio').not().isEmpty(),
@@ -41,7 +41,7 @@ router.post('/renovar', [
     validarCampos
 ], renovarAbono);
 
-router.post('/cancelar-liberacion', cancelarLiberacionAsiento);
+router.post('/cancelar-liberacion', validarJWT, cancelarLiberacionAsiento);
 
 module.exports = router;
 

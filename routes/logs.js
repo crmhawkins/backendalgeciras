@@ -1,50 +1,31 @@
 const { Router } = require('express');
 const logger = require('../helpers/logger');
+const { validarJWT } = require('../middlewares/validar-jwt');
 
 const router = Router();
 
-// Middleware para verificar si estamos en desarrollo o si hay autenticación
-const isDevelopment = process.env.NODE_ENV === 'development';
-const LOGS_PASSWORD = process.env.LOGS_PASSWORD || 'admin123'; // Cambiar en producción
+// All log routes require a valid JWT — no password-in-querystring
 
-// Ruta para ver los logs (protegida con contraseña simple)
-router.get('/', (req, res) => {
-    const { password, limit = 100, level } = req.query;
-
-    // En desarrollo, permitir sin contraseña. En producción, requerir contraseña
-    if (!isDevelopment && password !== LOGS_PASSWORD) {
-        return res.status(401).json({ 
-            msg: 'Acceso no autorizado. Proporciona la contraseña correcta en el parámetro ?password=...' 
-        });
-    }
+// Ruta para ver los logs
+router.get('/', validarJWT, (req, res) => {
+    const { limit = 100, level } = req.query;
 
     const logs = logger.getLogs(parseInt(limit), level || null);
-    
+
     res.json({
         total: logs.length,
-        logs: logs // Mantener orden cronológico (más antiguos primero, más nuevos al final)
+        logs: logs
     });
 });
 
 // Ruta para limpiar los logs
-router.delete('/', (req, res) => {
-    const { password } = req.query;
-
-    if (!isDevelopment && password !== LOGS_PASSWORD) {
-        return res.status(401).json({ msg: 'Acceso no autorizado' });
-    }
-
+router.delete('/', validarJWT, (req, res) => {
     logger.clearLogs();
     res.json({ msg: 'Logs limpiados correctamente' });
 });
 
 // Ruta para ver logs en tiempo real con Server-Sent Events
-router.get('/stream', (req, res) => {
-    const { password } = req.query;
-
-    if (!isDevelopment && password !== LOGS_PASSWORD) {
-        return res.status(401).json({ msg: 'Acceso no autorizado' });
-    }
+router.get('/stream', validarJWT, (req, res) => {
 
     // Configurar Server-Sent Events
     res.setHeader('Content-Type', 'text/event-stream');

@@ -48,7 +48,8 @@ const usuarioPost = async (req, res = response) => {
         const usuario = await Usuario.create({
             nombre, email, profileImage: 'default_profile_photo.png', password: hashedPassword, dni
         });
-        res.status(201).json({ usuario });
+        const { password: _pw, ...usuarioSafe } = usuario.get({ plain: true });
+        res.status(201).json({ usuario: usuarioSafe });
     } catch (error) {
         console.error(error);
         res.status(500).json({ msg: 'Error al crear el usuario' });

@@ -21,10 +21,15 @@ async function liberarAsientosPasados() {
       for (const entrada of entradas) {
         const asiento = await Asiento.findByPk(entrada.asientoId);
         if (asiento) {
-          asiento.estado = 'disponible';
-          await asiento.save();
+          const abonoActivo = await require('../models/abono').findOne({
+            where: { asientoId: asiento.id, activo: true }
+          });
+          if (!abonoActivo) {
+            asiento.estado = 'disponible';
+            await asiento.save();
+          }
         }
-        await entrada.destroy(); 
+        await entrada.destroy();
       }
     }
 

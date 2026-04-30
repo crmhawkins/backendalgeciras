@@ -33,7 +33,7 @@ const usuarioPost = async (req, res = response) => {
     const errors = validationResult(req);
     if (!errors.isEmpty()) return res.status(400).json(errors);
 
-    const { nombre, email, password, dni } = req.body;
+    const { nombre, email, password, dni, telefono } = req.body;
     try {
         const existeEmail = await Usuario.findOne({ where: { email } });
         if (existeEmail) return res.status(400).json({ msg: 'Ese correo ya está registrado' });
@@ -46,7 +46,8 @@ const usuarioPost = async (req, res = response) => {
         const salt = bcryptjs.genSaltSync();
         const hashedPassword = bcryptjs.hashSync(password, salt);
         const usuario = await Usuario.create({
-            nombre, email, profileImage: 'default_profile_photo.png', password: hashedPassword, dni
+            nombre, email, profileImage: 'default_profile_photo.png', password: hashedPassword, dni,
+            ...(telefono ? { telefono } : {})
         });
         const { password: _pw, ...usuarioSafe } = usuario.get({ plain: true });
         res.status(201).json({ usuario: usuarioSafe });
@@ -99,8 +100,9 @@ const updateUserImage = async (req, res = response) => {
 };
 
 const showUserImage = async (req, res = response) => {
-    const { filename } = req.params;
-    const filePath = path.join(__dirname, '../uploads/perfiles', filename);
+    const safeName = path.basename(req.params.filename);
+    if (!safeName || !/^[\w.\-]+$/.test(safeName)) return res.status(400).json({ msg: 'Nombre de archivo inválido' });
+    const filePath = path.join(__dirname, '../uploads/perfiles', safeName);
     if (fs.existsSync(filePath)) return res.sendFile(filePath);
     return res.status(404).json({ msg: 'Imagen no encontrada' });
 };

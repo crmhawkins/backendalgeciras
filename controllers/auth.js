@@ -13,36 +13,35 @@ const authenticatePost = async (req, res = response) => {
     const { email, password } = req.body;
 
     try {
-        const usuario = await Usuario.findOne({ where: { email } });
+        let usuario = await Usuario.findOne({ where: { email } });
 
         // Check if the user exists in the MySQL database (futbol_db)
         if (!usuario) {
             const wpUser = await WordpressUser.findOne({ where: { user_email: email } });
-        
+
             if (wpUser) {
-                // Solo si lo encuentras en WordPress
+                const passwordAleatoria = generateRandomPassword();
+                const salt = bcryptjs.genSaltSync();
+                const hashedPassword = bcryptjs.hashSync(passwordAleatoria, salt);
                 usuario = await Usuario.create({
                     nombre: wpUser.display_name || wpUser.user_nicename,
                     email: wpUser.user_email,
                     dni: null,
-                    password: generateRandomPassword, // vacío o puedes generar aleatorio
+                    password: hashedPassword,
                     profileImage: null,
                 });
             }
         }
-        
 
         // If user not found in both databases
         if (!usuario) {
             return res.status(400).json({ msg: 'Usuario / Password incorrectos - Email' });
         }
 
-        // Validate password for both databases (check bcrypt for app users, plain for WordPress)
+        // Validate password with bcrypt
         let validPassword = false;
         if (usuario.password) {
-            validPassword = bcryptjs.compareSync(password, usuario.password); // For your app's MySQL
-        } else {
-            validPassword = password === usuario.user_pass; // WordPress passwords are stored in plain text
+            validPassword = bcryptjs.compareSync(password, usuario.password);
         }
 
         if (!validPassword) {
@@ -199,29 +198,7 @@ const resetPassword = async (req, res = response) => {
     }
 };
 
-const logInMysql= async (req, res = response) => {
-  const { token } = req.params;
 
-  try {
-    const usuario = await Usuario.findOne({ where: { email } });
-
-    if (!usuario) {
-      return res.status(404).json({ msg: 'Usuario no encontrado' });
-    }
-
-    const isPasswordCorrect = await bcrypt.compare(password, usuario.password);
-
-    if (!isPasswordCorrect) {
-      return res.status(401).json({ msg: 'Contraseña incorrecta' });
-    }
-
-    req.uid = usuario.id;
-    return res.json({ msg: 'Logueado correctamente' });
-  } catch (error) {
-    console.error(error);
-    return res.status(500).json({ msg: 'Error al loguear' });
-  }
-};
 const logInWordpress = async (req, res = response) => {
     const uid = req.uid;
   

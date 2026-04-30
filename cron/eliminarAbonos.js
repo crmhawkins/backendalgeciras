@@ -3,7 +3,7 @@ const Abono = require('../models/abono');
 const Asiento = require('../models/asiento');
 
 async function eliminarAbonosFinTemporada() {
-  const fechaCorte = new Date('2025-07-01');
+  const fechaCorte = new Date();
 
   try {
     const abonosCaducados = await Abono.findAll({

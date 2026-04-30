@@ -331,18 +331,20 @@ const confirmarPago = async (req, res = response) => {
             return res.status(400).json({ msg: 'El session_id es requerido' });
         }
 
-        // Buscar la sesión de pago en la base de datos
-        const pagoSession = await PagoSession.findOne({
-            where: { stripeSessionId: session_id }
-        });
+        // Marcar atómicamente como 'procesando' para evitar race condition con webhook
+        const [updatedRows] = await PagoSession.update(
+            { estado: 'procesando' },
+            { where: { stripeSessionId: session_id, estado: 'pendiente' } }
+        );
 
-        if (!pagoSession) {
-            return res.status(404).json({ msg: 'Sesión de pago no encontrada' });
+        if (updatedRows === 0) {
+            const existing = await PagoSession.findOne({ where: { stripeSessionId: session_id } });
+            if (!existing) return res.status(404).json({ msg: 'Sesión de pago no encontrada' });
+            if (existing.estado === 'completado') return res.json({ msg: 'Pago ya procesado correctamente', completado: true });
+            return res.status(400).json({ msg: 'Este pago ya está siendo procesado' });
         }
 
-        if (pagoSession.estado === 'completado') {
-            return res.status(400).json({ msg: 'Este pago ya fue procesado' });
-        }
+        const pagoSession = await PagoSession.findOne({ where: { stripeSessionId: session_id } });
 
         // Verificar el estado del pago en Stripe
         const stripeSession = await stripe.checkout.sessions.retrieve(session_id);
@@ -752,6 +754,22 @@ const crearSesionPagoUnificada = async (req, res = response) => {
     }
 };
 
+const estadoPago = async (req, res = response) => {
+    const { session_id } = req.query;
+    if (!session_id) return res.status(400).json({ msg: 'session_id requerido' });
+    try {
+        const pagoSession = await PagoSession.findOne({ where: { stripeSessionId: session_id } });
+        if (!pagoSession) return res.status(404).json({ msg: 'Sesión no encontrada' });
+        return res.json({
+            estado: pagoSession.estado,
+            tipo: pagoSession.tipo,
+            completado: pagoSession.estado === 'completado'
+        });
+    } catch (error) {
+        return res.status(500).json({ msg: 'Error al consultar estado' });
+    }
+};
+
 const paginaPagoExitoso = (req, res) => {
     res.send(`<!DOCTYPE html><html><head><meta charset="utf-8"><title>Pago exitoso</title>
     <meta name="viewport" content="width=device-width,initial-scale=1">
@@ -785,6 +803,7 @@ module.exports = {
     confirmarPago,
     webhookStripe,
     crearSesionPagoUnificada,
+    estadoPago,
     paginaPagoExitoso,
     paginaPagoCancelado
 };

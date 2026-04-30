@@ -20,7 +20,7 @@ router.get('/', validarJWT, esAdmin, abonoGet);
 
 router.get('/usuario/:id', validarJWT, getAbonosPorUsuario);
 
-router.post('/create', [
+router.post('/create', validarJWT, esAdmin, [
     check('fechaInicio').isISO8601().withMessage('Fecha de inicio inválida'),
     check('fechaFin').isISO8601().withMessage('Fecha de fin inválida'),
 

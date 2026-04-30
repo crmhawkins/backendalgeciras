@@ -6,7 +6,7 @@ const { obtenerClasificacion} = require('../services/scrapingClasificacion');
 const { verificarProximosPartidos } = require('../notificaciones/verificarPartido');
 
 
-cron.schedule('* * * * *', async () => {
+cron.schedule('*/15 * * * *', async () => {
   console.log('⏰ Ejecutando scraping automático...');
   await obtenerPartidos();
   await obtenerClasificacion();

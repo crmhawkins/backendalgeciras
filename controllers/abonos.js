@@ -241,7 +241,8 @@ const getAbonosPorUsuario = async (req, res) => {
 };
 
 const liberarAsiento = async (req, res) => {
-    const { usuarioId, asientoId, partidoId } = req.body;
+    const usuarioId = req.uid;
+    const { asientoId, partidoId } = req.body;
 
     try {
         const abono = await Abono.findOne({
@@ -292,7 +293,8 @@ const liberarAsiento = async (req, res) => {
 };
 
 const cancelarLiberacionAsiento = async (req, res) => {
-    const { usuarioId, asientoId, partidoId } = req.body;
+    const usuarioId = req.uid;
+    const { asientoId, partidoId } = req.body;
 
     try {
         const abono = await Abono.findOne({

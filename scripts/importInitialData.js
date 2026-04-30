@@ -21,7 +21,6 @@ const fetchT = (url) => {
     return fetch(url, { signal: ctrl.signal }).finally(() => clearTimeout(t));
 };
 
-// Asigna una Grada a cada zona según nombre
 const gradaDeZona = (nombre) => {
     const n = nombre.toUpperCase();
     if (n.includes('TRIBUNA BAJA')) return { id: 1, nombre: 'Tribuna Baja' };
@@ -38,8 +37,8 @@ const gradaDeZona = (nombre) => {
 
 const precioDeZona = (zona) => {
     if (zona.precios && zona.precios.length > 0) {
-        const precios = zona.precios.map(p => parseFloat(p.precio || p.price || p.importe || 0)).filter(p => p > 0);
-        if (precios.length > 0) return Math.min(...precios);
+        const ps = zona.precios.map(p => parseFloat(p.precio || p.price || p.importe || 0)).filter(p => p > 0);
+        if (ps.length > 0) return Math.min(...ps);
     }
     const n = (zona.name || '').toUpperCase();
     if (n.includes('TRIBUNA BAJA'))  return 120;
@@ -55,15 +54,14 @@ const run = async () => {
     await dbConnection();
     console.log('BD conectada\n');
 
-    // 1. Obtener todas las zonas
     console.log('Obteniendo zonas de compralaentrada...');
     const res = await fetchT(`${BASE_URL}/zonas?renovacion=0&tid=${TID}`);
     if (!res.ok) throw new Error(`API zonas respondió ${res.status}`);
     const json = await res.json();
-    const zonas = json.data || [];
-    console.log(`${zonas.length} zonas encontradas\n`);
+    const zonas = (json.data || []).filter(z => z.total_asientos > 0);
+    console.log(`${zonas.length} zonas con asientos\n`);
 
-    // 2. Crear gradas únicas
+    // Gradas únicas
     const gradasMap = {};
     for (const z of zonas) {
         const g = gradaDeZona(z.name || '');
@@ -76,34 +74,29 @@ const run = async () => {
     }
     console.log();
 
-    // 3. Crear sectores
+    // Sectores
     console.log('Creando sectores...');
     for (const z of zonas) {
         const g = gradaDeZona(z.name || '');
-        const precio = precioDeZona(z);
         await Sector.upsert({
             id: z.id,
             nombre: z.name,
-            capacidad: z.total_asientos || 0,
-            precio,
+            capacidad: z.total_asientos,
+            precio: precioDeZona(z),
             gradaId: g.id,
             activo: true
         });
-        console.log(`  Sector ${z.id}: ${z.name} (cap=${z.total_asientos}, precio=${precio}€, grada=${g.nombre})`);
+        console.log(`  Sector ${z.id}: ${z.name} (cap=${z.total_asientos}, precio=${precioDeZona(z)}€)`);
     }
     console.log();
 
-    // 4. Crear asientos
-    console.log('Importando asientos (puede tardar)...');
+    // Asientos — intentar API primero, si no → generar sintético
+    console.log('Importando asientos...');
     let totalAsientos = 0;
     let asientoId = 1;
 
     for (const z of zonas) {
-        if (!z.esta_disponible && z.total_asientos === 0) {
-            console.log(`  Zona ${z.id} (${z.name}): sin asientos disponibles, skip`);
-            continue;
-        }
-
+        // Intentar obtener asientos reales de la API
         let asientosApi = [];
         try {
             const ra = await fetchT(`${BASE_URL}/zonas/${z.id}/asientos?tid=${TID}`);
@@ -111,35 +104,46 @@ const run = async () => {
                 const ja = await ra.json();
                 asientosApi = ja.data || ja.asientos || [];
             }
-        } catch (e) {
-            console.warn(`  Zona ${z.id}: no se pudieron obtener asientos (${e.message})`);
-        }
+        } catch (e) { /* ignorar */ }
 
-        if (asientosApi.length === 0) {
-            console.log(`  Zona ${z.id} (${z.name}): sin detalle de asientos`);
-            continue;
+        if (asientosApi.length > 0) {
+            // Asientos reales desde API
+            for (const a of asientosApi) {
+                const fila = String(a.fila || '1');
+                const numero = String(a.butaca || a.numero || a.id || asientoId);
+                const libre = a.estado === 'libre' || a.estado === 'disponible' ||
+                    a.disponible === true || a.disponible === 1 ||
+                    a.libre === true || a.libre === 1;
+                await Asiento.upsert({
+                    id: asientoId++,
+                    numero,
+                    fila,
+                    estado: libre ? 'disponible' : 'ocupado',
+                    sectorId: z.id
+                });
+            }
+            console.log(`  Zona ${z.id} (${z.name}): ${asientosApi.length} asientos (API)`);
+            totalAsientos += asientosApi.length;
+        } else {
+            // Generar sintético desde rows × seats_row
+            const filas = z.rows || Math.ceil(z.total_asientos / 15) || 6;
+            const porFila = z.seats_row || Math.ceil(z.total_asientos / filas) || 15;
+            let generados = 0;
+            for (let f = 1; f <= filas && generados < z.total_asientos; f++) {
+                for (let s = 1; s <= porFila && generados < z.total_asientos; s++) {
+                    await Asiento.upsert({
+                        id: asientoId++,
+                        numero: String(s),
+                        fila: String(f),
+                        estado: 'disponible',
+                        sectorId: z.id
+                    });
+                    generados++;
+                }
+            }
+            console.log(`  Zona ${z.id} (${z.name}): ${generados} asientos (sintético)`);
+            totalAsientos += generados;
         }
-
-        let zonCount = 0;
-        for (const a of asientosApi) {
-            const fila = String(a.fila || '1');
-            const numero = String(a.butaca || a.numero || a.id || asientoId);
-            const libre =
-                a.estado === 'libre' || a.estado === 'disponible' ||
-                a.disponible === true || a.disponible === 1 ||
-                a.libre === true || a.libre === 1;
-
-            await Asiento.upsert({
-                id: asientoId++,
-                numero,
-                fila,
-                estado: libre ? 'disponible' : 'ocupado',
-                sectorId: z.id
-            });
-            zonCount++;
-        }
-        totalAsientos += zonCount;
-        console.log(`  Zona ${z.id} (${z.name}): ${zonCount} asientos`);
     }
 
     console.log(`\nImportación completada:`);

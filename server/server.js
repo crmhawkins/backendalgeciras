@@ -73,7 +73,14 @@ class Server {
         this.app.use(helmet());
 
         // CORS
-        this.app.use( cors() );
+        const allowedOrigins = (process.env.CORS_ORIGINS || 'https://backend-algeciras.hawkins.es').split(',');
+        this.app.use(cors({
+            origin: (origin, callback) => {
+                if (!origin || allowedOrigins.includes(origin)) return callback(null, true);
+                callback(new Error('Not allowed by CORS'));
+            },
+            credentials: true
+        }));
 
         // Webhook de Stripe necesita el body raw, así que lo excluimos del parseo JSON
         this.app.use('/api/pagos/webhook', express.raw({ type: 'application/json' }));
@@ -113,6 +120,9 @@ class Server {
         this.app.use(this.paths.pagos, pagosRouter);
         this.app.use(this.paths.pagos, webhookRouter);
         
+        // Panel interno
+        this.app.use('/api/interno', require('../routes/interno'));
+
         // Rutas de logs (solo para debugging)
         this.app.use(this.paths.logs, require('../routes/logs'));
 

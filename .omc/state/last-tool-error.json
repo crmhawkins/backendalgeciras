@@ -1,7 +1,7 @@
 {
   "tool_name": "Bash",
-  "tool_input_preview": "{\"command\":\"python3 << 'EOF'\\nimport json, urllib.request\\n\\nwith open('C:/Users/Dani-Mefle/.claude/settings.json') as f:\\n    d = json.load(f)\\ntoken = d['env']['COOLIFY_API_TOKEN']\\nbase = 'http://2...",
-  "error": "Exit code 1\nStarting deployment of crmhawkins/backendalgeciras:main to localhost.\r\nPreparing container with helper image: ghcr.io/coollabsio/coolify-helper:1.0.12\r\nImage not found (xccw44c0wc8gw08kgwkwk0wo:2bf1f4bb577908abf7389d4aaade239e09b400dd). Building new image.\r\n----------------------------------------\r\nImporting crmhawkins/backendalgeciras:main (commit sha 2bf1f4bb577908abf7389d4aaade239e09b400dd) to /artifacts/u84w8kgkko0ccs488s8g8oos.\r\nGenerating nixpacks configuration with: nixpacks p...",
-  "timestamp": "2026-04-28T12:17:09.799Z",
-  "retry_count": 3
+  "tool_input_preview": "{\"command\":\"TOKEN=$(python3 -c \\\"import json; d=json.load(open('/c/Users/Dani-Mefle/.claude/settings.json')); print(d['env']['COOLIFY_API_TOKEN'])\\\") && curl -s \\\"http://217.160.39.81:8000/api/v1/depl...",
+  "error": "Exit code 1\nTraceback (most recent call last):\r\n  File \"<string>\", line 1, in <module>\r\n    import json; d=json.load(open('/c/Users/Dani-Mefle/.claude/settings.json')); print(d['env']['COOLIFY_API_TOKEN'])\r\n                             ~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\r\nFileNotFoundError: [Errno 2] No such file or directory: '/c/Users/Dani-Mefle/.claude/settings.json'",
+  "timestamp": "2026-04-29T11:16:04.085Z",
+  "retry_count": 1
 }

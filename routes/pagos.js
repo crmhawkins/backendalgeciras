@@ -6,6 +6,7 @@ const {
     confirmarPago,
     webhookStripe,
     crearSesionPagoUnificada,
+    estadoPago,
     paginaPagoExitoso,
     paginaPagoCancelado
 } = require('../controllers/pagos');
@@ -70,6 +71,9 @@ router.post('/create-checkout', [
     check('dni', 'El DNI es obligatorio').notEmpty(),
     validarCampos
 ], crearSesionPagoUnificada);
+
+// Estado de pago (para que la app verifique tras el browser)
+router.get('/status', estadoPago);
 
 // Páginas de resultado de Stripe
 router.get('/pago-exitoso', paginaPagoExitoso);

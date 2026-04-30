@@ -1,8 +1,16 @@
-const { Expo } = require('expo-server-sdk');
 const nodemailer = require('nodemailer');
 const { db } = require('../database/config');
 
-const expo = new Expo();
+let _expo = null;
+let _Expo = null;
+async function getExpo() {
+    if (!_expo) {
+        const mod = await import('expo-server-sdk');
+        _Expo = mod.Expo;
+        _expo = new _Expo();
+    }
+    return { expo: _expo, Expo: _Expo };
+}
 
 function getTransporter() {
     return nodemailer.createTransport({
@@ -37,6 +45,7 @@ async function enviarCodigoEmail(abono, partido) {
 }
 
 async function enviarCodigoPush(pushToken, abono, partido) {
+    const { expo, Expo } = await getExpo();
     if (!Expo.isExpoPushToken(pushToken)) return;
     const messages = [{
         to: pushToken,

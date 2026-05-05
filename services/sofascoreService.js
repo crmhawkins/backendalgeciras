@@ -9,8 +9,19 @@ const TEMPORADA = '2025/2026';
 
 const HEADERS = {
   'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36',
-  'Accept': 'application/json',
-  'Referer': 'https://www.sofascore.com/'
+  'Accept': 'application/json, text/plain, */*',
+  'Accept-Language': 'es-ES,es;q=0.9,en;q=0.8',
+  'Accept-Encoding': 'gzip, deflate, br',
+  'Referer': 'https://www.sofascore.com/',
+  'Origin': 'https://www.sofascore.com',
+  'sec-ch-ua': '"Chromium";v="124", "Google Chrome";v="124", "Not-A.Brand";v="99"',
+  'sec-ch-ua-mobile': '?0',
+  'sec-ch-ua-platform': '"Windows"',
+  'Sec-Fetch-Dest': 'empty',
+  'Sec-Fetch-Mode': 'cors',
+  'Sec-Fetch-Site': 'same-origin',
+  'Cache-Control': 'no-cache',
+  'Connection': 'keep-alive'
 };
 
 const delay = (ms) => new Promise(resolve => setTimeout(resolve, ms));
@@ -30,7 +41,7 @@ const sincronizarJugadores = async () => {
     players = res.data.players;
     console.log(`[SofaScore] Plantilla obtenida: ${players ? players.length : 0} jugadores. Keys: ${Object.keys(res.data).join(',')}`);
   } catch (err) {
-    console.error('[SofaScore] Error obteniendo plantilla:', err.message);
+    console.error('[SofaScore] Error obteniendo plantilla:', err.message, err.response?.status, JSON.stringify(err.response?.data)?.substring(0, 200));
     return;
   }
 

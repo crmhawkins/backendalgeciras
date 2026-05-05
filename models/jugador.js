@@ -54,3 +54,8 @@ const Jugador = db.define('Jugador', {
 });
 
 module.exports = Jugador;
+
+// Asociaciones — se ejecutan una sola vez por módulo cache
+const JugadorStats = require('./jugadorStats');
+Jugador.hasMany(JugadorStats, { foreignKey: 'jugadorId', as: 'stats' });
+JugadorStats.belongsTo(Jugador, { foreignKey: 'jugadorId' });

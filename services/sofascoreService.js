@@ -28,7 +28,7 @@ const sincronizarJugadores = async () => {
   try {
     const res = await axios.get(`https://www.sofascore.com/api/v1/team/${TEAM_ID}/players`, { headers: HEADERS });
     players = res.data.players;
-    console.log(`[SofaScore] Plantilla obtenida: ${players.length} jugadores`);
+    console.log(`[SofaScore] Plantilla obtenida: ${players ? players.length : 0} jugadores. Keys: ${Object.keys(res.data).join(',')}`);
   } catch (err) {
     console.error('[SofaScore] Error obteniendo plantilla:', err.message);
     return;
@@ -41,7 +41,7 @@ const sincronizarJugadores = async () => {
     try {
       const fotoUrl = `https://api.sofascore.app/api/v1/player/${p.id}/image`;
 
-      const [jugador] = await Jugador.upsert({
+      const datos = {
         sofascoreId: p.id,
         nombre: p.name || '',
         nombreCorto: p.shortName || null,
@@ -55,12 +55,12 @@ const sincronizarJugadores = async () => {
         altura: p.height || null,
         piePref: p.preferredFoot || null,
         valorMercado: p.proposedMarketValue || null
-      }, {
-        returning: true,
-        conflictFields: ['sofascoreId']
-      });
+      };
 
-      console.log(`[SofaScore] Jugador upsert OK: ${p.name} (id=${p.id})`);
+      await Jugador.upsert(datos);
+      const jugador = await Jugador.findOne({ where: { sofascoreId: p.id } });
+
+      console.log(`[SofaScore] Jugador upsert OK: ${p.name} (id=${jugador.id})`);
 
       await delay(300);
 

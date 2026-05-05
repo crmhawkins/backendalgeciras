@@ -40,7 +40,8 @@ class Server {
             pagos: '/api/pagos',
             logs: '/api/logs',
             sync: '/api/sync',
-            fanzone: '/api/fanzone'
+            fanzone: '/api/fanzone',
+            jugadores: '/api/jugadores'
         };
         
 
@@ -130,6 +131,7 @@ class Server {
         // Rutas de sincronización con compralaentrada
         this.app.use(this.paths.sync, require('../routes/sync'));
         this.app.use(this.paths.fanzone, require('../routes/fanzone'));
+        this.app.use(this.paths.jugadores, require('../routes/jugadores'));
 
     }
 

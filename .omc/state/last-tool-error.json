@@ -1,7 +1,7 @@
 {
   "tool_name": "Bash",
-  "tool_input_preview": "{\"command\":\"TOKEN=$(python3 -c \\\"import json; d=json.load(open('/c/Users/Dani-Mefle/.claude/settings.json')); print(d['env']['COOLIFY_API_TOKEN'])\\\") && curl -s \\\"http://217.160.39.81:8000/api/v1/depl...",
-  "error": "Exit code 1\nTraceback (most recent call last):\r\n  File \"<string>\", line 1, in <module>\r\n    import json; d=json.load(open('/c/Users/Dani-Mefle/.claude/settings.json')); print(d['env']['COOLIFY_API_TOKEN'])\r\n                             ~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\r\nFileNotFoundError: [Errno 2] No such file or directory: '/c/Users/Dani-Mefle/.claude/settings.json'",
-  "timestamp": "2026-04-29T11:16:04.085Z",
-  "retry_count": 1
+  "tool_input_preview": "{\"command\":\"ssh -i /c/Users/Dani-Mefle/.ssh/hawcert_dani -o StrictHostKeyChecking=no dani@217.160.39.81 \\\"curl -s 'https://apiteatros.compralaentrada.com/api1/f/lista/784?tid=9qXku4wevkdoDedmyHn7' | p...",
+  "error": "Exit code 1\nTraceback (most recent call last):\n  File \"<string>\", line 1, in <module>\n  File \"/usr/lib/python3.12/json/__init__.py\", line 293, in load\n    return loads(fp.read(),\n           ^^^^^^^^^^^^^^^^\n  File \"/usr/lib/python3.12/json/__init__.py\", line 346, in loads\n    return _default_decoder.decode(s)\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/usr/lib/python3.12/json/decoder.py\", line 337, in decode\n    obj, end = self.raw_decode(s, idx=_w(s, 0).end())\n               ^^^^^^^^^^^^^^^^...",
+  "timestamp": "2026-04-30T10:01:26.742Z",
+  "retry_count": 4
 }

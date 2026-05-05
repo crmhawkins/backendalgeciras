@@ -24,8 +24,13 @@ const db = new Sequelize(process.env.DB_NAME, process.env.DB_USER, process.env.D
     dialect: 'mysql',
     logging: false,
     dialectOptions: {
-        // Forzar nombres de tabla en minúsculas
-        multipleStatements: false
+        multipleStatements: false,
+        charset: 'utf8mb4',
+        collate: 'utf8mb4_unicode_ci'
+    },
+    define: {
+        charset: 'utf8mb4',
+        collate: 'utf8mb4_unicode_ci'
     }
 });
 
@@ -82,6 +87,11 @@ const dbConnection = async () => {
 
         Sector.hasMany(Entrada, { foreignKey: 'sectorId' });
         Entrada.belongsTo(Sector, { foreignKey: 'sectorId' });
+
+        const Jugador = require('../models/jugador');
+        const JugadorStats = require('../models/jugadorStats');
+        Jugador.hasMany(JugadorStats, { foreignKey: 'jugadorId', as: 'stats' });
+        JugadorStats.belongsTo(Jugador, { foreignKey: 'jugadorId' });
 
         // Sincronizar modelos con la base de datos (crear tablas si no existen)
         // Usar { alter: true } en desarrollo para modificar tablas existentes sin borrar datos

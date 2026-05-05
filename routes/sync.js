@@ -2,6 +2,7 @@ const { Router } = require('express');
 const { validarJWT } = require('../middlewares/validar-jwt');
 const { sincronizarZonas, obtenerDisponibilidadZona } = require('../services/compralaentradaService');
 const { ejecutarSincronizacion } = require('../cron/cronSync');
+const { sincronizarJugadores } = require('../services/sofascoreService');
 
 const router = Router();
 
@@ -39,6 +40,15 @@ router.get('/disponibilidad/:zonaId', async (req, res) => {
     } catch (err) {
         console.error(`[sync route] Error obteniendo disponibilidad zona ${zonaId}:`, err.message);
         res.status(502).json({ msg: 'Error al consultar compralaentrada', error: err.message });
+    }
+});
+
+router.post('/jugadores', async (req, res) => {
+    try {
+        await sincronizarJugadores();
+        res.json({ msg: 'Sync plantilla completado', timestamp: new Date().toISOString() });
+    } catch (err) {
+        res.status(500).json({ msg: 'Error sync jugadores', error: err.message });
     }
 });
 

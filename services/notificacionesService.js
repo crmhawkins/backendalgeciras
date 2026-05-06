@@ -115,4 +115,131 @@ async function procesarNotificaciones() {
     console.log(`[notificaciones] Ciclo completado para partido ${partido.id}`);
 }
 
-module.exports = { procesarNotificaciones };
+/**
+ * Envía push notification a todos los usuarios con expoPushToken registrado.
+ * @param {string} titulo
+ * @param {string} cuerpo
+ * @param {object} [data={}]
+ * @returns {Promise<{enviados: number, errores: number}>}
+ */
+async function enviarPushMasivo(titulo, cuerpo, data = {}) {
+    const { expo, Expo } = await getExpo();
+
+    const [rows] = await db.query(
+        `SELECT id, expoPushToken FROM usuarios WHERE expoPushToken IS NOT NULL AND expoPushToken != ''`,
+        { type: 'SELECT' }
+    );
+
+    if (!rows || rows.length === 0) {
+        console.log('[push] Sin tokens disponibles');
+        return { enviados: 0, errores: 0 };
+    }
+
+    const tokensValidos = rows.filter(u => Expo.isExpoPushToken(u.expoPushToken));
+    const mensajes = tokensValidos.map(u => ({
+        to: u.expoPushToken,
+        sound: 'default',
+        title: titulo,
+        body: cuerpo,
+        data,
+    }));
+
+    let enviados = 0;
+    let errores = 0;
+
+    const CHUNK_SIZE = 100;
+    for (let i = 0; i < mensajes.length; i += CHUNK_SIZE) {
+        const chunk = mensajes.slice(i, i + CHUNK_SIZE);
+        try {
+            const tickets = await expo.sendPushNotificationsAsync(chunk);
+            for (let j = 0; j < tickets.length; j++) {
+                const ticket = tickets[j];
+                if (ticket.status === 'ok') {
+                    enviados++;
+                } else {
+                    errores++;
+                    const token = chunk[j].to;
+                    console.error(`[push] Error ticket token ${token}:`, ticket.message);
+                    if (ticket.details && ticket.details.error === 'DeviceNotRegistered') {
+                        try {
+                            await db.query(
+                                `UPDATE usuarios SET expoPushToken = NULL WHERE expoPushToken = ?`,
+                                { replacements: [token] }
+                            );
+                            console.log(`[push] Token eliminado (DeviceNotRegistered): ${token}`);
+                        } catch (e) {
+                            console.error(`[push] No se pudo eliminar token ${token}:`, e.message);
+                        }
+                    }
+                }
+            }
+        } catch (e) {
+            console.error(`[push] Error en chunk ${i}-${i + CHUNK_SIZE}:`, e.message);
+            errores += chunk.length;
+        }
+    }
+
+    console.log(`[push] Masivo completado — enviados: ${enviados}, errores: ${errores}`);
+    return { enviados, errores };
+}
+
+/**
+ * Envía push notification a un usuario específico por ID.
+ * @param {number} userId
+ * @param {string} titulo
+ * @param {string} cuerpo
+ * @param {object} [data={}]
+ * @returns {Promise<{enviados: number, errores: number}>}
+ */
+async function enviarPushUsuario(userId, titulo, cuerpo, data = {}) {
+    const { expo, Expo } = await getExpo();
+
+    const [rows] = await db.query(
+        `SELECT id, expoPushToken FROM usuarios WHERE id = ? AND expoPushToken IS NOT NULL AND expoPushToken != ''`,
+        { replacements: [userId], type: 'SELECT' }
+    );
+
+    if (!rows || rows.length === 0) {
+        console.log(`[push] Usuario ${userId} sin token`);
+        return { enviados: 0, errores: 0 };
+    }
+
+    const token = rows[0].expoPushToken;
+    if (!Expo.isExpoPushToken(token)) {
+        console.error(`[push] Token inválido para usuario ${userId}: ${token}`);
+        return { enviados: 0, errores: 1 };
+    }
+
+    try {
+        const [ticket] = await expo.sendPushNotificationsAsync([{
+            to: token,
+            sound: 'default',
+            title: titulo,
+            body: cuerpo,
+            data,
+        }]);
+
+        if (ticket.status === 'ok') {
+            return { enviados: 1, errores: 0 };
+        } else {
+            console.error(`[push] Error ticket usuario ${userId}:`, ticket.message);
+            if (ticket.details && ticket.details.error === 'DeviceNotRegistered') {
+                try {
+                    await db.query(
+                        `UPDATE usuarios SET expoPushToken = NULL WHERE id = ?`,
+                        { replacements: [userId] }
+                    );
+                    console.log(`[push] Token eliminado usuario ${userId} (DeviceNotRegistered)`);
+                } catch (e) {
+                    console.error(`[push] No se pudo eliminar token usuario ${userId}:`, e.message);
+                }
+            }
+            return { enviados: 0, errores: 1 };
+        }
+    } catch (e) {
+        console.error(`[push] Error enviando a usuario ${userId}:`, e.message);
+        return { enviados: 0, errores: 1 };
+    }
+}
+
+module.exports = { procesarNotificaciones, enviarPushMasivo, enviarPushUsuario };

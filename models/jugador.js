@@ -54,4 +54,3 @@ const Jugador = db.define('Jugador', {
 });
 
 module.exports = Jugador;
-// Associations defined in models/associations.js — do not duplicate here

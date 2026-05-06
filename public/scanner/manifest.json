@@ -1,0 +1,22 @@
+{
+  "name": "Algeciras CF Scanner",
+  "short_name": "ACF Scanner",
+  "description": "Scanner de entradas y abonos Algeciras CF",
+  "start_url": "/scanner/",
+  "display": "fullscreen",
+  "orientation": "portrait",
+  "background_color": "#C8102E",
+  "theme_color": "#C8102E",
+  "icons": [
+    {
+      "src": "/imagenes/logo.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "/imagenes/logo.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}

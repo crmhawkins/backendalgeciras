@@ -1,0 +1,683 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="theme-color" content="#C8102E">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="ACF Scanner">
+<link rel="manifest" href="/scanner/manifest.json">
+<title>Algeciras CF — Scanner</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --rojo: #C8102E;
+    --rojo-dark: #9e0c24;
+    --verde: #1a8a3b;
+    --naranja: #d96c0a;
+    --blanco: #ffffff;
+    --gris: #f2f2f2;
+  }
+  html, body {
+    height: 100%;
+    width: 100%;
+    overflow: hidden;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    background: #1a1a1a;
+    color: var(--blanco);
+  }
+  #app {
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+    height: 100dvh;
+  }
+
+  /* HEADER */
+  #header {
+    background: var(--rojo);
+    padding: 12px 16px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-shrink: 0;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.4);
+    z-index: 10;
+  }
+  #header h1 {
+    font-size: 16px;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    line-height: 1.2;
+  }
+  #header span { font-size: 12px; opacity: 0.85; display: block; }
+  #btn-config {
+    background: rgba(255,255,255,0.15);
+    border: none;
+    color: white;
+    width: 40px; height: 40px;
+    border-radius: 50%;
+    font-size: 20px;
+    cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    transition: background 0.2s;
+  }
+  #btn-config:hover { background: rgba(255,255,255,0.25); }
+
+  /* VIEWFINDER */
+  #scanner-wrap {
+    flex: 1;
+    position: relative;
+    overflow: hidden;
+    background: #000;
+  }
+  #video {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+  }
+  #overlay {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    pointer-events: none;
+  }
+  #scan-frame {
+    width: 220px;
+    height: 220px;
+    position: relative;
+  }
+  #scan-frame::before, #scan-frame::after,
+  #scan-frame .corner-bl, #scan-frame .corner-br {
+    content: '';
+    position: absolute;
+    width: 36px; height: 36px;
+    border-color: #fff;
+    border-style: solid;
+  }
+  #scan-frame::before { top: 0; left: 0; border-width: 3px 0 0 3px; border-radius: 4px 0 0 0; }
+  #scan-frame::after  { top: 0; right: 0; border-width: 3px 3px 0 0; border-radius: 0 4px 0 0; }
+  #scan-frame .corner-bl { bottom: 0; left: 0; border-width: 0 0 3px 3px; border-radius: 0 0 0 4px; }
+  #scan-frame .corner-br { bottom: 0; right: 0; border-width: 0 3px 3px 0; border-radius: 0 0 4px 0; }
+  #scan-line {
+    position: absolute;
+    left: 6px; right: 6px;
+    height: 2px;
+    background: linear-gradient(90deg, transparent, var(--rojo), transparent);
+    animation: scan 2s linear infinite;
+    top: 0;
+  }
+  @keyframes scan {
+    0% { top: 6px; }
+    50% { top: calc(100% - 8px); }
+    100% { top: 6px; }
+  }
+  #scan-hint {
+    position: absolute;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 13px;
+    color: rgba(255,255,255,0.8);
+    text-align: center;
+    background: rgba(0,0,0,0.4);
+    padding: 6px 14px;
+    border-radius: 20px;
+    white-space: nowrap;
+  }
+
+  /* RESULTADO OVERLAY */
+  #resultado {
+    position: absolute;
+    inset: 0;
+    display: none;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 24px;
+    transition: background 0.3s;
+    z-index: 5;
+  }
+  #resultado.visible { display: flex; }
+  #resultado.valido   { background: rgba(26, 138, 59, 0.96); }
+  #resultado.ya_usado { background: rgba(217, 108, 10, 0.96); }
+  #resultado.invalido, #resultado.caducado { background: rgba(180, 20, 20, 0.96); }
+  #resultado-icon { font-size: 72px; margin-bottom: 12px; }
+  #resultado-titulo { font-size: 28px; font-weight: 800; margin-bottom: 8px; }
+  #resultado-subtitulo { font-size: 16px; opacity: 0.9; margin-bottom: 6px; }
+  #resultado-detalle { font-size: 14px; opacity: 0.75; }
+  #resultado-progress {
+    width: 200px; height: 4px;
+    background: rgba(255,255,255,0.3);
+    border-radius: 2px;
+    margin-top: 24px;
+    overflow: hidden;
+  }
+  #resultado-progress-bar {
+    height: 100%;
+    background: white;
+    border-radius: 2px;
+    width: 100%;
+    transition: width 3s linear;
+  }
+
+  /* BOTTOM BAR — input manual */
+  #bottom-bar {
+    background: #1e1e1e;
+    padding: 12px 16px;
+    flex-shrink: 0;
+    border-top: 1px solid #333;
+  }
+  #bottom-bar label {
+    font-size: 12px;
+    color: rgba(255,255,255,0.5);
+    display: block;
+    margin-bottom: 6px;
+  }
+  #manual-row {
+    display: flex;
+    gap: 8px;
+  }
+  #input-codigo {
+    flex: 1;
+    background: #2e2e2e;
+    border: 1px solid #444;
+    color: white;
+    padding: 10px 14px;
+    border-radius: 8px;
+    font-size: 15px;
+    font-family: monospace;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    outline: none;
+  }
+  #input-codigo:focus { border-color: var(--rojo); }
+  #btn-validar {
+    background: var(--rojo);
+    border: none;
+    color: white;
+    padding: 10px 18px;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: background 0.2s;
+  }
+  #btn-validar:hover { background: var(--rojo-dark); }
+  #btn-validar:disabled { opacity: 0.5; cursor: not-allowed; }
+
+  /* MODAL CONFIG */
+  #modal-config {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.7);
+    z-index: 100;
+    align-items: flex-end;
+    justify-content: center;
+  }
+  #modal-config.visible { display: flex; }
+  #modal-inner {
+    background: #1e1e1e;
+    width: 100%;
+    max-width: 480px;
+    border-radius: 20px 20px 0 0;
+    padding: 24px;
+    padding-bottom: 40px;
+  }
+  #modal-inner h2 {
+    font-size: 18px;
+    margin-bottom: 20px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .config-field { margin-bottom: 14px; }
+  .config-field label { font-size: 12px; color: rgba(255,255,255,0.5); display: block; margin-bottom: 4px; }
+  .config-field input {
+    width: 100%;
+    background: #2e2e2e;
+    border: 1px solid #444;
+    color: white;
+    padding: 10px 14px;
+    border-radius: 8px;
+    font-size: 14px;
+    outline: none;
+  }
+  .config-field input:focus { border-color: var(--rojo); }
+  #btn-guardar-config {
+    width: 100%;
+    background: var(--rojo);
+    border: none;
+    color: white;
+    padding: 12px;
+    border-radius: 10px;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    margin-top: 8px;
+  }
+  #btn-cerrar-config {
+    width: 100%;
+    background: transparent;
+    border: 1px solid #444;
+    color: rgba(255,255,255,0.6);
+    padding: 10px;
+    border-radius: 10px;
+    font-size: 14px;
+    cursor: pointer;
+    margin-top: 8px;
+  }
+
+  /* Loading spinner */
+  #loading {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.5);
+    z-index: 50;
+    align-items: center;
+    justify-content: center;
+  }
+  #loading.visible { display: flex; }
+  .spinner {
+    width: 48px; height: 48px;
+    border: 4px solid rgba(255,255,255,0.2);
+    border-top-color: white;
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  /* No camera message */
+  #no-camera {
+    display: none;
+    position: absolute;
+    inset: 0;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    text-align: center;
+    gap: 12px;
+    padding: 24px;
+    background: #0a0a0a;
+  }
+  #no-camera.visible { display: flex; }
+  #no-camera p { color: rgba(255,255,255,0.6); font-size: 14px; }
+</style>
+</head>
+<body>
+<div id="app">
+  <!-- HEADER -->
+  <div id="header">
+    <div>
+      <h1>🎟️ ALGECIRAS CF</h1>
+      <span>SCANNER ENTRADAS</span>
+    </div>
+    <button id="btn-config" title="Configuración">⚙️</button>
+  </div>
+
+  <!-- VIEWFINDER -->
+  <div id="scanner-wrap">
+    <video id="video" autoplay playsinline muted></video>
+
+    <!-- Marco de escaneo -->
+    <div id="overlay">
+      <div id="scan-frame">
+        <div class="corner-bl"></div>
+        <div class="corner-br"></div>
+        <div id="scan-line"></div>
+      </div>
+    </div>
+
+    <div id="scan-hint">Apunta la cámara al código QR</div>
+
+    <!-- Sin cámara -->
+    <div id="no-camera">
+      <div style="font-size:48px">📷</div>
+      <p>Cámara no disponible o sin permisos.<br>Usa el campo manual.</p>
+    </div>
+
+    <!-- Resultado overlay -->
+    <div id="resultado">
+      <div id="resultado-icon"></div>
+      <div id="resultado-titulo"></div>
+      <div id="resultado-subtitulo"></div>
+      <div id="resultado-detalle"></div>
+      <div id="resultado-progress"><div id="resultado-progress-bar"></div></div>
+    </div>
+  </div>
+
+  <!-- BOTTOM BAR -->
+  <div id="bottom-bar">
+    <label>O introduce código manualmente:</label>
+    <div id="manual-row">
+      <input id="input-codigo" type="text" placeholder="XXXX-XXXXXXXX" maxlength="20" autocomplete="off" autocorrect="off" spellcheck="false">
+      <button id="btn-validar">VALIDAR</button>
+    </div>
+  </div>
+</div>
+
+<!-- LOADING -->
+<div id="loading"><div class="spinner"></div></div>
+
+<!-- MODAL CONFIGURACIÓN -->
+<div id="modal-config">
+  <div id="modal-inner">
+    <h2>⚙️ Configuración Scanner</h2>
+    <div class="config-field">
+      <label>URL Backend</label>
+      <input id="cfg-url" type="url" placeholder="https://backend-algeciras.hawkins.es">
+    </div>
+    <div class="config-field">
+      <label>Scanner Secret</label>
+      <input id="cfg-secret" type="text" placeholder="token-secreto">
+    </div>
+    <button id="btn-guardar-config">Guardar</button>
+    <button id="btn-cerrar-config">Cancelar</button>
+  </div>
+</div>
+
+<!-- ZXing (QR scanner lib) -->
+<script src="https://unpkg.com/@zxing/browser@0.1.5/umd/index.min.js"></script>
+
+<script>
+// ═══════════════════════════════════════════
+// CONFIGURACIÓN (localStorage)
+// ═══════════════════════════════════════════
+const DEFAULT_BACKEND = 'https://backend-algeciras.hawkins.es';
+const DEFAULT_SECRET  = 'acf-scanner-2025';
+
+function getCfg(key, def) {
+  return localStorage.getItem(key) || def;
+}
+function setCfg(key, val) {
+  localStorage.setItem(key, val);
+}
+
+let BACKEND_URL    = getCfg('scanner_url', DEFAULT_BACKEND);
+let SCANNER_SECRET = getCfg('scanner_secret', DEFAULT_SECRET);
+
+// ═══════════════════════════════════════════
+// ESTADO
+// ═══════════════════════════════════════════
+let scanning     = true;
+let lastScanned  = '';
+let lastScannedAt = 0;
+let zxingReader  = null;
+let resultTimer  = null;
+
+// ═══════════════════════════════════════════
+// AUDIO (beep)
+// ═══════════════════════════════════════════
+function beep(freq = 880, dur = 120, type = 'sine') {
+  try {
+    const ctx = new (window.AudioContext || window.webkitAudioContext)();
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+    osc.connect(gain);
+    gain.connect(ctx.destination);
+    osc.type = type;
+    osc.frequency.value = freq;
+    gain.gain.setValueAtTime(0.4, ctx.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + dur / 1000);
+    osc.start(ctx.currentTime);
+    osc.stop(ctx.currentTime + dur / 1000);
+  } catch (_) {}
+}
+
+function beepOk()  { beep(880, 150); setTimeout(() => beep(1100, 100), 180); }
+function beepFail() { beep(220, 300, 'square'); }
+
+// ═══════════════════════════════════════════
+// RESULTADO UI
+// ═══════════════════════════════════════════
+function mostrarResultado(data) {
+  const el        = document.getElementById('resultado');
+  const icon      = document.getElementById('resultado-icon');
+  const titulo    = document.getElementById('resultado-titulo');
+  const subtitulo = document.getElementById('resultado-subtitulo');
+  const detalle   = document.getElementById('resultado-detalle');
+  const bar       = document.getElementById('resultado-progress-bar');
+
+  el.className = 'visible';
+
+  if (data.ok) {
+    el.classList.add('valido');
+    icon.textContent    = '✅';
+    titulo.textContent  = 'VÁLIDO';
+    subtitulo.textContent = data.titular || '';
+    detalle.textContent = [data.asiento, data.partido].filter(Boolean).join(' — ');
+    beepOk();
+  } else if (data.tipo === 'ya_usado') {
+    el.classList.add('ya_usado');
+    icon.textContent    = '⚠️';
+    titulo.textContent  = 'YA USADO';
+    subtitulo.textContent = data.usadoEn ? `Validado: ${new Date(data.usadoEn).toLocaleString('es-ES')}` : 'Entrada ya utilizada';
+    detalle.textContent = [data.asiento, data.partido].filter(Boolean).join(' — ');
+    beepFail();
+  } else if (data.tipo === 'caducado') {
+    el.classList.add('caducado');
+    icon.textContent    = '❌';
+    titulo.textContent  = 'CADUCADO';
+    subtitulo.textContent = 'Abono fuera de temporada';
+    detalle.textContent = data.titular || '';
+    beepFail();
+  } else {
+    el.classList.add('invalido');
+    icon.textContent    = '❌';
+    titulo.textContent  = 'INVÁLIDO';
+    subtitulo.textContent = data.msg || 'Código no reconocido';
+    detalle.textContent = '';
+    beepFail();
+  }
+
+  // Barra de progreso → vuelve en 3s
+  bar.style.transition = 'none';
+  bar.style.width = '100%';
+  requestAnimationFrame(() => {
+    requestAnimationFrame(() => {
+      bar.style.transition = 'width 3s linear';
+      bar.style.width = '0%';
+    });
+  });
+
+  clearTimeout(resultTimer);
+  resultTimer = setTimeout(() => resetResultado(), 3200);
+}
+
+function resetResultado() {
+  const el = document.getElementById('resultado');
+  el.className = '';
+  scanning = true;
+  lastScanned = '';
+}
+
+// ═══════════════════════════════════════════
+// VALIDAR CÓDIGO
+// ═══════════════════════════════════════════
+async function validarCodigo(codigo) {
+  const limpio = codigo.trim().toUpperCase();
+  if (!limpio) return;
+
+  // Evitar doble scan del mismo en <2s
+  const ahora = Date.now();
+  if (limpio === lastScanned && ahora - lastScannedAt < 2000) return;
+  lastScanned  = limpio;
+  lastScannedAt = ahora;
+  scanning = false;
+
+  document.getElementById('loading').classList.add('visible');
+
+  try {
+    const res = await fetch(`${BACKEND_URL}/api/validar-qr`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'x-scanner-secret': SCANNER_SECRET
+      },
+      body: JSON.stringify({ codigo: limpio })
+    });
+
+    const data = await res.json();
+    mostrarResultado(data);
+  } catch (e) {
+    mostrarResultado({ ok: false, tipo: 'invalido', msg: 'Error de conexión: ' + e.message });
+  } finally {
+    document.getElementById('loading').classList.remove('visible');
+  }
+}
+
+// ═══════════════════════════════════════════
+// CÁMARA + ZXING
+// ═══════════════════════════════════════════
+async function iniciarCamara() {
+  const video    = document.getElementById('video');
+  const noCamera = document.getElementById('no-camera');
+
+  // Intentar ZXing primero
+  if (window.ZXingBrowser) {
+    try {
+      const hints = new Map();
+      const formats = [window.ZXingBrowser.BarcodeFormat.QR_CODE];
+      hints.set(window.ZXingBrowser.DecodeHintType.POSSIBLE_FORMATS, formats);
+
+      zxingReader = new window.ZXingBrowser.BrowserMultiFormatReader(hints);
+      const devices = await window.ZXingBrowser.BrowserCodeReader.listVideoInputDevices();
+
+      // Preferir cámara trasera
+      let deviceId = devices[0]?.deviceId;
+      const trasera = devices.find(d =>
+        d.label.toLowerCase().includes('back') ||
+        d.label.toLowerCase().includes('rear') ||
+        d.label.toLowerCase().includes('trasera') ||
+        d.label.toLowerCase().includes('environment')
+      );
+      if (trasera) deviceId = trasera.deviceId;
+
+      zxingReader.decodeFromVideoDevice(deviceId, video, (result, err) => {
+        if (!scanning) return;
+        if (result) {
+          validarCodigo(result.getText());
+        }
+      });
+
+      return;
+    } catch (e) {
+      console.warn('ZXing falló:', e.message);
+    }
+  }
+
+  // Fallback: getUserMedia + jsQR
+  try {
+    const stream = await navigator.mediaDevices.getUserMedia({
+      video: { facingMode: { ideal: 'environment' }, width: { ideal: 1280 }, height: { ideal: 720 } }
+    });
+    video.srcObject = stream;
+    await video.play();
+
+    // Cargar jsQR dinámicamente como fallback
+    if (!window.jsQR) {
+      await new Promise((resolve, reject) => {
+        const s = document.createElement('script');
+        s.src = 'https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.js';
+        s.onload = resolve;
+        s.onerror = reject;
+        document.head.appendChild(s);
+      });
+    }
+
+    const canvas = document.createElement('canvas');
+    const ctx    = canvas.getContext('2d');
+
+    function scanFrame() {
+      if (video.readyState === video.HAVE_ENOUGH_DATA) {
+        canvas.width  = video.videoWidth;
+        canvas.height = video.videoHeight;
+        ctx.drawImage(video, 0, 0);
+        const img = ctx.getImageData(0, 0, canvas.width, canvas.height);
+        const code = window.jsQR(img.data, img.width, img.height, { inversionAttempts: 'dontInvert' });
+        if (code && scanning) {
+          validarCodigo(code.data);
+        }
+      }
+      requestAnimationFrame(scanFrame);
+    }
+    scanFrame();
+
+  } catch (e) {
+    console.warn('Sin acceso a cámara:', e.message);
+    noCamera.classList.add('visible');
+    document.getElementById('scan-hint').style.display = 'none';
+  }
+}
+
+// ═══════════════════════════════════════════
+// EVENTOS
+// ═══════════════════════════════════════════
+document.getElementById('btn-validar').addEventListener('click', () => {
+  const val = document.getElementById('input-codigo').value;
+  if (val.trim()) {
+    validarCodigo(val);
+    document.getElementById('input-codigo').value = '';
+  }
+});
+
+document.getElementById('input-codigo').addEventListener('keydown', e => {
+  if (e.key === 'Enter') {
+    document.getElementById('btn-validar').click();
+  }
+});
+
+// Config modal
+document.getElementById('btn-config').addEventListener('click', () => {
+  document.getElementById('cfg-url').value    = BACKEND_URL;
+  document.getElementById('cfg-secret').value = SCANNER_SECRET;
+  document.getElementById('modal-config').classList.add('visible');
+});
+
+document.getElementById('btn-cerrar-config').addEventListener('click', () => {
+  document.getElementById('modal-config').classList.remove('visible');
+});
+
+document.getElementById('btn-guardar-config').addEventListener('click', () => {
+  const url    = document.getElementById('cfg-url').value.trim();
+  const secret = document.getElementById('cfg-secret').value.trim();
+  if (url) {
+    BACKEND_URL = url;
+    setCfg('scanner_url', url);
+  }
+  if (secret) {
+    SCANNER_SECRET = secret;
+    setCfg('scanner_secret', secret);
+  }
+  document.getElementById('modal-config').classList.remove('visible');
+});
+
+document.getElementById('modal-config').addEventListener('click', e => {
+  if (e.target === document.getElementById('modal-config')) {
+    document.getElementById('modal-config').classList.remove('visible');
+  }
+});
+
+// ═══════════════════════════════════════════
+// SERVICE WORKER
+// ═══════════════════════════════════════════
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('/scanner/sw.js').catch(() => {});
+}
+
+// ═══════════════════════════════════════════
+// INIT
+// ═══════════════════════════════════════════
+window.addEventListener('load', iniciarCamara);
+</script>
+</body>
+</html>

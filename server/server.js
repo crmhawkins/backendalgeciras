@@ -51,7 +51,8 @@ class Server {
             logs: '/api/logs',
             sync: '/api/sync',
             fanzone: '/api/fanzone',
-            jugadores: '/api/jugadores'
+            jugadores: '/api/jugadores',
+            validarQr: '/api/validar-qr'
         };
         
 
@@ -145,6 +146,9 @@ class Server {
         this.app.use(this.paths.sync, require('../routes/sync'));
         this.app.use(this.paths.fanzone, require('../routes/fanzone'));
         this.app.use(this.paths.jugadores, require('../routes/jugadores'));
+
+        // Validación QR scanner (portería)
+        this.app.use(this.paths.validarQr, require('../routes/validarQr'));
 
     }
 

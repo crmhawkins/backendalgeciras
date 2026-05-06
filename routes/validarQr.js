@@ -79,15 +79,23 @@ router.post('/', scannerAuth, async (req, res) => {
             if (entrada.estado === 'usada') {
                 return res.status(400).json({
                     ok: false,
+                    tipo: 'ya_usado',
                     msg: 'Ya utilizado',
-                    usadoAt: entrada.usadoAt
+                    usadoEn: entrada.usadoAt,
+                    titular: `Usuario #${entrada.usuarioId}`,
+                    asiento: entrada.Asiento
+                        ? `Sector ${entrada.Asiento?.Sector?.nombre || 'N/A'} - Fila ${entrada.Asiento?.fila || 'N/A'} - Asiento ${entrada.Asiento?.numero || 'N/A'}`
+                        : null,
+                    partido: entrada.Partido
+                        ? `${entrada.Partido.equipoLocal} vs ${entrada.Partido.equipoVisitante}`
+                        : null
                 });
             }
             if (entrada.estado === 'cancelada') {
-                return res.status(400).json({ ok: false, msg: 'Entrada cancelada' });
+                return res.status(400).json({ ok: false, tipo: 'invalido', msg: 'Entrada cancelada' });
             }
             if (entrada.estado === 'pendiente') {
-                return res.status(400).json({ ok: false, msg: 'Entrada pendiente de pago' });
+                return res.status(400).json({ ok: false, tipo: 'invalido', msg: 'Entrada pendiente de pago' });
             }
 
             // Marcar como usada
@@ -137,7 +145,7 @@ router.post('/', scannerAuth, async (req, res) => {
             const ahora    = new Date();
             const caducado = abono.fechaFin && new Date(abono.fechaFin) < ahora;
             if (caducado) {
-                return res.status(400).json({ ok: false, msg: 'Abono caducado' });
+                return res.status(400).json({ ok: false, tipo: 'caducado', msg: 'Abono caducado', titular: `${abono.nombre} ${abono.apellidos || ''}`.trim() });
             }
 
             const sector   = abono.Asiento?.Sector?.nombre || 'N/A';

@@ -1,5 +1,6 @@
 const { Router } = require('express');
 const { check } = require('express-validator');
+const { Op } = require('sequelize');
 const { entradaGet, entradaPost, buscarEntradaLiberada, generarPDFEntrada } = require('../controllers/entradas');
 const { validarCampos } = require('../middlewares/validar-campos');
 const { validarJWT } = require('../middlewares/validar-jwt');
@@ -66,7 +67,7 @@ router.get('/buscar-liberada', [
 
   try {
     const entrada = await Entrada.findOne({
-      where: { asientoId, partidoId }
+      where: { asientoId, partidoId, estado: { [Op.in]: ['valida', 'pendiente'] } }
     });
 
     if (!entrada) {
@@ -81,7 +82,7 @@ router.get('/buscar-liberada', [
 });
 
 // Ruta para generar PDF de entrada con QR
-router.get('/pdf/:entradaId', generarPDFEntrada);
+router.get('/pdf/:entradaId', validarJWT, generarPDFEntrada);
 
 module.exports = router;
 

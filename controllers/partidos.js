@@ -1,6 +1,7 @@
 const Partido = require('../models/partido');
 const { validationResult } = require('express-validator');
 const EventoPartido = require('../models/eventoPartido');
+const logger = require('../helpers/logger');
 
 const eventosGet = async (req, res) => {
   const { id } = req.params;
@@ -23,12 +24,6 @@ const eventosGet = async (req, res) => {
     });
   }
 };
-
-module.exports = {
-  eventosGet
-};
-
-const logger = require('../helpers/logger');
 
 const partidoGet = async (req, res) => {
     try {

@@ -42,7 +42,7 @@ const abonoPost = async (req, res) => {
         const asiento = await Asiento.findByPk(asientoId, {
             include: {
                 model: Sector,
-                attributes: ['precio']
+                attributes: ['nombre', 'precio']
             }
         });
 
@@ -137,11 +137,12 @@ const abonoPost = async (req, res) => {
             }
         });
 
-        await transporter.sendMail({
-            from: `"Algeciras CF" <${process.env.EMAIL_USER}>`,
-            to: email,
-            subject: 'Abono confirmado - Algeciras CF',
-            html: `
+        try {
+            await transporter.sendMail({
+                from: `"Algeciras CF" <${process.env.EMAIL_USER}>`,
+                to: email,
+                subject: 'Abono confirmado - Algeciras CF',
+                html: `
                 <h2>¡Gracias por adquirir tu abono!</h2>
                 <p><strong>Nombre:</strong> ${nombre} ${apellidos}</p>
                 <p><strong>Zona:</strong> Sector ${sector.nombre} (ID= ${asiento.sectorId}) - Fila ${asiento.fila}, Butaca ${asiento.numero}</p>
@@ -152,7 +153,10 @@ const abonoPost = async (req, res) => {
                 <hr/>
                 <p>⚽ Algeciras CF</p>
             `
-        });
+            });
+        } catch (emailErr) {
+            console.error('[abonoPost] Email falló (abono creado igualmente):', emailErr.message);
+        }
 
         const { dni: _d, telefono: _t, domicilio: _dom, codigoPostal: _cp, pais: _p, provincia: _pr, localidad: _loc, ...abonoSafe } = abono.get({ plain: true });
         res.status(201).json({ msg: 'Abono creado correctamente', abono: abonoSafe });
@@ -277,7 +281,15 @@ const liberarAsiento = async (req, res) => {
             return res.status(400).json({ msg: 'Información del asiento incompleta' });
         }
 
+        const tokenUnico = crypto.randomBytes(16).toString('hex');
+        const codigoAcc = crypto.randomBytes(3).toString('hex').toUpperCase().slice(0, 4) + '-' + crypto.randomBytes(3).toString('hex').toUpperCase();
+
         await Entrada.create({
+            token: tokenUnico,
+            qrCode: tokenUnico,
+            codigoAcceso: codigoAcc,
+            estado: 'valida',
+            tipo: 'taquilla',
             usuarioId: 1,
             partidoId,
             asientoId,

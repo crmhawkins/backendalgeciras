@@ -2,6 +2,7 @@ const { Router } = require('express');
 const { check } = require('express-validator');
 const { entradaGet, entradaPost, buscarEntradaLiberada, generarPDFEntrada } = require('../controllers/entradas');
 const { validarCampos } = require('../middlewares/validar-campos');
+const { validarJWT } = require('../middlewares/validar-jwt');
 const Entrada = require('../models/entrada');
 const Usuario = require('../models/usuario');
 const Partido = require('../models/partido');
@@ -34,7 +35,7 @@ router.post('/create', [
   validarCampos
 ], entradaPost);
 
-router.get('/usuario/:id', async (req, res) => {
+router.get('/usuario/:id', validarJWT, async (req, res) => {
   const { id } = req.params;
 
   try {

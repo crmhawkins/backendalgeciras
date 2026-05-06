@@ -15,7 +15,7 @@ async function getExpo() {
 function getTransporter() {
     return nodemailer.createTransport({
         host: process.env.EMAIL_HOST,
-        port: Number(process.env.EMAIL_PORT),
+        port: Number(process.env.EMAIL_PORT) || 465,
         secure: process.env.EMAIL_ENCRYPTION === 'ssl',
         auth: { user: process.env.EMAIL_USER, pass: process.env.EMAIL_PASS },
     });
@@ -64,7 +64,7 @@ async function procesarNotificaciones() {
     const en6h = new Date(ahora.getTime() + 6 * 60 * 60 * 1000);
     const en5h55m = new Date(ahora.getTime() + (6 * 60 - 5) * 60 * 1000);
 
-    const [partidos] = await db.query(
+    const partidos = await db.query(
         `SELECT * FROM partidos WHERE fecha >= ? AND fecha <= ? LIMIT 1`,
         { replacements: [en5h55m, en6h], type: 'SELECT' }
     );
@@ -73,7 +73,7 @@ async function procesarNotificaciones() {
     const partido = partidos[0];
     console.log(`[notificaciones] Partido próximo encontrado: ${partido.equipoLocal} vs ${partido.equipoVisitante}`);
 
-    const [abonos] = await db.query(
+    const abonos = await db.query(
         `SELECT a.*, u.expoPushToken FROM abonos a
          LEFT JOIN usuarios u ON u.id = a.usuarioId
          WHERE a.activo = 1 AND a.codigoAcceso IS NOT NULL`,
@@ -82,7 +82,7 @@ async function procesarNotificaciones() {
 
     for (const abono of abonos) {
         if (abono.email && abono.email.includes('@')) {
-            const [ya] = await db.query(
+            const ya = await db.query(
                 `SELECT id FROM notificaciones_partidos WHERE abonoId=? AND partidoId=? AND canal='email'`,
                 { replacements: [abono.id, partido.id], type: 'SELECT' }
             );
@@ -97,7 +97,7 @@ async function procesarNotificaciones() {
             }
         }
         if (abono.expoPushToken) {
-            const [ya] = await db.query(
+            const ya = await db.query(
                 `SELECT id FROM notificaciones_partidos WHERE abonoId=? AND partidoId=? AND canal='push'`,
                 { replacements: [abono.id, partido.id], type: 'SELECT' }
             );
@@ -125,7 +125,7 @@ async function procesarNotificaciones() {
 async function enviarPushMasivo(titulo, cuerpo, data = {}) {
     const { expo, Expo } = await getExpo();
 
-    const [rows] = await db.query(
+    const rows = await db.query(
         `SELECT id, expoPushToken FROM usuarios WHERE expoPushToken IS NOT NULL AND expoPushToken != ''`,
         { type: 'SELECT' }
     );
@@ -194,7 +194,7 @@ async function enviarPushMasivo(titulo, cuerpo, data = {}) {
 async function enviarPushUsuario(userId, titulo, cuerpo, data = {}) {
     const { expo, Expo } = await getExpo();
 
-    const [rows] = await db.query(
+    const rows = await db.query(
         `SELECT id, expoPushToken FROM usuarios WHERE id = ? AND expoPushToken IS NOT NULL AND expoPushToken != ''`,
         { replacements: [userId], type: 'SELECT' }
     );

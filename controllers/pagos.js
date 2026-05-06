@@ -350,6 +350,10 @@ const confirmarPago = async (req, res = response) => {
         const stripeSession = await stripe.checkout.sessions.retrieve(session_id);
 
         if (stripeSession.payment_status !== 'paid') {
+            await PagoSession.update(
+                { estado: 'pendiente' },
+                { where: { stripeSessionId: session_id, estado: 'procesando' } }
+            );
             return res.status(400).json({ msg: 'El pago no ha sido completado' });
         }
 

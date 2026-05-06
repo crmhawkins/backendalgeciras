@@ -44,6 +44,11 @@ router.get('/disponibilidad/:zonaId', async (req, res) => {
 });
 
 router.post('/jugadores', async (req, res) => {
+    const secret = req.headers['x-sync-secret'];
+    const SYNC_SECRET = process.env.SYNC_SECRET || 'hawkins-sync-2026';
+    if (secret !== SYNC_SECRET) {
+        return res.status(401).json({ ok: false, error: 'Unauthorized' });
+    }
     try {
         await sincronizarJugadores();
         res.json({ msg: 'Sync plantilla completado', timestamp: new Date().toISOString() });

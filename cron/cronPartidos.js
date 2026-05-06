@@ -20,7 +20,7 @@ cron.schedule('0 2 * * *', async () => {
   await eliminarAbonosTemporada();
 });
 
-// Ejecuta todos los días a las 19:00 PM
+// Ejecuta todos los días a las 03:00 UTC (05:00 España)
 cron.schedule('0 3 * * *', async () => {
   console.log('🔔 Verificando partidos próximos...');
   verificarProximosPartidos();

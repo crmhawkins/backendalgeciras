@@ -233,7 +233,7 @@ const getAbonosPorUsuario = async (req, res) => {
             }
         });
 
-        res.json({ abonos });
+        res.json(abonos);
     } catch (error) {
         console.error(error);
         res.status(500).json({ msg: 'Error al obtener los abonos del usuario' });

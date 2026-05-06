@@ -32,9 +32,11 @@ const logger = require('../helpers/logger');
 
 const partidoGet = async (req, res) => {
     try {
-      const partidos = await Partido.findAll();
+      const partidos = await Partido.findAll({ order: [['fecha', 'ASC']] });
       logger.info('Partidos obtenidos correctamente', { count: partidos.length });
-      res.json({ partidos });
+      // Return flat array so all clients can consume consistently.
+      // Legacy shape { partidos } broke HomeScreen which expects array directly.
+      res.json(partidos);
     } catch (error) {
       logger.error('Error en partidoGet', error);
       console.error('❌ Error en partidoGet:', error);

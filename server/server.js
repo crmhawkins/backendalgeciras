@@ -1,9 +1,12 @@
+const http = require('http');
 const express = require('express');
 const cors = require('cors');
 const helmet = require('helmet');
 const rateLimit = require('express-rate-limit');
 const fileUpload = require('express-fileupload');
 const i18n = require('../lib/i18nConfigure');
+const { Server: SocketIOServer } = require('socket.io');
+const { initChatSocket } = require('../sockets/chatSocket');
 
 // Inicializar el sistema de logging (debe ser lo primero para capturar todos los logs)
 require('../helpers/logger');
@@ -25,7 +28,14 @@ const loginLimiter = rateLimit({
 class Server {
 
     constructor() {
-        this.app  = express();
+        this.app        = express();
+        this.httpServer = http.createServer(this.app);
+        this.io         = new SocketIOServer(this.httpServer, {
+            cors: {
+                origin: '*',
+                methods: ['GET', 'POST'],
+            },
+        });
         this.port = process.env.PORT || 3000;
         this.paths = {
             authenticate: '/api/authenticate',
@@ -53,6 +63,9 @@ class Server {
 
         // Rutas de mi aplicación
         this.routes();
+
+        // Socket.io chat
+        initChatSocket(this.io);
     }
     async conectarDB() {
         try {
@@ -136,8 +149,9 @@ class Server {
     }
 
     listen() {
-        this.app.listen( this.port, () => {
+        this.httpServer.listen( this.port, () => {
             console.log('Servidor corriendo en puerto', this.port );
+            console.log('Socket.io chat activo');
         });
     }
 

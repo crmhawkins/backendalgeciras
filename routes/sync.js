@@ -3,6 +3,7 @@ const { validarJWT } = require('../middlewares/validar-jwt');
 const { sincronizarZonas, obtenerDisponibilidadZona } = require('../services/compralaentradaService');
 const { ejecutarSincronizacion } = require('../cron/cronSync');
 const { sincronizarJugadores } = require('../services/sofascoreService');
+const { db } = require('../database/config');
 
 const router = Router();
 
@@ -57,5 +58,32 @@ router.post('/jugadores', async (req, res) => {
     }
 });
 
+
+router.post('/cleanup-db', async (req, res) => {
+    const secret = req.headers['x-sync-secret'];
+    const SYNC_SECRET = process.env.SYNC_SECRET || 'hawkins-sync-2026';
+    if (secret !== SYNC_SECRET) {
+        return res.status(401).json({ ok: false, error: 'Unauthorized' });
+    }
+    try {
+        const [r1] = await db.query('DELETE FROM jugador_stats WHERE jugadorId IN (SELECT id FROM jugadores WHERE sofascoreId = 999)');
+        const [r2] = await db.query('DELETE FROM jugadores WHERE sofascoreId = 999');
+        const [r3] = await db.query('DELETE FROM partidos WHERE id = 27');
+        const [r4] = await db.query(`
+            DELETE js FROM jugador_stats js
+            INNER JOIN (
+                SELECT MIN(id) as min_id, jugadorId, temporada
+                FROM jugador_stats
+                GROUP BY jugadorId, temporada
+            ) t ON js.jugadorId = t.jugadorId AND js.temporada = t.temporada AND js.id > t.min_id
+        `);
+        const [[{ jugadores }]] = await db.query('SELECT COUNT(*) as jugadores FROM jugadores');
+        const [[{ stats }]] = await db.query('SELECT COUNT(*) as stats FROM jugador_stats');
+        const [[{ partidos }]] = await db.query('SELECT COUNT(*) as partidos FROM partidos');
+        res.json({ ok: true, jugadores, stats, partidos });
+    } catch (err) {
+        res.status(500).json({ ok: false, error: err.message });
+    }
+});
 
 module.exports = router;

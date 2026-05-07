@@ -47,6 +47,7 @@ const dbConnection = async () => {
         require('../models/sector');
         require('../models/abono');
         require('../models/pagoSession');
+        require('../models/producto');
 
         const Usuario = require('../models/usuario');
         const Entrada = require('../models/entrada');

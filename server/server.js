@@ -56,7 +56,8 @@ class Server {
             sync: '/api/sync',
             fanzone: '/api/fanzone',
             jugadores: '/api/jugadores',
-            validarQr: '/api/validar-qr'
+            validarQr: '/api/validar-qr',
+            productos: '/api/productos'
         };
         
 
@@ -151,6 +152,9 @@ class Server {
 
         // Validación QR scanner (portería)
         this.app.use(this.paths.validarQr, require('../routes/validarQr'));
+
+        // Tienda
+        this.app.use(this.paths.productos, require('../routes/productos'));
 
     }
 

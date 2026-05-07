@@ -1,4 +1,4 @@
-const BASE = 'https://latiendadelalgeciras.com/wp-content/uploads/';
+const BASE = 'https://backend-algeciras.hawkins.es/tienda/';
 
 const productos = [
     // ── EQUIPACIONES 25/26 ──────────────────────────────────────────────

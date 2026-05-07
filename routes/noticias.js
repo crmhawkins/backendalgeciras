@@ -56,7 +56,20 @@ router.get('/:slug', async (req, res) => {
             where: { slug: req.params.slug, activo: true },
         });
         if (!noticia) return res.status(404).json({ msg: 'Noticia no encontrada' });
-        res.json({ noticia });
+
+        // Noticias relacionadas: misma categoría, excluye la actual
+        const relacionadas = await Noticia.findAll({
+            where: {
+                activo: true,
+                categoria: noticia.categoria,
+                id: { [Op.ne]: noticia.id },
+            },
+            order: [['fecha', 'DESC']],
+            limit: 3,
+            attributes: ['id', 'titulo', 'slug', 'imagen', 'fecha', 'categoria'],
+        });
+
+        res.json({ noticia, relacionadas });
     } catch (err) {
         console.error(err);
         res.status(500).json({ msg: 'Error al obtener noticia' });

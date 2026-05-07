@@ -29,9 +29,8 @@ const partidoGet = async (req, res) => {
     try {
       const partidos = await Partido.findAll({ order: [['fecha', 'ASC']] });
       logger.info('Partidos obtenidos correctamente', { count: partidos.length });
-      // Return flat array so all clients can consume consistently.
-      // Legacy shape { partidos } broke HomeScreen which expects array directly.
-      res.json(partidos);
+      const proximoPartido = partidos.find(p => !p.marcador && new Date(p.fecha) >= new Date()) || null;
+      res.json({ partidos, proximoPartido });
     } catch (error) {
       logger.error('Error en partidoGet', error);
       console.error('❌ Error en partidoGet:', error);

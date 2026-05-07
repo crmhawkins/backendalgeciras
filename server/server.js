@@ -58,7 +58,8 @@ class Server {
             jugadores: '/api/jugadores',
             validarQr: '/api/validar-qr',
             productos: '/api/productos',
-            noticias: '/api/noticias'
+            noticias: '/api/noticias',
+            estadio: '/api/estadio'
         };
         
 
@@ -159,6 +160,9 @@ class Server {
 
         // Noticias
         this.app.use(this.paths.noticias, require('../routes/noticias'));
+
+        // Estadio
+        this.app.use(this.paths.estadio, require('../routes/estadio'));
 
     }
 

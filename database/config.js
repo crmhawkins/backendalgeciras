@@ -125,6 +125,7 @@ const dbConnection = async () => {
 
         try {
             const Clasificacion = require('../models/clasificacion');
+            await Clasificacion.sync({ alter: true });
             const count = await Clasificacion.count();
             if (count === 0) {
                 await require('../scripts/seedClasificacion').seedClasificacion(Clasificacion);

@@ -1,106 +1,105 @@
-// Sistema de logging en memoria para visualización en tiempo real
-const logs = [];
-const MAX_LOGS = 1000; // Mantener solo los últimos 1000 logs
+'use strict';
 
-// Interceptar console.log, console.error, etc. para capturar todos los logs
-const originalConsole = {
-    log: console.log,
-    error: console.error,
-    warn: console.warn,
-    info: console.info
-};
+const winston = require('winston');
+
+// In-memory buffer for /api/logs backward compat
+const logs = [];
+const MAX_LOGS = 1000;
+
+function addLog(entry) {
+    logs.push(entry);
+    if (logs.length > MAX_LOGS) logs.shift();
+}
+
+const winstonLogger = winston.createLogger({
+    level: process.env.LOG_LEVEL || 'info',
+    format: winston.format.combine(
+        winston.format.timestamp(),
+        winston.format.errors({ stack: true }),
+        process.env.NODE_ENV === 'production'
+            ? winston.format.json()
+            : winston.format.combine(
+                winston.format.colorize(),
+                winston.format.printf(({ timestamp, level, message, ...meta }) => {
+                    const metaStr = Object.keys(meta).length ? ' ' + JSON.stringify(meta) : '';
+                    return `${timestamp} [${level}]: ${message}${metaStr}`;
+                })
+            )
+    ),
+    transports: [
+        new winston.transports.Console(),
+    ],
+});
 
 const logger = {
     log: (message, data = null) => {
-        const logEntry = {
-            timestamp: new Date().toISOString(),
-            level: 'log',
-            message,
-            data
-        };
-        addLog(logEntry);
-        originalConsole.log(`[${logEntry.timestamp}]`, message, data || '');
+        const entry = { timestamp: new Date().toISOString(), level: 'log', message, data };
+        addLog(entry);
+        winstonLogger.info(message, data ? { data } : {});
     },
 
     error: (message, error = null) => {
-        const logEntry = {
+        const entry = {
             timestamp: new Date().toISOString(),
             level: 'error',
             message,
-            error: error ? {
-                name: error.name,
-                message: error.message,
-                stack: error.stack
-            } : null
+            error: error ? { name: error.name, message: error.message, stack: error.stack } : null,
         };
-        addLog(logEntry);
-        originalConsole.error(`[${logEntry.timestamp}]`, message, error || '');
+        addLog(entry);
+        winstonLogger.error(message, error ? { error: error.message } : {});
     },
 
     warn: (message, data = null) => {
-        const logEntry = {
-            timestamp: new Date().toISOString(),
-            level: 'warn',
-            message,
-            data
-        };
-        addLog(logEntry);
-        originalConsole.warn(`[${logEntry.timestamp}]`, message, data || '');
+        const entry = { timestamp: new Date().toISOString(), level: 'warn', message, data };
+        addLog(entry);
+        winstonLogger.warn(message, data ? { data } : {});
     },
 
     info: (message, data = null) => {
-        const logEntry = {
-            timestamp: new Date().toISOString(),
-            level: 'info',
-            message,
-            data
-        };
-        addLog(logEntry);
-        originalConsole.info(`[${logEntry.timestamp}]`, message, data || '');
+        const entry = { timestamp: new Date().toISOString(), level: 'info', message, data };
+        addLog(entry);
+        winstonLogger.info(message, data ? { data } : {});
     },
 
     getLogs: (limit = 100, level = null) => {
-        let filteredLogs = logs;
-        if (level) {
-            filteredLogs = logs.filter(log => log.level === level);
-        }
-        return filteredLogs.slice(-limit);
+        let filtered = logs;
+        if (level) filtered = logs.filter(l => l.level === level);
+        return filtered.slice(-limit);
     },
 
     clearLogs: () => {
         logs.length = 0;
-    }
+    },
 };
 
-function addLog(logEntry) {
-    logs.push(logEntry);
-    // Mantener solo los últimos MAX_LOGS
-    if (logs.length > MAX_LOGS) {
-        logs.shift();
-    }
-}
+// Keep console intercept for existing code that uses console.log/error/warn/info
+const originalConsole = {
+    log: console.log,
+    error: console.error,
+    warn: console.warn,
+    info: console.info,
+};
 
-// Interceptar console para capturar logs automáticamente
 console.log = (...args) => {
     originalConsole.log(...args);
-    logger.log(args.join(' '), args.length > 1 ? args.slice(1) : null);
+    addLog({ timestamp: new Date().toISOString(), level: 'log', message: args.join(' '), data: null });
 };
 
 console.error = (...args) => {
     originalConsole.error(...args);
-    const error = args.find(arg => arg instanceof Error) || null;
-    const message = args.filter(arg => !(arg instanceof Error)).join(' ') || 'Error';
-    logger.error(message, error);
+    const error = args.find(a => a instanceof Error) || null;
+    const message = args.filter(a => !(a instanceof Error)).join(' ') || 'Error';
+    addLog({ timestamp: new Date().toISOString(), level: 'error', message, error: error ? { name: error.name, message: error.message, stack: error.stack } : null });
 };
 
 console.warn = (...args) => {
     originalConsole.warn(...args);
-    logger.warn(args.join(' '), args.length > 1 ? args.slice(1) : null);
+    addLog({ timestamp: new Date().toISOString(), level: 'warn', message: args.join(' '), data: null });
 };
 
 console.info = (...args) => {
     originalConsole.info(...args);
-    logger.info(args.join(' '), args.length > 1 ? args.slice(1) : null);
+    addLog({ timestamp: new Date().toISOString(), level: 'info', message: args.join(' '), data: null });
 };
 
 module.exports = logger;

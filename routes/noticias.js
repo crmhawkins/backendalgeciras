@@ -11,8 +11,16 @@ router.get('/', async (req, res) => {
     try {
         const { categoria, destacado, page = 1, limit = 20 } = req.query;
         const where = { activo: true };
-        if (categoria) where.categoria = categoria;
+        if (categoria && categoria !== 'todo') where.categoria = categoria;
         if (destacado === 'true') where.destacado = true;
+        if (req.query.q && req.query.q.trim()) {
+            const q = req.query.q.trim();
+            where[Op.or] = [
+                { titulo: { [Op.like]: `%${q}%` } },
+                { extracto: { [Op.like]: `%${q}%` } },
+                { contenido: { [Op.like]: `%${q}%` } },
+            ];
+        }
 
         const offset = (parseInt(page) - 1) * parseInt(limit);
         const { count, rows } = await Noticia.findAndCountAll({

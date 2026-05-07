@@ -1,6 +1,6 @@
 'use strict';
 
-const BASE = 'https://algecirasclubdefutbol.com/wp-content/uploads/';
+const BASE = 'https://backend-algeciras.hawkins.es/acf/noticias/';
 
 function img(path) { return BASE + path; }
 

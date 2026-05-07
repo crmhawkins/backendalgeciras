@@ -123,6 +123,17 @@ const dbConnection = async () => {
             console.error('Error al sembrar noticias (no crítico):', seedError.message);
         }
 
+        try {
+            const Clasificacion = require('../models/clasificacion');
+            const count = await Clasificacion.count();
+            if (count === 0) {
+                await require('../scripts/seedClasificacion').seedClasificacion(Clasificacion);
+                console.log('Clasificacion inicial insertada');
+            }
+        } catch (seedError) {
+            console.error('Error al sembrar clasificacion (no crítico):', seedError.message);
+        }
+
     } catch (error) {
         console.error('Error al conectar con la base de datos:', error);
         throw new Error('Error en la conexión con la base de datos');

@@ -7,6 +7,8 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "initdb": "node initDB.mjs",
     "seed:productos": "node scripts/seedProductos.mjs",
+    "seed:clasificacion": "node scripts/seedClasificacion.js",
+    "seed:all": "node scripts/seedClasificacion.js && node scripts/seedProductos.js",
     "start": "node app.js",
     "dev": "nodemon app.js"
   },

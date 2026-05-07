@@ -3,7 +3,10 @@ const Asiento = require('../models/asiento');
 const Sector = require('../models/sector');
 
 const BASE_URL = 'https://apiteatros.compralaentrada.com/api1/f';
-const TID = process.env.COMPRALAENTRADA_TID || '9qXku4wevkdoDedmyHn7';
+const TID = process.env.COMPRALAENTRADA_TID;
+if (!TID) {
+    console.warn('[compralaentradaScraper] COMPRALAENTRADA_TID no está definida — el servicio devolverá errores hasta que se configure.');
+}
 const TIMEOUT_MS = 8000;
 
 const fetchJson = async (url) => {

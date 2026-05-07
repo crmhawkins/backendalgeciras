@@ -35,7 +35,14 @@ const bcryptjs = require('bcryptjs');
 const generarPasswordAleatoria = require('../helpers/generarPasswordAleatoria');
 const { generarJWT } = require('../helpers/generarJWT');
 const generarIdUnico = require('../helpers/generarIdUnico');
+const crypto = require('crypto');
 const nodemailer = require('nodemailer');
+
+// Genera un código de acceso visible para el usuario (hex en mayúsculas)
+const generarCodigoAcceso = (longitud = 12) => {
+    const bytes = Math.ceil(longitud / 2);
+    return crypto.randomBytes(bytes).toString('hex').toUpperCase().slice(0, longitud);
+};
 const { actualizarJSONAsiento } = require('../services/updateJSON');
 const { verificarAsientoEnCompralaentrada, sincronizarZona } = require('../services/compralaentradaService');
 
@@ -406,6 +413,8 @@ const confirmarPago = async (req, res = response) => {
             // Crear entrada
             const entrada = await Entrada.create({
                 token: token,
+                qrCode: token,
+                codigoAcceso: generarCodigoAcceso(12),
                 partidoId: datosCompra.partidoId,
                 asientoId: datosCompra.asientoId,
                 precio: datosCompra.precio,
@@ -486,7 +495,8 @@ const confirmarPago = async (req, res = response) => {
                 codigoPostal: datosCompra.codigoPostal,
                 usuarioId: usuario.id,
                 asientoId: datosCompra.asientoId,
-                precio: pagoSession.monto
+                precio: pagoSession.monto,
+                codigoAcceso: generarCodigoAcceso(8)
             });
 
             // Actualizar estado del asiento
@@ -638,7 +648,8 @@ const webhookStripe = async (req, res) => {
                     codigoPostal: datosCompra.codigoPostal || null,
                     usuarioId: usuario.id,
                     asientoId: datosCompra.asientoId,
-                    precio: pagoSession.monto
+                    precio: pagoSession.monto,
+                    codigoAcceso: generarCodigoAcceso(8)
                 });
                 const asiento = await Asiento.findByPk(datosCompra.asientoId);
                 if (asiento) { asiento.estado = 'ocupado'; await asiento.save(); sectorId = asiento.sectorId; }
@@ -656,6 +667,8 @@ const webhookStripe = async (req, res) => {
 
                 await Entrada.create({
                     token,
+                    qrCode: token,
+                    codigoAcceso: generarCodigoAcceso(12),
                     partidoId: datosCompra.partidoId,
                     asientoId: datosCompra.asientoId,
                     precio: datosCompra.precio,

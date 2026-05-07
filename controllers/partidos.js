@@ -8,7 +8,7 @@ const eventosGet = async (req, res) => {
 
   try {
     const eventos = await EventoPartido.findAll({
-      where: { PartidoId: id },
+      where: { partidoId: id },
       order: [['minuto', 'ASC']]
     });
 

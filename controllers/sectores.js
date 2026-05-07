@@ -4,7 +4,9 @@ const Asiento = require('../models/asiento');
 
 const sectorGet = async (req, res) => {
     try {
-        const sectores = await Sector.findAll();
+        const where = {};
+        if (req.query.gradaId) where.gradaId = req.query.gradaId;
+        const sectores = await Sector.findAll({ where });
 
         const sectoresConDisponibles = await Promise.all(
             sectores.map(async (sector) => {

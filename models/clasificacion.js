@@ -30,6 +30,21 @@ const Clasificacion = db.define('Clasificacion', {
   puntos: {
     type: DataTypes.INTEGER,
     allowNull: false
+  },
+  g: {
+    type: DataTypes.INTEGER,
+    allowNull: false,
+    defaultValue: 0
+  },
+  e: {
+    type: DataTypes.INTEGER,
+    allowNull: false,
+    defaultValue: 0
+  },
+  d: {
+    type: DataTypes.INTEGER,
+    allowNull: false,
+    defaultValue: 0
   }
 },{
     tableName: 'clasificacion',

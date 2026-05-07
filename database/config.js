@@ -98,7 +98,17 @@ const dbConnection = async () => {
             console.log('Modelos sincronizados con la base de datos');
         } catch (syncError) {
             console.error('Error al sincronizar modelos (continuando de todas formas):', syncError.message);
-            // Continuar aunque falle la sincronización para no bloquear el inicio de la app
+        }
+
+        try {
+            const Producto = require('../models/producto');
+            const count = await Producto.count();
+            if (count === 0) {
+                await require('../scripts/seedProductosData').seedProductos(Producto);
+                console.log('Productos iniciales insertados');
+            }
+        } catch (seedError) {
+            console.error('Error al sembrar productos (no crítico):', seedError.message);
         }
 
     } catch (error) {

@@ -1,8 +1,10 @@
 
-
 node_modules/
 
+# Variables de entorno — NO commitear (usar .env.example como plantilla)
 .env
+.env.local
+.env.*.local
 
 # Firebase service account — NUNCA commitear
 notificaciones/*.json

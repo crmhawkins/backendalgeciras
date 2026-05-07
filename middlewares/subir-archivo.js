@@ -15,7 +15,6 @@ const storage = multer.diskStorage({
 const fileFilter = (req, file, cb) => {
   const allowedTypes = /jpeg|jpg|png|webp/;
   const ext = path.extname(file.originalname).toLowerCase();
-  console.log('🧠 ext recibido en subir archivo:', file.mimetype);//extension
   const mime = allowedTypes.test(file.mimetype);
   if (mime && allowedTypes.test(ext)) {
     cb(null, true);

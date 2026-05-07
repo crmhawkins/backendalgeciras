@@ -38,8 +38,8 @@ const generarIdUnico = require('../helpers/generarIdUnico');
 const crypto = require('crypto');
 const nodemailer = require('nodemailer');
 
-// Genera un código de acceso visible para el usuario (hex en mayúsculas)
-const generarCodigoAcceso = (longitud = 12) => {
+// Genera un código de acceso visible para el usuario (hex en mayúsculas, 16 bytes = 32 chars = 128-bit entropy)
+const generarCodigoAcceso = (longitud = 16) => {
     const bytes = Math.ceil(longitud / 2);
     return crypto.randomBytes(bytes).toString('hex').toUpperCase().slice(0, longitud);
 };

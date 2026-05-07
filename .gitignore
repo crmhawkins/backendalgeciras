@@ -4,3 +4,6 @@ node_modules/
 
 .env
 
+# Firebase service account — NUNCA commitear
+notificaciones/*.json
+

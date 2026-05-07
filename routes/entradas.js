@@ -12,12 +12,12 @@ const Asiento = require('../models/asiento');
 
 const router = Router();
 
-router.get('/', [
+router.get('/', validarJWT, [
   check('id', 'El ID debe ser un número').isInt(),
   validarCampos
 ], entradaGet);
 
-router.post('/create', [
+router.post('/create', validarJWT, [
   check('asientoId', 'El asiento es obligatorio y numérico').isInt(),
   check('precio', 'El precio debe ser numérico').isNumeric(),
   check('partidoId', 'El ID del partido es obligatorio y numérico').isInt(),
@@ -38,6 +38,10 @@ router.post('/create', [
 
 router.get('/usuario/:id', validarJWT, async (req, res) => {
   const { id } = req.params;
+
+  if (String(req.uid) !== String(id)) {
+    return res.status(403).json({ msg: 'No tienes permiso para ver las entradas de otro usuario' });
+  }
 
   try {
     const entradas = await Entrada.findAll({

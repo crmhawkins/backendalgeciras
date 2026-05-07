@@ -99,7 +99,10 @@ router.get('/', [
     validarCampos
 ], asientoGet);
 
-router.post('/create', [
+const { validarJWT } = require('../middlewares/validar-jwt');
+const { esAdmin } = require('../middlewares/es-admin');
+
+router.post('/create', validarJWT, esAdmin, [
     check('numero', 'El número de asiento es obligatorio').not().isEmpty(),
     check('sectorId', 'El ID del sector es obligatorio y numérico').isInt(),
     check('partidoId', 'El ID del partido es obligatorio y numérico').isInt(),

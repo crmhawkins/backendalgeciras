@@ -590,73 +590,96 @@ const webhookStripe = async (req, res) => {
     if (event.type === 'checkout.session.completed') {
         const session = event.data.object;
         try {
-            const pagoSession = await PagoSession.findOne({ where: { stripeSessionId: session.id } });
-            if (pagoSession && pagoSession.estado === 'pendiente') {
-                const datosCompra = pagoSession.datosCompra;
+            // CAS atómico — evita race condition con confirmarPago
+            const [updatedRows] = await PagoSession.update(
+                { estado: 'procesando' },
+                { where: { stripeSessionId: session.id, estado: 'pendiente' } }
+            );
 
-                // Find or create usuario
-                let usuario = await Usuario.findOne({ where: { email: datosCompra.email } });
-                if (!usuario) {
-                    const salt = bcryptjs.genSaltSync();
-                    usuario = await Usuario.create({
-                        nombre: datosCompra.nombre,
-                        email: datosCompra.email,
-                        profileImage: 'default_profile_photo.png',
-                        password: bcryptjs.hashSync(generarPasswordAleatoria(10), salt),
-                        dni: datosCompra.dni || null
-                    });
-                }
-
-                let sectorId = null;
-
-                if (pagoSession.tipo === 'abono') {
-                    const abono = await Abono.create({
-                        fechaInicio: datosCompra.fechaInicio,
-                        fechaFin: datosCompra.fechaFin,
-                        nombre: datosCompra.nombre,
-                        apellidos: datosCompra.apellidos,
-                        genero: datosCompra.genero || null,
-                        dni: datosCompra.dni || null,
-                        fechaNacimiento: datosCompra.fechaNacimiento || null,
-                        email: datosCompra.email,
-                        telefono: datosCompra.telefono || null,
-                        pais: datosCompra.pais || null,
-                        provincia: datosCompra.provincia || null,
-                        localidad: datosCompra.localidad || null,
-                        domicilio: datosCompra.domicilio || null,
-                        codigoPostal: datosCompra.codigoPostal || null,
-                        usuarioId: usuario.id,
-                        asientoId: datosCompra.asientoId,
-                        precio: pagoSession.monto
-                    });
-                    const asiento = await Asiento.findByPk(datosCompra.asientoId);
-                    if (asiento) { asiento.estado = 'ocupado'; await asiento.save(); sectorId = asiento.sectorId; }
-                    actualizarJSONAsiento(datosCompra.asientoId, 'ocupado');
-                } else if (pagoSession.tipo === 'entrada') {
-                    const token = generarIdUnico();
-                    await Entrada.create({
-                        token,
-                        partidoId: datosCompra.partidoId,
-                        asientoId: datosCompra.asientoId,
-                        precio: datosCompra.precio,
-                        usuarioId: usuario.id
-                    });
-                    const asiento = await Asiento.findByPk(datosCompra.asientoId);
-                    if (asiento) { asiento.estado = 'ocupado'; await asiento.save(); sectorId = asiento.sectorId; }
-                }
-
-                pagoSession.estado = 'completado';
-                await pagoSession.save();
-
-                // Sync compralaentrada for this zone immediately
-                if (sectorId) {
-                    sincronizarZona(sectorId).catch(e => console.warn('[webhook] sync zona error:', e.message));
-                }
-
-                console.log(`[webhook] Pago procesado y zona sincronizada: session=${session.id}`);
+            if (updatedRows === 0) {
+                // Ya procesado o siendo procesado por confirmarPago
+                console.log(`[webhook] Sesión ${session.id} ya procesada o en curso — omitiendo`);
+                return res.json({ received: true });
             }
+
+            const pagoSession = await PagoSession.findOne({ where: { stripeSessionId: session.id } });
+            const datosCompra = pagoSession.datosCompra;
+
+            // Find or create usuario
+            let usuario = await Usuario.findOne({ where: { email: datosCompra.email } });
+            if (!usuario) {
+                const salt = bcryptjs.genSaltSync();
+                usuario = await Usuario.create({
+                    nombre: datosCompra.nombre,
+                    email: datosCompra.email,
+                    profileImage: 'default_profile_photo.png',
+                    password: bcryptjs.hashSync(generarPasswordAleatoria(10), salt),
+                    dni: datosCompra.dni || null
+                });
+            }
+
+            let sectorId = null;
+
+            if (pagoSession.tipo === 'abono') {
+                await Abono.create({
+                    fechaInicio: datosCompra.fechaInicio,
+                    fechaFin: datosCompra.fechaFin,
+                    nombre: datosCompra.nombre,
+                    apellidos: datosCompra.apellidos,
+                    genero: datosCompra.genero || null,
+                    dni: datosCompra.dni || null,
+                    fechaNacimiento: datosCompra.fechaNacimiento || null,
+                    email: datosCompra.email,
+                    telefono: datosCompra.telefono || null,
+                    pais: datosCompra.pais || null,
+                    provincia: datosCompra.provincia || null,
+                    localidad: datosCompra.localidad || null,
+                    domicilio: datosCompra.domicilio || null,
+                    codigoPostal: datosCompra.codigoPostal || null,
+                    usuarioId: usuario.id,
+                    asientoId: datosCompra.asientoId,
+                    precio: pagoSession.monto
+                });
+                const asiento = await Asiento.findByPk(datosCompra.asientoId);
+                if (asiento) { asiento.estado = 'ocupado'; await asiento.save(); sectorId = asiento.sectorId; }
+                actualizarJSONAsiento(datosCompra.asientoId, 'ocupado');
+            } else if (pagoSession.tipo === 'entrada') {
+                // Token único con retry (igual que confirmarPago)
+                let token = null;
+                let intentos = 0;
+                do {
+                    token = generarIdUnico();
+                    const existe = await Entrada.findOne({ where: { token } });
+                    if (!existe) break;
+                    intentos++;
+                } while (intentos < 10);
+
+                await Entrada.create({
+                    token,
+                    partidoId: datosCompra.partidoId,
+                    asientoId: datosCompra.asientoId,
+                    precio: datosCompra.precio,
+                    usuarioId: usuario.id
+                });
+                const asiento = await Asiento.findByPk(datosCompra.asientoId);
+                if (asiento) { asiento.estado = 'ocupado'; await asiento.save(); sectorId = asiento.sectorId; }
+            }
+
+            pagoSession.estado = 'completado';
+            await pagoSession.save();
+
+            if (sectorId) {
+                sincronizarZona(sectorId).catch(e => console.warn('[webhook] sync zona error:', e.message));
+            }
+
+            console.log(`[webhook] Pago procesado: session=${session.id}`);
         } catch (err) {
             console.error('[webhook] Error procesando checkout.session.completed:', err.message);
+            // Revertir estado a pendiente para que Stripe reintente
+            await PagoSession.update(
+                { estado: 'pendiente' },
+                { where: { stripeSessionId: session.id, estado: 'procesando' } }
+            ).catch(() => {});
         }
     }
 

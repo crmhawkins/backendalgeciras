@@ -46,7 +46,8 @@ router.get('/disponibilidad/:zonaId', async (req, res) => {
 
 router.post('/jugadores', async (req, res) => {
     const secret = req.headers['x-sync-secret'];
-    const SYNC_SECRET = process.env.SYNC_SECRET || 'hawkins-sync-2026';
+    const SYNC_SECRET = process.env.SYNC_SECRET;
+    if (!SYNC_SECRET) return res.status(503).json({ ok: false, error: 'SYNC_SECRET no configurado' });
     if (secret !== SYNC_SECRET) {
         return res.status(401).json({ ok: false, error: 'Unauthorized' });
     }
@@ -61,7 +62,8 @@ router.post('/jugadores', async (req, res) => {
 
 router.post('/cleanup-db', async (req, res) => {
     const secret = req.headers['x-sync-secret'];
-    const SYNC_SECRET = process.env.SYNC_SECRET || 'hawkins-sync-2026';
+    const SYNC_SECRET = process.env.SYNC_SECRET;
+    if (!SYNC_SECRET) return res.status(503).json({ ok: false, error: 'SYNC_SECRET no configurado' });
     if (secret !== SYNC_SECRET) {
         return res.status(401).json({ ok: false, error: 'Unauthorized' });
     }

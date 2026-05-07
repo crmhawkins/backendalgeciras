@@ -16,7 +16,8 @@ async function eliminarAbonosFinTemporada() {
         asiento.estado = 'disponible';
         await asiento.save();
       }
-      await abono.destroy();
+      abono.activo = false;
+      await abono.save();
     }
 
     console.log(`[✔] Abonos eliminados después de la temporada`);

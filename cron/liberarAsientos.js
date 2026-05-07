@@ -29,7 +29,8 @@ async function liberarAsientosPasados() {
             await asiento.save();
           }
         }
-        await entrada.destroy();
+        entrada.estado = 'archivada';
+        await entrada.save();
       }
     }
 

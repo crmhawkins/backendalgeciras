@@ -6,7 +6,7 @@ const JugadorStats = require('../models/jugadorStats');
 const router = Router();
 
 const TEMPORADA = '2025/2026';
-const SYNC_SECRET = process.env.SYNC_SECRET || 'hawkins-sync-2026';
+const SYNC_SECRET = process.env.SYNC_SECRET;
 
 router.get('/', getPlantilla);
 router.get('/:id', getJugador);
@@ -18,6 +18,7 @@ router.get('/:id', getJugador);
  */
 router.post('/import', async (req, res) => {
     const secret = req.headers['x-sync-secret'];
+    if (!SYNC_SECRET) return res.status(503).json({ ok: false, error: 'SYNC_SECRET no configurado' });
     if (secret !== SYNC_SECRET) {
         return res.status(401).json({ ok: false, error: 'Unauthorized' });
     }

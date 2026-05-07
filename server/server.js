@@ -30,9 +30,13 @@ class Server {
     constructor() {
         this.app        = express();
         this.httpServer = http.createServer(this.app);
+        const allowedSocketOrigins = (process.env.CORS_ORIGINS || 'https://backend-algeciras.hawkins.es').split(',');
         this.io         = new SocketIOServer(this.httpServer, {
             cors: {
-                origin: '*',
+                origin: (origin, callback) => {
+                    if (!origin || allowedSocketOrigins.includes(origin)) return callback(null, true);
+                    callback(new Error('Not allowed by CORS'));
+                },
                 methods: ['GET', 'POST'],
             },
         });
@@ -56,9 +60,6 @@ class Server {
         };
         
 
-        //Conectar a base de datos para
-        this.conectarDB();
-
         // Middlewares
         this.middlewares();
 
@@ -68,6 +69,7 @@ class Server {
         // Socket.io chat
         initChatSocket(this.io);
     }
+
     async conectarDB() {
         try {
             await dbConnection();
@@ -152,7 +154,8 @@ class Server {
 
     }
 
-    listen() {
+    async listen() {
+        await this.conectarDB();
         this.httpServer.listen( this.port, () => {
             console.log('Servidor corriendo en puerto', this.port );
             console.log('Socket.io chat activo');

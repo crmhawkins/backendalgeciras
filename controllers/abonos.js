@@ -147,7 +147,7 @@ const abonoPost = async (req, res) => {
                 <p><strong>Nombre:</strong> ${nombre} ${apellidos}</p>
                 <p><strong>Zona:</strong> Sector ${sector.nombre} (ID= ${asiento.sectorId}) - Fila ${asiento.fila}, Butaca ${asiento.numero}</p>
                 <p><strong>Email de acceso:</strong> ${email}</p>
-                ${nuevaCuenta ? `<p><strong>Contraseña generada:</strong> ${passwordPlano}</p>` : ''}
+                ${nuevaCuenta ? `<p>Puedes acceder a tu cuenta usando el email indicado. Si necesitas establecer contraseña, usa la opción "¿Olvidaste tu contraseña?" en la app.</p>` : ''}
                 <p><strong>Código de abono:</strong> ${abono.id}</p>
                 <p><strong>Precio del abono:</strong> ${sector.precio} €</p>
                 <hr/>

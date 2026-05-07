@@ -16,17 +16,21 @@ const verificarProximosPartidos = async () => {
   });
 
     for (const partido of partidos) {
-        const texto = `⚽ ${partido.equipoLocal} 🆚 ${partido.equipoVisitante}`;
-        const fechaHora = new Date(`${partido.fecha}T${partido.hora}`);
-        
-        const diaSemana = fechaHora.toLocaleDateString('es-ES', { weekday: 'long' });
-        const hora = fechaHora.toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' });
-        
-        const mensaje = `${texto} el ${diaSemana} a las 🕒 ${hora}.\n¡Compra ya tus entradas!`;
-        
-        // Enviar notificación
-        await sendNotificationToAll('🔥 ¡Se viene partidazo!', mensaje);
-        
+        try {
+            const texto = `⚽ ${partido.equipoLocal} 🆚 ${partido.equipoVisitante}`;
+            let horaTexto = 'hora por confirmar';
+            if (partido.hora) {
+                const fechaHora = new Date(`${partido.fecha}T${partido.hora}`);
+                if (!isNaN(fechaHora.getTime())) {
+                    const diaSemana = fechaHora.toLocaleDateString('es-ES', { weekday: 'long' });
+                    horaTexto = `el ${diaSemana} a las 🕒 ${fechaHora.toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' })}`;
+                }
+            }
+            const mensaje = `${texto} ${horaTexto}.\n¡Compra ya tus entradas!`;
+            await sendNotificationToAll('🔥 ¡Se viene partidazo!', mensaje);
+        } catch (err) {
+            console.error(`[verificarPartido] Error enviando notificación para partido ${partido.id}:`, err.message);
+        }
     }
 };
 

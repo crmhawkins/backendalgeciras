@@ -5,13 +5,24 @@ const fs = require('fs');
 let messaging = null;
 
 try {
-    const credPath = path.join(__dirname, 'tictac-project-firebase-adminsdk-y2maa-290473989b.json');
-    if (fs.existsSync(credPath)) {
-        const serviceAccount = require(credPath);
+    let serviceAccount = null;
+
+    // Preferir variable de entorno (JSON string) sobre fichero
+    if (process.env.FIREBASE_SERVICE_ACCOUNT) {
+        serviceAccount = JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT);
+    } else {
+        const credPath = path.join(__dirname, 'tictac-project-firebase-adminsdk-y2maa-290473989b.json');
+        if (fs.existsSync(credPath)) {
+            serviceAccount = require(credPath);
+        }
+    }
+
+    if (serviceAccount) {
         admin.initializeApp({ credential: admin.credential.cert(serviceAccount) });
         messaging = admin.messaging();
     } else {
         console.warn('[FCM] Credenciales Firebase no encontradas — notificaciones push desactivadas');
+        console.warn('[FCM] Configura FIREBASE_SERVICE_ACCOUNT como variable de entorno');
     }
 } catch (err) {
     console.warn('[FCM] Firebase init fallido:', err.message, '— notificaciones push desactivadas');

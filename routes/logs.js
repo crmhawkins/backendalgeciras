@@ -1,13 +1,14 @@
 const { Router } = require('express');
 const logger = require('../helpers/logger');
 const { validarJWT } = require('../middlewares/validar-jwt');
+const { esAdmin } = require('../middlewares/es-admin');
 
 const router = Router();
 
-// All log routes require a valid JWT — no password-in-querystring
+// All log routes require a valid JWT + admin role
 
 // Ruta para ver los logs
-router.get('/', validarJWT, (req, res) => {
+router.get('/', validarJWT, esAdmin, (req, res) => {
     const { limit = 100, level } = req.query;
 
     const logs = logger.getLogs(parseInt(limit), level || null);
@@ -19,13 +20,13 @@ router.get('/', validarJWT, (req, res) => {
 });
 
 // Ruta para limpiar los logs
-router.delete('/', validarJWT, (req, res) => {
+router.delete('/', validarJWT, esAdmin, (req, res) => {
     logger.clearLogs();
     res.json({ msg: 'Logs limpiados correctamente' });
 });
 
 // Ruta para ver logs en tiempo real con Server-Sent Events
-router.get('/stream', validarJWT, (req, res) => {
+router.get('/stream', validarJWT, esAdmin, (req, res) => {
 
     // Configurar Server-Sent Events
     res.setHeader('Content-Type', 'text/event-stream');

@@ -52,8 +52,25 @@ const partidoPost = async (req, res) => {
     }
 };
 
+const partidoGetById = async (req, res) => {
+  const { id } = req.params;
+  try {
+    const partido = await Partido.findByPk(id);
+    if (!partido) return res.status(404).json({ ok: false, msg: 'Partido no encontrado' });
+    const eventos = await EventoPartido.findAll({
+      where: { partidoId: id },
+      order: [['minuto', 'ASC']]
+    });
+    res.json({ ok: true, partido, eventos });
+  } catch (error) {
+    logger.error('Error en partidoGetById', error);
+    res.status(500).json({ ok: false, msg: 'Error al obtener el partido' });
+  }
+};
+
 module.exports = {
     partidoGet,
     partidoPost,
-    eventosGet
+    eventosGet,
+    partidoGetById
 };

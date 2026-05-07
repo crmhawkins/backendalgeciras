@@ -1,12 +1,16 @@
 const { Router } = require('express');
 const { check } = require('express-validator');
-const { partidoGet, partidoPost, eventosGet } = require('../controllers/partidos');
+const { partidoGet, partidoPost, eventosGet, partidoGetById } = require('../controllers/partidos');
 const { validarCampos } = require('../middlewares/validar-campos');
 const { validarJWT } = require('../middlewares/validar-jwt');
 
 const router = Router();
 
 router.get('/', partidoGet);
+
+router.get('/eventos/:id', eventosGet);
+
+router.get('/:id', partidoGetById);
 
 router.post('/create', [
     validarJWT,
@@ -16,8 +20,6 @@ router.post('/create', [
     check('equipoVisitante', 'El equipo visitante es obligatorio').not().isEmpty(),
     validarCampos
 ], partidoPost);
-
-router.get('/eventos/:id', eventosGet);
 
 
 module.exports = router;

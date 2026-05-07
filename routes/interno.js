@@ -239,9 +239,9 @@ router.post('/taquilla/abono', basicAuth, async (req, res) => {
 
         const codigoAcceso = generarCodigoAcceso();
 
-        // Temporada actual 2025/26
-        const fechaInicio = new Date('2025-07-01');
-        const fechaFin    = new Date('2026-06-30');
+        // Temporada actual — configurable via env vars
+        const fechaInicio = new Date(process.env.TEMPORADA_INICIO || '2025-07-01');
+        const fechaFin    = new Date(process.env.TEMPORADA_FIN    || '2026-06-30');
 
         const abono = await Abono.create({
             codigoAcceso,

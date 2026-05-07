@@ -2,6 +2,7 @@ const http = require('http');
 const express = require('express');
 const cors = require('cors');
 const helmet = require('helmet');
+const compression = require('compression');
 const rateLimit = require('express-rate-limit');
 const fileUpload = require('express-fileupload');
 const i18n = require('../lib/i18nConfigure');
@@ -59,7 +60,8 @@ class Server {
             validarQr: '/api/validar-qr',
             productos: '/api/productos',
             noticias: '/api/noticias',
-            estadio: '/api/estadio'
+            estadio: '/api/estadio',
+            patrocinadores: '/api/patrocinadores'
         };
         
 
@@ -89,6 +91,9 @@ class Server {
     }
 
     middlewares() {
+
+        // Gzip compression
+        this.app.use(compression());
 
         // Security headers
         this.app.use(helmet());
@@ -163,6 +168,9 @@ class Server {
 
         // Estadio
         this.app.use(this.paths.estadio, require('../routes/estadio'));
+
+        // Patrocinadores
+        this.app.use(this.paths.patrocinadores, require('../routes/patrocinadores'));
 
     }
 

@@ -86,11 +86,7 @@ router.get('/sector/:id', async (req, res) => {
         logger.error('Error al obtener los asientos del sector', error);
         console.error('❌ Error al obtener los asientos del sector:', error);
         console.error('Stack trace:', error.stack);
-        res.status(500).json({ 
-            msg: 'Error al obtener los asientos del sector',
-            error: error.message,
-            details: error.name
-        });
+        res.status(500).json({ msg: 'Error al obtener los asientos del sector' });
     }
 });
 

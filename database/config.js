@@ -48,6 +48,7 @@ const dbConnection = async () => {
         require('../models/abono');
         require('../models/pagoSession');
         require('../models/producto');
+        require('../models/noticia');
 
         const Usuario = require('../models/usuario');
         const Entrada = require('../models/entrada');
@@ -109,6 +110,17 @@ const dbConnection = async () => {
             }
         } catch (seedError) {
             console.error('Error al sembrar productos (no crítico):', seedError.message);
+        }
+
+        try {
+            const Noticia = require('../models/noticia');
+            const count = await Noticia.count();
+            if (count === 0) {
+                await require('../scripts/seedNoticiasData').seedNoticias(Noticia);
+                console.log('Noticias iniciales insertadas');
+            }
+        } catch (seedError) {
+            console.error('Error al sembrar noticias (no crítico):', seedError.message);
         }
 
     } catch (error) {

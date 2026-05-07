@@ -57,7 +57,8 @@ class Server {
             fanzone: '/api/fanzone',
             jugadores: '/api/jugadores',
             validarQr: '/api/validar-qr',
-            productos: '/api/productos'
+            productos: '/api/productos',
+            noticias: '/api/noticias'
         };
         
 
@@ -155,6 +156,9 @@ class Server {
 
         // Tienda
         this.app.use(this.paths.productos, require('../routes/productos'));
+
+        // Noticias
+        this.app.use(this.paths.noticias, require('../routes/noticias'));
 
     }
 

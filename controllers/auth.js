@@ -7,6 +7,7 @@ const { generarJWT } = require('../helpers/generarJWT');
 const WordpressUser = require('../models/usuarioWP');
 const {generateRandomPassword} = require('../helpers/password-generator');
 const jwt = require('jsonwebtoken');
+const logger = require('../helpers/logger');
 
 // Singleton transporter — creado una vez al cargar el módulo
 const transporter = nodemailer.createTransport({
@@ -70,11 +71,11 @@ const authenticatePost = async (req, res = response) => {
         });
 
     } catch (error) {
-        console.log('ERROR LOGIN:', error);  // 👈 Important to log errors for debugging
+        logger.error('ERROR LOGIN', error);
         return res.status(500).json({
             msg: 'Error del servidor. Contacte al administrador'
         });
-    }    
+    }
 }
 
 
@@ -120,11 +121,11 @@ const authenticateGoogleUser = async (req, res = response) => {
         });
 
     } catch (error) {
-        console.log('ERROR LOGIN:', error);
+        logger.error('ERROR LOGIN Google', error);
         return res.status(500).json({
             msg: 'Error del servidor. Contacte al administrador'
         });
-    }    
+    }
 };
 
 const enviarRecuperacion = async (req, res = response) => {
@@ -147,7 +148,7 @@ const enviarRecuperacion = async (req, res = response) => {
         const resetLink = `${req.protocol}://${req.headers.host}/reset-password.html?token=${token}`;
 
         await transporter.sendMail({
-            from: 'Algeciras CF <dani.mefle@hawkins.es>',
+            from: `Algeciras CF <${process.env.EMAIL_USER}>`,
             to: email,
             subject: 'Recuperación de contraseña - Algeciras CF',
             html: `
@@ -234,12 +235,12 @@ const logInWordpress = async (req, res = response) => {
       // Sensitive email removed from log intentionally
 
       // 4. Crear URL de autologin en WordPress
-      const autologinUrl = `https://tienda.algecirasclubdefutbol.com/wp-login-auto?token=${token}`;
+      const autologinUrl = `${process.env.WP_AUTOLOGIN_URL || 'https://tienda.algecirasclubdefutbol.com/wp-login-auto'}?token=${token}`;
 
       return res.json({ autologinUrl });
   
     } catch (err) {
-      console.error('❌ Error en logInWordpress:', err.message);
+      logger.error('Error en logInWordpress', err);
       return res.status(500).json({ msg: 'Error al generar token para WordPress' });
     }
   };

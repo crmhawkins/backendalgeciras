@@ -75,7 +75,8 @@ const Entrada = db.define('Entrada', {
     indexes: [
         { fields: ['asientoId', 'partidoId'], name: 'idx_entradas_asiento_partido' },
         { fields: ['token'], name: 'idx_entradas_token' },
-        { fields: ['estado'], name: 'idx_entradas_estado' }
+        { fields: ['estado'], name: 'idx_entradas_estado' },
+        { fields: ['usuarioId'], name: 'idx_entradas_usuario' }
     ]
 });
 

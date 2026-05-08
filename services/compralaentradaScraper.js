@@ -89,17 +89,28 @@ const sincronizarButacasDesdeCompralaentrada = async () => {
             const sector = await Sector.findByPk(zona.id);
             if (!sector) continue;
 
+            // FIX-17: bulk update by estado — 2 queries per fila instead of 1 per butaca
             for (const [fila, butacas] of Object.entries(configuracion)) {
                 if (!Array.isArray(butacas)) continue;
-                for (const butaca of butacas) {
-                    const estadoNuevo = butaca.ocupado ? 'ocupado' : 'disponible';
+
+                const ocupadosNumeros   = butacas.filter(b => b.ocupado).map(b => b.asiento);
+                const disponiblesNumeros = butacas.filter(b => !b.ocupado).map(b => b.asiento);
+
+                if (ocupadosNumeros.length > 0) {
                     const [count] = await Asiento.update(
-                        { estado: estadoNuevo },
-                        { where: { sectorId: sector.id, fila: String(fila), numero: butaca.asiento } }
+                        { estado: 'ocupado' },
+                        { where: { sectorId: sector.id, fila: String(fila), numero: { [require('sequelize').Op.in]: ocupadosNumeros } } }
                     );
-                    if (count > 0) totalActualizadas++;
-                    if (butaca.ocupado) totalOcupadas++;
-                    else totalLibres++;
+                    totalActualizadas += count;
+                    totalOcupadas += ocupadosNumeros.length;
+                }
+                if (disponiblesNumeros.length > 0) {
+                    const [count] = await Asiento.update(
+                        { estado: 'disponible' },
+                        { where: { sectorId: sector.id, fila: String(fila), numero: { [require('sequelize').Op.in]: disponiblesNumeros } } }
+                    );
+                    totalActualizadas += count;
+                    totalLibres += disponiblesNumeros.length;
                 }
             }
 

@@ -1,7 +1,8 @@
 const jwt = require('jsonwebtoken');
 const { OAuth2Client } = require('google-auth-library');
-const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID, process.env.GOOGLE_CLIENT_SECRET); // Reemplaza con tu Google Client ID
+const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID, process.env.GOOGLE_CLIENT_SECRET);
 const { request, response } = require('express');
+const logger = require('../helpers/logger');
 
 
 const validarJWT = async (req = request, res = response, next) => {
@@ -27,20 +28,20 @@ const validarJWT = async (req = request, res = response, next) => {
         } catch (error) {
             // Diferenciar entre diferentes tipos de errores de JWT
             if (error.name === 'TokenExpiredError') {
-                console.log('❌ JWT expirado:', error.message);
+                logger.warn('JWT expirado: ' + error.message);
                 return res.status(401).json({ 
                     msg: 'Token JWT expirado. Por favor, inicia sesión nuevamente.',
                     error: 'jwt_expired',
                     expiredAt: error.expiredAt
                 });
             } else if (error.name === 'JsonWebTokenError') {
-                console.log('❌ JWT inválido:', error.message);
+                logger.warn('JWT inválido: ' + error.message);
                 return res.status(401).json({ 
                     msg: 'Token JWT inválido',
                     error: 'jwt_invalid'
                 });
             } else {
-                console.log('❌ Error al verificar JWT:', error.message);
+                logger.error('Error al verificar JWT: ' + error.message);
                 return res.status(401).json({ 
                     msg: 'Error al verificar el token',
                     error: 'jwt_error'
@@ -62,7 +63,7 @@ const validarJWT = async (req = request, res = response, next) => {
             req.payload = payload;
             return next();
         } catch (error) {
-            console.log('❌ Token de Google inválido:', error.message);
+            logger.warn('Token de Google inválido: ' + error.message);
             return res.status(401).json({ msg: 'Token de Google inválido' });
         }
     }

@@ -2,6 +2,7 @@ const { Router } = require('express');
 const rateLimit = require('express-rate-limit');
 const crypto = require('crypto');
 const { Op } = require('sequelize');
+const { db } = require('../database/config');
 const { Parser } = require('json2csv');
 const { enviarPushMasivo, enviarPushUsuario } = require('../services/notificacionesService');
 const Entrada = require('../models/entrada');
@@ -171,19 +172,7 @@ router.post('/taquilla/entrada', basicAuth, async (req, res) => {
         });
         if (!asiento) return res.status(404).json({ ok: false, msg: 'Asiento no encontrado' });
 
-        // Verificar no hay entrada activa para asiento+partido
-        const entradaExistente = await Entrada.findOne({
-            where: {
-                asientoId: parseInt(asientoId),
-                partidoId: parseInt(partidoId),
-                estado: { [Op.in]: ['pendiente', 'valida'] }
-            }
-        });
-        if (entradaExistente) {
-            return res.status(409).json({ ok: false, msg: 'Asiento ya vendido para este partido' });
-        }
-
-        // Verificar no tiene abono activo
+        // Verificar no tiene abono activo (outside tx — read-only check)
         const abonoExistente = await Abono.findOne({
             where: { asientoId: parseInt(asientoId), activo: true }
         });
@@ -199,22 +188,54 @@ router.post('/taquilla/entrada', basicAuth, async (req, res) => {
         const codigoAcceso = generarCodigoAcceso();
         const qrCode       = generarCodigoAcceso(); // código interno distinto
 
-        const entrada = await Entrada.create({
-            token:        codigoAcceso,
-            qrCode,
-            codigoAcceso,
-            precio,
-            usuarioId:    1, // taquilla presencial
-            partidoId:    parseInt(partidoId),
-            asientoId:    parseInt(asientoId),
-            estado:       'valida',
-            tipo:         'taquilla',
-            metodoPago:   metodoPago || 'efectivo',
-            enviadoEmail: false
-        });
+        // FIX-2: atomic transaction — prevents double-sale race condition
+        let entrada;
+        try {
+            entrada = await db.transaction(async (t) => {
+                // CAS check inside tx
+                const entradaExistente = await Entrada.findOne({
+                    where: {
+                        asientoId: parseInt(asientoId),
+                        partidoId: parseInt(partidoId),
+                        estado: { [Op.in]: ['pendiente', 'valida'] }
+                    },
+                    transaction: t,
+                    lock: t.LOCK.UPDATE
+                });
+                if (entradaExistente) {
+                    throw new Error('ASIENTO_YA_VENDIDO');
+                }
 
-        // Marcar asiento como ocupado
-        await asiento.update({ estado: 'ocupado', partidoId: parseInt(partidoId) });
+                const nuevaEntrada = await Entrada.create({
+                    token:        codigoAcceso,
+                    qrCode,
+                    codigoAcceso,
+                    precio,
+                    usuarioId:    1,
+                    partidoId:    parseInt(partidoId),
+                    asientoId:    parseInt(asientoId),
+                    estado:       'valida',
+                    tipo:         'taquilla',
+                    metodoPago:   metodoPago || 'efectivo',
+                    enviadoEmail: false
+                }, { transaction: t });
+
+                const [affectedRows] = await Asiento.update(
+                    { estado: 'ocupado', partidoId: parseInt(partidoId) },
+                    { where: { id: parseInt(asientoId), estado: 'disponible' }, transaction: t }
+                );
+                if (affectedRows === 0) {
+                    throw new Error('ASIENTO_YA_VENDIDO');
+                }
+
+                return nuevaEntrada;
+            });
+        } catch (txError) {
+            if (txError.message === 'ASIENTO_YA_VENDIDO') {
+                return res.status(409).json({ ok: false, msg: 'Asiento ya vendido para este partido' });
+            }
+            throw txError;
+        }
 
         console.log(`[taquilla/entrada] Vendida: ${codigoAcceso} | Partido ${partidoId} | Asiento ${asientoId} | ${nombre}`);
 
@@ -276,25 +297,40 @@ router.post('/taquilla/abono', basicAuth, async (req, res) => {
         const fechaInicio = new Date(process.env.TEMPORADA_INICIO || '2025-07-01');
         const fechaFin    = new Date(process.env.TEMPORADA_FIN    || '2026-06-30');
 
-        const abono = await Abono.create({
-            codigoAcceso,
-            fechaInicio,
-            fechaFin,
-            activo:     true,
-            nombre,
-            apellidos:  apellidos  || '',
-            dni:        dni        || null,
-            email:      email      || null,
-            telefono:   telefono   || null,
-            pais:       'España',
-            provincia:  'Cádiz',
-            localidad:  'Algeciras',
-            domicilio:  '',
-            codigoPostal: '',
-            usuarioId:  1,
-            asientoId:  parseInt(asientoId),
-            precio:     parseFloat(precio)
-        });
+        // FIX-3: wrap in transaction + mark asiento ocupado (was missing)
+        let abono;
+        try {
+            abono = await db.transaction(async (t) => {
+                const nuevoAbono = await Abono.create({
+                    codigoAcceso,
+                    fechaInicio,
+                    fechaFin,
+                    activo:     true,
+                    nombre,
+                    apellidos:  apellidos  || '',
+                    dni:        dni        || null,
+                    email:      email      || null,
+                    telefono:   telefono   || null,
+                    pais:       'España',
+                    provincia:  'Cádiz',
+                    localidad:  'Algeciras',
+                    domicilio:  '',
+                    codigoPostal: '',
+                    usuarioId:  1,
+                    asientoId:  parseInt(asientoId),
+                    precio:     parseFloat(precio)
+                }, { transaction: t });
+
+                await Asiento.update(
+                    { estado: 'ocupado' },
+                    { where: { id: parseInt(asientoId) }, transaction: t }
+                );
+
+                return nuevoAbono;
+            });
+        } catch (txError) {
+            throw txError;
+        }
 
         console.log(`[taquilla/abono] Vendido: ${codigoAcceso} | Asiento ${asientoId} | ${nombre} ${apellidos || ''}`);
 

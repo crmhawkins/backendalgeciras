@@ -1,4 +1,5 @@
 const bcryptjs = require('bcryptjs');
+const crypto = require('crypto');
 const { response } = require('express');
 const { validationResult } = require('express-validator');
 const fs = require('fs');
@@ -17,9 +18,12 @@ const usuarioGet = async (req, res = response) => {
             try { wordpressUser = await WordpressUser.findOne({ where: { ID: uid } }); } catch (_) {}
             if (!wordpressUser) return res.status(404).json({ msg: `No existe un usuario con el id ${uid}` });
             const mappedUser = mapWordpressToUser(wordpressUser);
+            // FIX-6: never store empty password — generate secure random hash
+            const _salt = await bcryptjs.genSalt(10);
+            const _randomPw = await bcryptjs.hash(crypto.randomBytes(16).toString('hex'), _salt);
             usuario = await Usuario.create({
                 id: mappedUser.id, nombre: mappedUser.nombre, email: mappedUser.email,
-                dni: mappedUser.dni || null, password: '', profileImage: mappedUser.profileImage || null,
+                dni: mappedUser.dni || null, password: _randomPw, profileImage: mappedUser.profileImage || null,
             });
         }
         res.json({ usuario: { id: usuario.id, nombre: usuario.nombre, email: usuario.email, dni: usuario.dni, telefono: usuario.telefono, profileImage: usuario.profileImage } });

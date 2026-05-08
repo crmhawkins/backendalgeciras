@@ -10,6 +10,8 @@
 
 const { Router } = require('express');
 const { Op } = require('sequelize');
+const crypto = require('crypto');
+const rateLimit = require('express-rate-limit');
 const Entrada = require('../models/entrada');
 const Abono   = require('../models/abono');
 const Asiento = require('../models/asiento');
@@ -18,14 +20,22 @@ const Partido = require('../models/partido');
 
 const router = Router();
 
-// Middleware: valida x-scanner-secret
+// FIX-11: 5 req/min per IP rate limit
+const qrLimiter = rateLimit({
+    windowMs: 60 * 1000,
+    max: 5,
+    message: { msg: 'Demasiadas peticiones' }
+});
+
+// Middleware: valida x-scanner-secret with timing-safe compare
 function scannerAuth(req, res, next) {
     const secret = process.env.SCANNER_SECRET;
     if (!secret) {
         return res.status(503).json({ ok: false, msg: 'Scanner no configurado (SCANNER_SECRET vacío)' });
     }
-    const provided = req.headers['x-scanner-secret'] || '';
-    if (provided !== secret) {
+    const provided = Buffer.from(req.headers['x-scanner-secret'] || '');
+    const expected = Buffer.from(secret);
+    if (provided.length !== expected.length || !crypto.timingSafeEqual(provided, expected)) {
         return res.status(401).json({ ok: false, msg: 'Scanner secret inválido' });
     }
     next();
@@ -35,7 +45,7 @@ function scannerAuth(req, res, next) {
  * POST /api/validar-qr
  * Body: { codigo: string }
  */
-router.post('/', scannerAuth, async (req, res) => {
+router.post('/', qrLimiter, scannerAuth, async (req, res) => {
     const { codigo } = req.body;
 
     if (!codigo || typeof codigo !== 'string' || !codigo.trim()) {

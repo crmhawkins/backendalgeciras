@@ -26,15 +26,26 @@ async function eliminarAbonosFinTemporada() {
       { where: { id: { [Op.in]: abonoIds } } }
     );
 
-    // Bulk: liberar asientos
+    // FIX-8: only liberate seats with no OTHER active abono
     if (asientoIds.length) {
-      await Asiento.update(
-        { estado: 'disponible' },
-        { where: { id: { [Op.in]: asientoIds } } }
-      );
-    }
+      const abonosActivos = await Abono.findAll({
+        where: { asientoId: { [Op.in]: asientoIds }, activo: true, fechaFin: { [Op.gte]: fechaCorte } },
+        attributes: ['asientoId']
+      });
+      const asientosConAbonoActivo = new Set(abonosActivos.map(a => a.asientoId));
+      const asientosALiberar = asientoIds.filter(id => !asientosConAbonoActivo.has(id));
 
-    console.log(`[✔] ${abonoIds.length} abonos desactivados, ${asientoIds.length} asientos liberados`);
+      if (asientosALiberar.length > 0) {
+        await Asiento.update(
+          { estado: 'disponible' },
+          { where: { id: { [Op.in]: asientosALiberar } } }
+        );
+      }
+
+      console.log(`[✔] ${abonoIds.length} abonos desactivados, ${asientosALiberar.length} asientos liberados (${asientosConAbonoActivo.size} protegidos por abono activo)`);
+    } else {
+      console.log(`[✔] ${abonoIds.length} abonos desactivados, sin asientos a liberar`);
+    }
   } catch (error) {
     console.error('[❌] Error al eliminar abonos:', error);
   }

@@ -28,7 +28,7 @@ router.get('/compralaentrada', validarJWT, async (req, res) => {
  * GET /api/sync/disponibilidad/:zonaId
  * Disponibilidad en tiempo real de una zona desde compralaentrada
  */
-router.get('/disponibilidad/:zonaId', async (req, res) => {
+router.get('/disponibilidad/:zonaId', validarJWT, async (req, res) => {
     const { zonaId } = req.params;
     try {
         const disponibilidad = await obtenerDisponibilidadZona(zonaId);

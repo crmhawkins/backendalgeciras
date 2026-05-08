@@ -1,13 +1,14 @@
 const path = require('path');
 const { v4: uuidv4 } = require('uuid');
 const cote = require('cote');
+const logger = require('./logger');
 
 
 const subirArchivo = async( files, extensionesValidas = ['png','jpg','jpeg','gif'], carpeta = '' ) => {
 
     return new Promise((resolve, reject) => {
 
-        console.log(files);
+        logger.info('subirArchivo called');
         const { img } = files;
         const nombreCortado = img.name.split('.');
         const extension =  nombreCortado[nombreCortado.length - 1];

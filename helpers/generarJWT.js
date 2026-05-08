@@ -1,4 +1,5 @@
 const jwt = require('jsonwebtoken');
+const logger = require('./logger');
 
 const generarJWT = ( uid = '' ) => {
 
@@ -16,7 +17,7 @@ const generarJWT = ( uid = '' ) => {
         }, (err, token) => {
 
             if (err) {
-                console.log('❌ Error al generar JWT:', err);
+                logger.error('Error al generar JWT', err);
                 reject('No se pudo generar el token');
             } else {
                 resolve( token );

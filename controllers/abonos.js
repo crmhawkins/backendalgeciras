@@ -9,6 +9,7 @@ const Partido = require('../models/partido');
 const bcryptjs = require('bcryptjs');
 const nodemailer = require('nodemailer');
 const generarPasswordAleatoria = require('../helpers/generarPasswordAleatoria');
+const { db } = require('../database/config');
 
 const {actualizarJSONAsiento} = require('../services/updateJSON');
 
@@ -110,30 +111,44 @@ const abonoPost = async (req, res) => {
 
         const codigoAcceso = crypto.randomBytes(4).toString('hex').toUpperCase();
 
-        const abono = await Abono.create({
-            fechaInicio,
-            fechaFin,
-            nombre,
-            apellidos,
-            genero,
-            dni,
-            fechaNacimiento,
-            email,
-            telefono,
-            pais,
-            provincia,
-            localidad,
-            domicilio,
-            codigoPostal,
-            usuarioId: usuario.id,
-            asientoId,
-            precio: sector.precio,
-            codigoAcceso
-        });
-
-        asiento.estado = 'ocupado';
-
-        await asiento.save();
+        // FIX-1: atomic CAS transaction — prevents race condition double-booking
+        let abono;
+        try {
+            abono = await db.transaction(async (t) => {
+                const [affectedRows] = await Asiento.update(
+                    { estado: 'ocupado' },
+                    { where: { id: asientoId, estado: 'disponible' }, transaction: t }
+                );
+                if (affectedRows === 0) {
+                    throw new Error('ASIENTO_NO_DISPONIBLE');
+                }
+                return await Abono.create({
+                    fechaInicio,
+                    fechaFin,
+                    nombre,
+                    apellidos,
+                    genero,
+                    dni,
+                    fechaNacimiento,
+                    email,
+                    telefono,
+                    pais,
+                    provincia,
+                    localidad,
+                    domicilio,
+                    codigoPostal,
+                    usuarioId: usuario.id,
+                    asientoId,
+                    precio: sector.precio,
+                    codigoAcceso
+                }, { transaction: t });
+            });
+        } catch (txError) {
+            if (txError.message === 'ASIENTO_NO_DISPONIBLE') {
+                return res.status(409).json({ msg: 'El asiento ya no está disponible' });
+            }
+            throw txError;
+        }
 
         actualizarJSONAsiento(asientoId, 'ocupado');
 
@@ -228,6 +243,11 @@ const renovarAbono = async (req, res) => {
 
         if (!abono || abono.usuarioId !== usuario.id) {
             return res.status(404).json({ msg: 'Abono no encontrado para ese usuario' });
+        }
+
+        // FIX-10: IDOR — verify abono belongs to JWT user
+        if (abono.usuarioId !== req.uid) {
+            return res.status(403).json({ msg: 'No autorizado' });
         }
 
         const fechaInicio = new Date();

@@ -63,7 +63,8 @@ router.get('/usuario/:id', validarJWT, async (req, res) => {
   }
 });
 
-router.get('/buscar-liberada', [
+// FIX-5: protected + strip sensitive fields (token/qrCode/codigoAcceso never sent)
+router.get('/buscar-liberada', validarJWT, [
   check('asientoId', 'El asientoId es obligatorio y numérico').isInt(),
   check('partidoId', 'El partidoId es obligatorio y numérico').isInt(),
   validarCampos
@@ -72,7 +73,8 @@ router.get('/buscar-liberada', [
 
   try {
     const entrada = await Entrada.findOne({
-      where: { asientoId, partidoId, estado: { [Op.in]: ['valida', 'pendiente'] } }
+      where: { asientoId, partidoId, estado: { [Op.in]: ['valida', 'pendiente'] } },
+      attributes: ['id', 'estado', 'asientoId', 'partidoId', 'precio', 'tipo']
     });
 
     if (!entrada) {

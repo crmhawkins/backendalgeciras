@@ -71,7 +71,12 @@ const Entrada = db.define('Entrada', {
 }, {
     tableName: 'entradas',
     freezeTableName: true,
-    timestamps: true
+    timestamps: true,
+    indexes: [
+        { fields: ['asientoId', 'partidoId'], name: 'idx_entradas_asiento_partido' },
+        { fields: ['token'], name: 'idx_entradas_token' },
+        { fields: ['estado'], name: 'idx_entradas_estado' }
+    ]
 });
 
 module.exports = Entrada;

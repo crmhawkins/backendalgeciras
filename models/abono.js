@@ -28,7 +28,11 @@ const Abono = db.define('Abono', {
     codigoAcceso: { type: DataTypes.STRING(12), allowNull: true }
 }, {
     tableName: 'abonos',
-    freezeTableName: true
+    freezeTableName: true,
+    indexes: [
+        { fields: ['asientoId', 'activo'], name: 'idx_abonos_asiento_activo' },
+        { fields: ['usuarioId'], name: 'idx_abonos_usuario' }
+    ]
 });
 
 module.exports = Abono;

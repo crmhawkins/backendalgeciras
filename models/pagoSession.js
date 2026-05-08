@@ -37,7 +37,11 @@ const PagoSession = db.define('PagoSession', {
 }, {
     tableName: 'pago_sessions',
     freezeTableName: true,
-    timestamps: true
+    timestamps: true,
+    indexes: [
+        { fields: ['stripeSessionId'], name: 'idx_pago_sessions_session_id', unique: true },
+        { fields: ['estado'], name: 'idx_pago_sessions_estado' }
+    ]
 });
 
 module.exports = PagoSession;

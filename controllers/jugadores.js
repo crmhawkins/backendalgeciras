@@ -1,7 +1,7 @@
 const Jugador = require('../models/jugador');
 const JugadorStats = require('../models/jugadorStats');
 
-const TEMPORADA = '2025/2026';
+const TEMPORADA = process.env.TEMPORADA || '2025/2026';
 
 const POSICION_MAP = {
   G: 'porteros',

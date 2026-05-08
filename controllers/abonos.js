@@ -169,8 +169,43 @@ const abonoPost = async (req, res) => {
 
 const abonoGet = async (req, res) => {
     try {
-        const abonos = await Abono.findAll();
-        res.json({ abonos });
+        const { Op } = require('sequelize');
+        const page  = Math.max(1, parseInt(req.query.page)  || 1);
+        const limit = Math.min(200, parseInt(req.query.limit) || 50);
+        const offset = (page - 1) * limit;
+
+        const where = {};
+        if (req.query.activo !== undefined) {
+            where.activo = req.query.activo === 'true' || req.query.activo === '1';
+        }
+        if (req.query.sectorId) {
+            where['$Asiento.sectorId$'] = parseInt(req.query.sectorId);
+        }
+
+        const { count, rows } = await Abono.findAndCountAll({
+            where,
+            limit,
+            offset,
+            include: [
+                {
+                    model: Asiento,
+                    include: [{ model: Sector }]
+                },
+                {
+                    model: Usuario,
+                    attributes: ['nombre', 'email']
+                }
+            ],
+            subQuery: false,
+            distinct: true
+        });
+
+        res.json({
+            data: rows,
+            total: count,
+            page,
+            totalPages: Math.ceil(count / limit)
+        });
     } catch (error) {
         console.error(error);
         res.status(500).json({ msg: 'Error al obtener los abonos' });

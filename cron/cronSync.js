@@ -11,7 +11,11 @@ const ejecutarSincronizacion = async () => {
 };
 
 // Cada 5 minutos — butacas individuales por partido activo
-cron.schedule('*/5 * * * *', ejecutarSincronizacion);
+cron.schedule('*/5 * * * *', async () => {
+    await ejecutarSincronizacion();
+    if (!global.cronLastRun) global.cronLastRun = {};
+    global.cronLastRun.cronSync = new Date().toISOString();
+});
 
 // Notificaciones de partidos — cada 5 minutos (desactivado por defecto via NOTIFICACIONES_ACTIVAS)
 cron.schedule('*/5 * * * *', async () => {

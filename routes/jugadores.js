@@ -5,7 +5,7 @@ const JugadorStats = require('../models/jugadorStats');
 
 const router = Router();
 
-const TEMPORADA = '2025/2026';
+const TEMPORADA = process.env.TEMPORADA || '2025/2026';
 const SYNC_SECRET = process.env.SYNC_SECRET;
 
 router.get('/', getPlantilla);

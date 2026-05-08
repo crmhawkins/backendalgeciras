@@ -2,6 +2,7 @@ const { Router } = require('express');
 const rateLimit = require('express-rate-limit');
 const crypto = require('crypto');
 const { Op } = require('sequelize');
+const { Parser } = require('json2csv');
 const { enviarPushMasivo, enviarPushUsuario } = require('../services/notificacionesService');
 const Entrada = require('../models/entrada');
 const Abono   = require('../models/abono');
@@ -9,6 +10,7 @@ const Asiento = require('../models/asiento');
 const Partido = require('../models/partido');
 const Sector  = require('../models/sector');
 const Grada   = require('../models/grada');
+const Usuario = require('../models/usuario');
 const { enviarEmailEntrada } = require('../services/emailEntradaService');
 
 const router = Router();
@@ -300,7 +302,7 @@ router.post('/taquilla/abono', basicAuth, async (req, res) => {
             abonoId:      abono.id,
             codigoAcceso,
             asientoInfo:  `Sector ${asiento.Sector?.nombre || 'N/A'} - Fila ${asiento.fila} - Asiento ${asiento.numero}`,
-            temporada:    '2025/26'
+            temporada:    process.env.TEMPORADA || '2025/2026'
         });
 
     } catch (e) {
@@ -406,6 +408,70 @@ router.get('/taquilla/disponibilidad/:partidoId', basicAuth, async (req, res) =>
     } catch (e) {
         console.error('[taquilla/disponibilidad] Error:', e.message);
         return res.status(500).json({ ok: false, msg: 'Error interno al obtener disponibilidad' });
+    }
+});
+
+/**
+ * GET /api/interno/abonos/export
+ * Export abonados. ?format=csv (default) | json. Basic Auth requerido.
+ */
+router.get('/abonos/export', basicAuth, async (req, res) => {
+    const format = (req.query.format || 'csv').toLowerCase();
+
+    try {
+        const abonos = await Abono.findAll({
+            include: [{
+                model: Asiento,
+                include: [{ model: Sector, attributes: ['nombre'] }]
+            }],
+            order: [['id', 'ASC']]
+        });
+
+        const rows = abonos.map(a => ({
+            nombre:      a.nombre       || '',
+            apellidos:   a.apellidos    || '',
+            dni:         a.dni          || '',
+            email:       a.email        || '',
+            telefono:    a.telefono     || '',
+            sector:      a.Asiento?.Sector?.nombre || '',
+            fila:        a.Asiento?.fila           || '',
+            asiento:     a.Asiento?.numero         || '',
+            precio:      a.precio      != null ? parseFloat(a.precio) : '',
+            activo:      a.activo ? 'Sí' : 'No',
+            fechaInicio: a.fechaInicio ? new Date(a.fechaInicio).toISOString().split('T')[0] : '',
+            fechaFin:    a.fechaFin    ? new Date(a.fechaFin).toISOString().split('T')[0]    : ''
+        }));
+
+        if (format === 'json') {
+            return res.json({ ok: true, total: rows.length, data: rows });
+        }
+
+        const fields = [
+            { label: 'Nombre',      value: 'nombre' },
+            { label: 'Apellidos',   value: 'apellidos' },
+            { label: 'DNI',         value: 'dni' },
+            { label: 'Email',       value: 'email' },
+            { label: 'Teléfono',    value: 'telefono' },
+            { label: 'Sector',      value: 'sector' },
+            { label: 'Fila',        value: 'fila' },
+            { label: 'Asiento',     value: 'asiento' },
+            { label: 'Precio',      value: 'precio' },
+            { label: 'Activo',      value: 'activo' },
+            { label: 'Fecha Inicio',value: 'fechaInicio' },
+            { label: 'Fecha Fin',   value: 'fechaFin' }
+        ];
+
+        const parser = new Parser({ fields, delimiter: ',', withBOM: true });
+        const csv    = parser.parse(rows);
+
+        const fecha = new Date().toISOString().split('T')[0];
+        res.setHeader('Content-Type', 'text/csv; charset=utf-8');
+        res.setHeader('Content-Disposition', `attachment; filename="abonados_${fecha}.csv"`);
+        return res.send(csv);
+
+    } catch (e) {
+        console.error('[interno/abonos/export] Error:', e.message);
+        return res.status(500).json({ ok: false, msg: 'Error al exportar abonados' });
     }
 });
 

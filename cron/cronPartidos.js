@@ -13,6 +13,8 @@ cron.schedule('*/15 * * * *', async () => {
   try {
     await obtenerPartidos();
     await obtenerClasificacion();
+    if (!global.cronLastRun) global.cronLastRun = {};
+    global.cronLastRun.cronPartidos = new Date().toISOString();
     console.log('✅ Scraping automático completado');
   } catch (err) {
     console.error('❌ Error en scraping automático:', err.message);
@@ -25,6 +27,9 @@ cron.schedule('0 2 * * *', async () => {
     await obtenerPartidos();
     await liberarAsientosPasados();
     await eliminarAbonosTemporada();
+    if (!global.cronLastRun) global.cronLastRun = {};
+    global.cronLastRun.liberarAsientos = new Date().toISOString();
+    global.cronLastRun.eliminarAbonos  = new Date().toISOString();
   } catch (err) {
     console.error('❌ Error en limpieza nocturna:', err.message);
   }

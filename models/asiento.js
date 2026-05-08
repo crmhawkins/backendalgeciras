@@ -23,7 +23,11 @@ const Asiento = db.define('Asiento', {
 }, {
     tableName: 'asientos',
     freezeTableName: true,
-    timestamps: false
+    timestamps: false,
+    indexes: [
+        { fields: ['sectorId', 'estado'], name: 'idx_asientos_sector_estado' },
+        { fields: ['reservadoHasta'], name: 'idx_asientos_reservado_hasta' }
+    ]
 });
 
 module.exports = Asiento;

@@ -74,6 +74,7 @@ class Server {
             patrocinadores: '/api/patrocinadores',
             health: '/api/health',
             stats: '/api/stats',
+            export: '/api/interno',
         };
         
 

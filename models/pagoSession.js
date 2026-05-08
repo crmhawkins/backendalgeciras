@@ -33,6 +33,10 @@ const PagoSession = db.define('PagoSession', {
     fechaExpiracion: {
         type: DataTypes.DATE,
         allowNull: false
+    },
+    usuarioEmail: {
+        type: DataTypes.STRING(254),
+        allowNull: true
     }
 }, {
     tableName: 'pago_sessions',
@@ -40,7 +44,8 @@ const PagoSession = db.define('PagoSession', {
     timestamps: true,
     indexes: [
         { fields: ['stripeSessionId'], name: 'idx_pago_sessions_session_id', unique: true },
-        { fields: ['estado'], name: 'idx_pago_sessions_estado' }
+        { fields: ['estado'], name: 'idx_pago_sessions_estado' },
+        { fields: ['usuarioEmail'], name: 'idx_pago_sessions_usuario_email' }
     ]
 });
 

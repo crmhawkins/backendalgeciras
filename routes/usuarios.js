@@ -1,11 +1,18 @@
 const { Router } = require('express');
 const { check } = require('express-validator');
+const rateLimit = require('express-rate-limit');
 const { usuarioGet, usuarioPost, cambiarPassword, showUserImage, updateUserImage, showMyUserImage, updatePushToken, updateProfile } = require('../controllers/usuarios');
 const { validarCampos } = require('../middlewares/validar-campos');
 const { validarJWT } = require('../middlewares/validar-jwt');
 const {upload} = require('../middlewares/subir-archivo');
 
-
+const registroLimiter = rateLimit({
+    windowMs: 15 * 60 * 1000, // 15 min
+    max: 5,
+    standardHeaders: true,
+    legacyHeaders: false,
+    message: { msg: 'Demasiados intentos de registro. Intenta de nuevo en 15 minutos.' }
+});
 
 const router = Router();
 
@@ -13,7 +20,7 @@ router.get('/', [
     validarJWT
 ], usuarioGet);
 
-router.post('/create', [
+router.post('/create', registroLimiter, [
     check('nombre', 'El nombre es obligatorio').not().isEmpty(),
     check('email', 'El email no es válido').isEmail(),
     check('password', 'El password es obligatorio').not().isEmpty(),

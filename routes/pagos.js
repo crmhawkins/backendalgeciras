@@ -136,8 +136,8 @@ router.get('/confirmar', [
     validarCampos
 ], confirmarPago);
 
-// Ruta unificada para la app móvil
-router.post('/create-checkout', [
+// Ruta unificada para la app móvil (requiere JWT — previene reservas de bots)
+router.post('/create-checkout', validarJWT, [
     check('asientoId', 'El asiento es obligatorio').isInt(),
     check('dni', 'El DNI es obligatorio').notEmpty(),
     validarCampos

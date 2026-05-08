@@ -1,4 +1,6 @@
 const { validationResult } = require('express-validator');
+const { db } = require('../database/config');
+const { fn, col, literal } = require('sequelize');
 const Sector = require('../models/sector');
 const Asiento = require('../models/asiento');
 
@@ -8,14 +10,22 @@ const sectorGet = async (req, res) => {
         if (req.query.gradaId) where.gradaId = req.query.gradaId;
         const sectores = await Sector.findAll({ where });
 
-        const sectoresConDisponibles = await Promise.all(
-            sectores.map(async (sector) => {
-                const asientosDisponibles = await Asiento.count({
-                    where: { sectorId: sector.id, estado: 'disponible' }
-                });
-                return { ...sector.toJSON(), asientosDisponibles };
-            })
-        );
+        // Fix N+1: single GROUP BY query instead of Asiento.count() per sector
+        const counts = await Asiento.findAll({
+            attributes: ['sectorId', [fn('COUNT', col('id')), 'total']],
+            where: { estado: 'disponible' },
+            group: ['sectorId'],
+            raw: true
+        });
+        const countMap = {};
+        for (const row of counts) {
+            countMap[row.sectorId] = parseInt(row.total, 10);
+        }
+
+        const sectoresConDisponibles = sectores.map((sector) => ({
+            ...sector.toJSON(),
+            asientosDisponibles: countMap[sector.id] || 0
+        }));
 
         res.json({ sectores: sectoresConDisponibles });
     } catch (error) {

@@ -1,8 +1,17 @@
 const { Router } = require('express');
 const { check } = require('express-validator');
+const rateLimit = require('express-rate-limit');
 const { authenticatePost, enviarRecuperacion, resetPassword, authenticateGoogleUser,logInWordpress } = require('../controllers/auth');
 const { validarCampos } = require('../middlewares/validar-campos');
 const { validarJWT } = require('../middlewares/validar-jwt');
+
+const resetPasswordLimiter = rateLimit({
+    windowMs: 60 * 60 * 1000, // 1 hora
+    max: 3,
+    standardHeaders: true,
+    legacyHeaders: false,
+    message: { msg: 'Demasiados intentos de recuperación. Intenta de nuevo en 1 hora.' }
+});
 
 const router = Router();
 
@@ -70,12 +79,12 @@ router.post('/login', [
  *       400:
  *         description: Email inválido
  */
-router.post('/recuperar-password', [
+router.post('/recuperar-password', resetPasswordLimiter, [
     check('email', 'Email no válido').isEmail(),
     validarCampos
 ], enviarRecuperacion);
 
-router.post('/reset-password/:token', [
+router.post('/reset-password/:token', resetPasswordLimiter, [
     check('password', 'La nueva contraseña es obligatoria').isLength({ min: 6 }),
     validarCampos
 ], resetPassword);

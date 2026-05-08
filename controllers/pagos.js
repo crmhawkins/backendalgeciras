@@ -230,7 +230,8 @@ const crearSesionPagoEntrada = async (req, res = response) => {
             estado: 'pendiente',
             datosCompra,
             monto: precioFinal,
-            fechaExpiracion
+            fechaExpiracion,
+            usuarioEmail: email || null
         });
 
         res.json({
@@ -412,7 +413,8 @@ const crearSesionPagoAbono = async (req, res = response) => {
             estado: 'pendiente',
             datosCompra,
             monto: precioAbonoFinal,
-            fechaExpiracion
+            fechaExpiracion,
+            usuarioEmail: email || null
         });
 
         res.json({
@@ -698,7 +700,8 @@ const crearSesionPagoUnificada = async (req, res = response) => {
             estado: 'pendiente',
             datosCompra: { asientoId, dni, email, nombre, tipo, partidoId },
             monto: precio,
-            fechaExpiracion
+            fechaExpiracion,
+            usuarioEmail: email || null
         });
 
         res.json({ sessionId: session.id, url: session.url });
@@ -732,7 +735,7 @@ const historialPagos = async (req, res = response) => {
         const { count, rows } = await PagoSession.findAndCountAll({
             where: {
                 estado: 'completado',
-                datosCompra: { [Op.like]: `%"email":"${usuario.email}"%` }
+                usuarioEmail: usuario.email
             },
             order: [['createdAt', 'DESC']],
             limit,

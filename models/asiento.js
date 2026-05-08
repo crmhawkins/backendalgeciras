@@ -5,7 +5,7 @@ const Asiento = db.define('Asiento', {
     id: {
         type: DataTypes.INTEGER,
         primaryKey: true,
-        autoIncrement: false 
+        autoIncrement: false
     },
     numero: { type: DataTypes.STRING, allowNull: false },
     fila: { type: DataTypes.STRING, allowNull: false },
@@ -14,7 +14,12 @@ const Asiento = db.define('Asiento', {
         defaultValue: 'disponible'
     },
     sectorId: { type: DataTypes.INTEGER, allowNull: false },
-    partidoId: { type: DataTypes.INTEGER, allowNull: true } 
+    partidoId: { type: DataTypes.INTEGER, allowNull: true },
+    reservadoHasta: {
+        type: DataTypes.DATE,
+        allowNull: true,
+        defaultValue: null,
+    }
 }, {
     tableName: 'asientos',
     freezeTableName: true,

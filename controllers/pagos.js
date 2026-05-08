@@ -1,4 +1,5 @@
 const { response } = require('express');
+const { Op } = require('sequelize');
 
 // Inicializar Stripe solo si hay una clave válida
 let stripe = null;
@@ -85,6 +86,25 @@ const crearSesionPagoEntrada = async (req, res = response) => {
             domicilio,
             codigoPostal
         } = req.body;
+
+        // Intentar reservar el asiento atómicamente (previene race condition doble-compra)
+        const [affectedRowsEntrada] = await Asiento.update(
+            { reservadoHasta: new Date(Date.now() + 15 * 60 * 1000) },
+            {
+                where: {
+                    id: asientoId,
+                    estado: 'disponible',
+                    [Op.or]: [
+                        { reservadoHasta: null },
+                        { reservadoHasta: { [Op.lt]: new Date() } }
+                    ]
+                }
+            }
+        );
+
+        if (affectedRowsEntrada === 0) {
+            return res.status(409).json({ msg: 'El asiento ya está reservado o no disponible' });
+        }
 
         // Validar que el asiento existe y está disponible
         const asiento = await Asiento.findByPk(asientoId, {
@@ -229,6 +249,25 @@ const crearSesionPagoAbono = async (req, res = response) => {
             domicilio,
             codigoPostal
         } = req.body;
+
+        // Intentar reservar el asiento atómicamente (previene race condition doble-compra)
+        const [affectedRowsAbono] = await Asiento.update(
+            { reservadoHasta: new Date(Date.now() + 15 * 60 * 1000) },
+            {
+                where: {
+                    id: asientoId,
+                    estado: 'disponible',
+                    [Op.or]: [
+                        { reservadoHasta: null },
+                        { reservadoHasta: { [Op.lt]: new Date() } }
+                    ]
+                }
+            }
+        );
+
+        if (affectedRowsAbono === 0) {
+            return res.status(409).json({ msg: 'El asiento ya está reservado o no disponible' });
+        }
 
         // Validar que el asiento existe y está disponible
         const asiento = await Asiento.findByPk(asientoId, {
@@ -519,6 +558,25 @@ const crearSesionPagoUnificada = async (req, res = response) => {
             email,
             nombre
         } = req.body;
+
+        // Intentar reservar el asiento atómicamente (previene race condition doble-compra)
+        const [affectedRowsUnificada] = await Asiento.update(
+            { reservadoHasta: new Date(Date.now() + 15 * 60 * 1000) },
+            {
+                where: {
+                    id: asientoId,
+                    estado: 'disponible',
+                    [Op.or]: [
+                        { reservadoHasta: null },
+                        { reservadoHasta: { [Op.lt]: new Date() } }
+                    ]
+                }
+            }
+        );
+
+        if (affectedRowsUnificada === 0) {
+            return res.status(409).json({ msg: 'El asiento ya está reservado o no disponible' });
+        }
 
         const asiento = await Asiento.findByPk(asientoId, {
             include: { model: Sector, attributes: ['nombre', 'precio'] }

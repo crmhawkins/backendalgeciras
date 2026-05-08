@@ -1,9 +1,11 @@
 const cron = require('node-cron');
+const { Op } = require('sequelize');
 const { obtenerPartidos } = require('../services/scrappingPartidos');
 const liberarAsientosPasados = require('./liberarAsientos');
 const eliminarAbonosTemporada = require('./eliminarAbonos');
 const { obtenerClasificacion} = require('../services/scrapingClasificacion');
 const { verificarProximosPartidos } = require('../notificaciones/verificarPartido');
+const Asiento = require('../models/asiento');
 
 
 cron.schedule('*/15 * * * *', async () => {
@@ -35,5 +37,22 @@ cron.schedule('0 3 * * *', async () => {
     await verificarProximosPartidos();
   } catch (err) {
     console.error('❌ Error en verificarProximosPartidos:', err.message);
+  }
+});
+
+// Cada minuto: liberar reservas temporales expiradas
+cron.schedule('* * * * *', async () => {
+  try {
+    await Asiento.update(
+      { reservadoHasta: null },
+      {
+        where: {
+          reservadoHasta: { [Op.lt]: new Date() },
+          estado: 'disponible'
+        }
+      }
+    );
+  } catch (err) {
+    console.error('Error limpiando reservas:', err);
   }
 });

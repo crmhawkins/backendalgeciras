@@ -1,5 +1,7 @@
 const http = require('http');
 const express = require('express');
+const swaggerUi   = require('swagger-ui-express');
+const swaggerSpec = require('../docs/swagger.js');
 const cors = require('cors');
 const helmet = require('helmet');
 const compression = require('compression');
@@ -75,6 +77,7 @@ class Server {
             health: '/api/health',
             stats: '/api/stats',
             export: '/api/interno',
+            waitlist: '/api/waitlist',
         };
         
 
@@ -158,6 +161,9 @@ class Server {
     }
 
     routes() {
+        // Swagger UI — documentación API
+        this.app.use('/api/docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
+
         // Public endpoints (no auth, no rate limit)
         this.app.use(this.paths.health, require('../routes/health'));
         this.app.use(this.paths.stats, require('../routes/stats'));
@@ -205,6 +211,9 @@ class Server {
 
         // Patrocinadores
         this.app.use(this.paths.patrocinadores, require('../routes/patrocinadores'));
+
+        // Waitlist
+        this.app.use(this.paths.waitlist, require('../routes/waitlist'));
 
     }
 

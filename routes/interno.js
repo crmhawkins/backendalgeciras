@@ -12,6 +12,7 @@ const Sector  = require('../models/sector');
 const Grada   = require('../models/grada');
 const Usuario = require('../models/usuario');
 const { enviarEmailEntrada } = require('../services/emailEntradaService');
+const { crearCodigo, listarCodigos, desactivarCodigo } = require('../controllers/codigos');
 
 const router = Router();
 
@@ -474,5 +475,18 @@ router.get('/abonos/export', basicAuth, async (req, res) => {
         return res.status(500).json({ ok: false, msg: 'Error al exportar abonados' });
     }
 });
+
+// ─────────────────────────────────────────────
+// CÓDIGOS DE DESCUENTO
+// ─────────────────────────────────────────────
+
+// POST /api/interno/codigos — crear código
+router.post('/codigos', basicAuth, crearCodigo);
+
+// GET /api/interno/codigos — listar todos
+router.get('/codigos', basicAuth, listarCodigos);
+
+// DELETE /api/interno/codigos/:id — desactivar
+router.delete('/codigos/:id', basicAuth, desactivarCodigo);
 
 module.exports = router;

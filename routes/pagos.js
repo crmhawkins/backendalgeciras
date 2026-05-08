@@ -10,8 +10,10 @@ const {
     paginaPagoExitoso,
     paginaPagoCancelado
 } = require('../controllers/pagos');
+const { aplicarCodigo } = require('../controllers/codigos');
 const { validarCampos } = require('../middlewares/validar-campos');
 const { validarJWTOpcional } = require('../middlewares/validar-jwt-opcional');
+const { validarJWT } = require('../middlewares/validar-jwt');
 
 const router = Router();
 
@@ -71,6 +73,14 @@ router.post('/create-checkout', [
     check('dni', 'El DNI es obligatorio').notEmpty(),
     validarCampos
 ], crearSesionPagoUnificada);
+
+// Aplicar código de descuento (requiere JWT)
+router.post('/aplicar-codigo', validarJWT, [
+    check('codigo', 'codigo es obligatorio').notEmpty(),
+    check('tipo', 'tipo debe ser abono o entrada').isIn(['abono', 'entrada']),
+    check('monto', 'monto debe ser numérico').isNumeric(),
+    validarCampos
+], aplicarCodigo);
 
 // Estado de pago (para que la app verifique tras el browser)
 router.get('/status', estadoPago);

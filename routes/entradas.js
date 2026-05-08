@@ -2,6 +2,7 @@ const { Router } = require('express');
 const { check } = require('express-validator');
 const { Op } = require('sequelize');
 const { entradaGet, entradaPost, buscarEntradaLiberada, generarPDFEntrada } = require('../controllers/entradas');
+const { transferirEntrada } = require('../controllers/transferirEntrada');
 const { validarCampos } = require('../middlewares/validar-campos');
 const { validarJWT } = require('../middlewares/validar-jwt');
 const Entrada = require('../models/entrada');
@@ -87,6 +88,12 @@ router.get('/buscar-liberada', [
 
 // Ruta para generar PDF de entrada con QR
 router.get('/pdf/:entradaId', validarJWT, generarPDFEntrada);
+
+// POST /api/entradas/:id/transferir
+router.post('/:id/transferir', validarJWT, [
+    check('emailDestinatario', 'emailDestinatario debe ser un email válido').isEmail(),
+    validarCampos
+], transferirEntrada);
 
 module.exports = router;
 

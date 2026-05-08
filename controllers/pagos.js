@@ -32,6 +32,7 @@ const Usuario = require('../models/usuario');
 const Partido = require('../models/partido');
 const Asiento = require('../models/asiento');
 const Sector = require('../models/sector');
+const CodigoDescuento = require('../models/CodigoDescuento');
 const bcryptjs = require('bcryptjs');
 const generarPasswordAleatoria = require('../helpers/generarPasswordAleatoria');
 const { generarJWT } = require('../helpers/generarJWT');
@@ -84,7 +85,8 @@ const crearSesionPagoEntrada = async (req, res = response) => {
             provincia,
             localidad,
             domicilio,
-            codigoPostal
+            codigoPostal,
+            codigoId
         } = req.body;
 
         // Intentar reservar el asiento atómicamente (previene race condition doble-compra)
@@ -145,8 +147,31 @@ const crearSesionPagoEntrada = async (req, res = response) => {
         }
         const precioFinal = Number(asiento.Sector.precio);
 
+        // Aplicar código de descuento si viene codigoId
+        let precioConDescuento = precioFinal;
+        let codigoDescuentoValidado = null;
+        if (codigoId) {
+            codigoDescuentoValidado = await CodigoDescuento.findOne({
+                where: { id: codigoId, activo: true, soloAbonos: false }
+            });
+            if (codigoDescuentoValidado) {
+                const ahora = new Date();
+                const expirado = codigoDescuentoValidado.fechaFin && ahora > new Date(codigoDescuentoValidado.fechaFin);
+                const agotado = codigoDescuentoValidado.usosMax !== null && codigoDescuentoValidado.usosActuales >= codigoDescuentoValidado.usosMax;
+                if (!expirado && !agotado) {
+                    if (codigoDescuentoValidado.tipo === 'porcentaje') {
+                        precioConDescuento = precioFinal - (precioFinal * Number(codigoDescuentoValidado.valor)) / 100;
+                    } else {
+                        precioConDescuento = Math.max(0, precioFinal - Number(codigoDescuentoValidado.valor));
+                    }
+                } else {
+                    codigoDescuentoValidado = null;
+                }
+            }
+        }
+
         // Calcular monto total (convertir a centavos para Stripe)
-        const montoCentavos = Math.round(precioFinal * 100);
+        const montoCentavos = Math.round(precioConDescuento * 100);
 
         // Crear sesión de pago en Stripe
         const session = await stripe.checkout.sessions.create({
@@ -179,7 +204,7 @@ const crearSesionPagoEntrada = async (req, res = response) => {
         const datosCompra = {
             partidoId,
             asientoId,
-            precio: precioFinal,
+            precio: precioConDescuento,
             nombre,
             apellidos,
             genero,
@@ -191,7 +216,8 @@ const crearSesionPagoEntrada = async (req, res = response) => {
             provincia,
             localidad,
             domicilio,
-            codigoPostal
+            codigoPostal,
+            codigoId: codigoDescuentoValidado ? codigoDescuentoValidado.id : null
         };
 
         // Fecha de expiración: 30 minutos desde ahora
@@ -247,7 +273,8 @@ const crearSesionPagoAbono = async (req, res = response) => {
             provincia,
             localidad,
             domicilio,
-            codigoPostal
+            codigoPostal,
+            codigoId
         } = req.body;
 
         // Intentar reservar el asiento atómicamente (previene race condition doble-compra)
@@ -303,7 +330,31 @@ const crearSesionPagoAbono = async (req, res = response) => {
         }
 
         const precio = Number(asiento.Sector.precio);
-        const montoCentavos = Math.round(precio * 100);
+
+        // Aplicar código de descuento si viene codigoId
+        let precioAbonoFinal = precio;
+        let codigoAbonoValidado = null;
+        if (codigoId) {
+            codigoAbonoValidado = await CodigoDescuento.findOne({
+                where: { id: codigoId, activo: true, soloEntradas: false }
+            });
+            if (codigoAbonoValidado) {
+                const ahora = new Date();
+                const expirado = codigoAbonoValidado.fechaFin && ahora > new Date(codigoAbonoValidado.fechaFin);
+                const agotado = codigoAbonoValidado.usosMax !== null && codigoAbonoValidado.usosActuales >= codigoAbonoValidado.usosMax;
+                if (!expirado && !agotado) {
+                    if (codigoAbonoValidado.tipo === 'porcentaje') {
+                        precioAbonoFinal = precio - (precio * Number(codigoAbonoValidado.valor)) / 100;
+                    } else {
+                        precioAbonoFinal = Math.max(0, precio - Number(codigoAbonoValidado.valor));
+                    }
+                } else {
+                    codigoAbonoValidado = null;
+                }
+            }
+        }
+
+        const montoCentavos = Math.round(precioAbonoFinal * 100);
 
         // Crear sesión de pago en Stripe
         const session = await stripe.checkout.sessions.create({
@@ -347,7 +398,8 @@ const crearSesionPagoAbono = async (req, res = response) => {
             provincia,
             localidad,
             domicilio,
-            codigoPostal
+            codigoPostal,
+            codigoId: codigoAbonoValidado ? codigoAbonoValidado.id : null
         };
 
         // Fecha de expiración: 30 minutos desde ahora
@@ -359,7 +411,7 @@ const crearSesionPagoAbono = async (req, res = response) => {
             tipo: 'abono',
             estado: 'pendiente',
             datosCompra,
-            monto: precio,
+            monto: precioAbonoFinal,
             fechaExpiracion
         });
 
@@ -520,6 +572,13 @@ const webhookStripe = async (req, res) => {
 
             pagoSession.estado = 'completado';
             await pagoSession.save();
+
+            // Incrementar usosActuales del código de descuento si aplica
+            if (datosCompra.codigoId) {
+                CodigoDescuento.increment('usosActuales', {
+                    where: { id: datosCompra.codigoId }
+                }).catch(e => console.warn('[webhook] codigoDescuento increment error:', e.message));
+            }
 
             if (sectorId) {
                 sincronizarZona(sectorId).catch(e => console.warn('[webhook] sync zona error:', e.message));

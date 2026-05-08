@@ -49,6 +49,8 @@ const dbConnection = async () => {
         require('../models/pagoSession');
         require('../models/producto');
         require('../models/noticia');
+        require('../models/CodigoDescuento');
+        require('../models/Waitlist');
 
         const Usuario = require('../models/usuario');
         const Entrada = require('../models/entrada');

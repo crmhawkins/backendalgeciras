@@ -4,6 +4,7 @@ const Entrada = require('../models/entrada');
 const Partido = require('../models/partido');
 const Asiento = require('../models/asiento');
 const Abono   = require('../models/abono');
+const { notificarWaitlist } = require('../controllers/waitlist');
 
 async function liberarAsientosPasados() {
   const hoy = new Date();
@@ -47,6 +48,13 @@ async function liberarAsientosPasados() {
         { estado: 'disponible' },
         { where: { id: { [Op.in]: liberar } } }
       );
+
+      // Notificar waitlist para cada asiento liberado (fire-and-forget)
+      for (const asientoId of liberar) {
+        notificarWaitlist(asientoId).catch(e =>
+          console.error(`[liberarAsientos] waitlist notify error asiento ${asientoId}:`, e.message)
+        );
+      }
     }
 
     console.log(`[✔] Archivadas ${entradaIds.length} entradas, liberados ${liberar.length} asientos`);

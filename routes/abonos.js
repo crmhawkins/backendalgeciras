@@ -1,5 +1,5 @@
 const { Router } = require('express');
-const { check } = require('express-validator');
+const { check, param, validationResult } = require('express-validator');
 const rateLimit = require('express-rate-limit');
 const { abonoGet, abonoPost, renovarAbono, getAbonosPorUsuario, liberarAsiento, cancelarLiberacionAsiento  } = require('../controllers/abonos');
 const { validarCampos } = require('../middlewares/validar-campos');
@@ -15,6 +15,15 @@ const renovarAbonoLimiter = rateLimit({
 });
 
 const router = Router();
+
+const validarId = [
+  param('id').isInt({ min: 1 }).withMessage('ID debe ser un entero positivo'),
+  (req, res, next) => {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) return res.status(400).json({ ok: false, msg: errors.array()[0].msg });
+    next();
+  }
+];
 
 /**
  * @swagger
@@ -85,7 +94,7 @@ const router = Router();
 
 router.get('/', validarJWT, esAdmin, abonoGet);
 
-router.get('/usuario/:id', validarJWT, getAbonosPorUsuario);
+router.get('/usuario/:id', validarJWT, validarId, getAbonosPorUsuario);
 
 router.post('/create', validarJWT, esAdmin, [
     check('fechaInicio').isISO8601().withMessage('Fecha de inicio inválida'),

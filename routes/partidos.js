@@ -1,11 +1,20 @@
 const { Router } = require('express');
-const { check } = require('express-validator');
+const { check, param, validationResult } = require('express-validator');
 const { partidoGet, partidoPost, eventosGet, partidoGetById } = require('../controllers/partidos');
 const { validarCampos } = require('../middlewares/validar-campos');
 const { validarJWT } = require('../middlewares/validar-jwt');
 const { esAdmin } = require('../middlewares/es-admin');
 
 const router = Router();
+
+const validarId = [
+  param('id').isInt({ min: 1 }).withMessage('ID debe ser un entero positivo'),
+  (req, res, next) => {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) return res.status(400).json({ ok: false, msg: errors.array()[0].msg });
+    next();
+  }
+];
 
 /**
  * @swagger
@@ -59,9 +68,9 @@ const router = Router();
 
 router.get('/', partidoGet);
 
-router.get('/eventos/:id', eventosGet);
+router.get('/eventos/:id', validarId, eventosGet);
 
-router.get('/:id', partidoGetById);
+router.get('/:id', validarId, partidoGetById);
 
 router.post('/create', [
     validarJWT,

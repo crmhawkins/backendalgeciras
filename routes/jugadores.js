@@ -1,9 +1,19 @@
 const { Router } = require('express');
+const { param, validationResult } = require('express-validator');
 const { getPlantilla, getJugador } = require('../controllers/jugadores');
 const Jugador = require('../models/jugador');
 const JugadorStats = require('../models/jugadorStats');
 
 const router = Router();
+
+const validarId = [
+  param('id').isInt({ min: 1 }).withMessage('ID debe ser un entero positivo'),
+  (req, res, next) => {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) return res.status(400).json({ ok: false, msg: errors.array()[0].msg });
+    next();
+  }
+];
 
 /**
  * @swagger
@@ -69,7 +79,7 @@ const TEMPORADA = process.env.TEMPORADA || '2025/2026';
 const SYNC_SECRET = process.env.SYNC_SECRET;
 
 router.get('/', getPlantilla);
-router.get('/:id', getJugador);
+router.get('/:id', validarId, getJugador);
 
 /**
  * POST /api/jugadores/import

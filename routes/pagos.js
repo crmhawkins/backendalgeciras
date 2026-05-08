@@ -17,6 +17,74 @@ const { validarJWT } = require('../middlewares/validar-jwt');
 
 const router = Router();
 
+/**
+ * @swagger
+ * tags:
+ *   name: Pagos
+ *   description: Sesiones de pago con Stripe
+ */
+
+/**
+ * @swagger
+ * /api/pagos/create-checkout:
+ *   post:
+ *     summary: Crear sesión de pago unificada (app móvil)
+ *     tags: [Pagos]
+ *     security:
+ *       - bearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required: [asientoId, dni]
+ *             properties:
+ *               asientoId: { type: integer, example: 42 }
+ *               dni:       { type: string,  example: '12345678A' }
+ *     responses:
+ *       200:
+ *         description: URL de checkout Stripe
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 ok:  { type: boolean }
+ *                 url: { type: string, format: uri }
+ *       400:
+ *         description: Datos inválidos
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Error'
+ */
+
+/**
+ * @swagger
+ * /api/pagos/status:
+ *   get:
+ *     summary: Estado de pago por session_id (para verificar tras browser)
+ *     tags: [Pagos]
+ *     parameters:
+ *       - in: query
+ *         name: session_id
+ *         required: true
+ *         schema: { type: string }
+ *     responses:
+ *       200:
+ *         description: Estado del pago
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 ok:     { type: boolean }
+ *                 status: { type: string, example: paid }
+ *       400:
+ *         description: session_id requerido
+ */
+
 // Router para webhook (el middleware raw se aplica en server.js antes de express.json())
 const webhookRouter = Router();
 webhookRouter.post('/webhook', webhookStripe);

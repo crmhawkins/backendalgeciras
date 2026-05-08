@@ -7,6 +7,56 @@ const { esAdmin } = require('../middlewares/es-admin');
 
 const router = Router();
 
+/**
+ * @swagger
+ * tags:
+ *   name: Partidos
+ *   description: Calendario y detalle de partidos
+ */
+
+/**
+ * @swagger
+ * /api/partidos:
+ *   get:
+ *     summary: Listar todos los partidos
+ *     tags: [Partidos]
+ *     responses:
+ *       200:
+ *         description: Lista de partidos
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 ok:       { type: boolean }
+ *                 partidos: { type: array, items: { type: object } }
+ */
+
+/**
+ * @swagger
+ * /api/partidos/{id}:
+ *   get:
+ *     summary: Detalle de un partido
+ *     tags: [Partidos]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema: { type: integer }
+ *     responses:
+ *       200:
+ *         description: Datos del partido
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 ok:      { type: boolean }
+ *                 partido: { type: object }
+ *       404:
+ *         description: Partido no encontrado
+ */
+
 router.get('/', partidoGet);
 
 router.get('/eventos/:id', eventosGet);

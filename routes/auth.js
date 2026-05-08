@@ -6,12 +6,70 @@ const { validarJWT } = require('../middlewares/validar-jwt');
 
 const router = Router();
 
+/**
+ * @swagger
+ * tags:
+ *   name: Auth
+ *   description: Autenticación de usuarios
+ */
+
+/**
+ * @swagger
+ * /api/authenticate/login:
+ *   post:
+ *     summary: Login usuario
+ *     tags: [Auth]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required: [email, password]
+ *             properties:
+ *               email:    { type: string, format: email, example: usuario@algecirascf.es }
+ *               password: { type: string, example: miPassword123 }
+ *     responses:
+ *       200:
+ *         description: Token JWT generado
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/AuthToken'
+ *       400:
+ *         description: Credenciales incorrectas
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Error'
+ */
 router.post('/login', [
     check('email', 'El email es obligatorio').isEmail(),
     check('password', 'La contraseña es obligatoria').not().isEmpty(),
     validarCampos
 ], authenticatePost);
 
+/**
+ * @swagger
+ * /api/authenticate/recuperar-password:
+ *   post:
+ *     summary: Solicitar recuperación de contraseña
+ *     tags: [Auth]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required: [email]
+ *             properties:
+ *               email: { type: string, format: email }
+ *     responses:
+ *       200:
+ *         description: Email de recuperación enviado
+ *       400:
+ *         description: Email inválido
+ */
 router.post('/recuperar-password', [
     check('email', 'Email no válido').isEmail(),
     validarCampos

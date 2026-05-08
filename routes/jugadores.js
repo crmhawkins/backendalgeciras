@@ -5,6 +5,66 @@ const JugadorStats = require('../models/jugadorStats');
 
 const router = Router();
 
+/**
+ * @swagger
+ * tags:
+ *   name: Jugadores
+ *   description: Plantilla y estadísticas de jugadores
+ */
+
+/**
+ * @swagger
+ * /api/jugadores:
+ *   get:
+ *     summary: Obtener plantilla completa
+ *     tags: [Jugadores]
+ *     responses:
+ *       200:
+ *         description: Lista de jugadores con estadísticas
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 ok:       { type: boolean }
+ *                 jugadores:
+ *                   type: array
+ *                   items:
+ *                     type: object
+ *                     properties:
+ *                       id:          { type: integer }
+ *                       nombre:      { type: string }
+ *                       posicion:    { type: string }
+ *                       dorsal:      { type: integer }
+ *                       foto:        { type: string, format: uri }
+ *                       nacionalidad:{ type: string }
+ */
+
+/**
+ * @swagger
+ * /api/jugadores/{id}:
+ *   get:
+ *     summary: Detalle de un jugador
+ *     tags: [Jugadores]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema: { type: integer }
+ *     responses:
+ *       200:
+ *         description: Datos del jugador con stats de la temporada
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 ok:      { type: boolean }
+ *                 jugador: { type: object }
+ *       404:
+ *         description: Jugador no encontrado
+ */
+
 const TEMPORADA = process.env.TEMPORADA || '2025/2026';
 const SYNC_SECRET = process.env.SYNC_SECRET;
 

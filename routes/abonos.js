@@ -16,6 +16,73 @@ const renovarAbonoLimiter = rateLimit({
 
 const router = Router();
 
+/**
+ * @swagger
+ * tags:
+ *   name: Abonos
+ *   description: Gestión de abonados
+ */
+
+/**
+ * @swagger
+ * /api/abonos/usuario/{id}:
+ *   get:
+ *     summary: Listar abonos de un usuario
+ *     tags: [Abonos]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema: { type: integer }
+ *         description: ID del usuario
+ *     responses:
+ *       200:
+ *         description: Lista de abonos del usuario
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 ok:     { type: boolean }
+ *                 abonos: { type: array, items: { type: object } }
+ *       401:
+ *         description: Token requerido
+ */
+
+/**
+ * @swagger
+ * /api/abonos/renovar:
+ *   post:
+ *     summary: Renovar abono existente
+ *     tags: [Abonos]
+ *     security:
+ *       - bearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required: [dni, codigo]
+ *             properties:
+ *               dni:    { type: string, example: '12345678A' }
+ *               codigo: { type: integer, example: 1001 }
+ *     responses:
+ *       200:
+ *         description: URL de checkout para renovación
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 ok:  { type: boolean }
+ *                 url: { type: string, format: uri }
+ *       400:
+ *         description: Datos inválidos o abono no encontrado
+ */
+
 router.get('/', validarJWT, esAdmin, abonoGet);
 
 router.get('/usuario/:id', validarJWT, getAbonosPorUsuario);

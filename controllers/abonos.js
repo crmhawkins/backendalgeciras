@@ -12,6 +12,16 @@ const generarPasswordAleatoria = require('../helpers/generarPasswordAleatoria');
 
 const {actualizarJSONAsiento} = require('../services/updateJSON');
 
+// Singleton transporter — creado una vez al cargar el módulo
+const transporter = nodemailer.createTransport({
+    host: process.env.EMAIL_HOST,
+    port: process.env.EMAIL_PORT,
+    secure: process.env.EMAIL_ENCRYPTION === 'ssl',
+    auth: {
+        user: process.env.EMAIL_USER,
+        pass: process.env.EMAIL_PASS
+    }
+});
 
 const abonoPost = async (req, res) => {
 
@@ -126,16 +136,6 @@ const abonoPost = async (req, res) => {
         await asiento.save();
 
         actualizarJSONAsiento(asientoId, 'ocupado');
-
-        const transporter = nodemailer.createTransport({
-            host: process.env.EMAIL_HOST,
-            port: process.env.EMAIL_PORT,
-            secure: process.env.EMAIL_ENCRYPTION === 'ssl',
-            auth: {
-                user: process.env.EMAIL_USER,
-                pass: process.env.EMAIL_PASS
-            }
-        });
 
         try {
             await transporter.sendMail({

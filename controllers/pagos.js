@@ -46,6 +46,17 @@ const generarCodigoAcceso = (longitud = 16) => {
 const { actualizarJSONAsiento } = require('../services/updateJSON');
 const { verificarAsientoEnCompralaentrada, sincronizarZona } = require('../services/compralaentradaService');
 
+// Singleton transporter — creado una vez al cargar el módulo
+const transporter = nodemailer.createTransport({
+    host: process.env.EMAIL_HOST,
+    port: process.env.EMAIL_PORT,
+    secure: process.env.EMAIL_ENCRYPTION === 'ssl',
+    auth: {
+        user: process.env.EMAIL_USER,
+        pass: process.env.EMAIL_PASS
+    }
+});
+
 /**
  * Crea una sesión de pago de Stripe para entradas
  */
@@ -108,8 +119,14 @@ const crearSesionPagoEntrada = async (req, res = response) => {
             return res.status(400).json({ msg: 'El partido no existe.' });
         }
 
+        // Precio siempre desde BD — nunca confiar en el cliente
+        if (!asiento.Sector || asiento.Sector.precio == null) {
+            return res.status(400).json({ msg: 'No se pudo determinar el precio del sector.' });
+        }
+        const precioFinal = Number(asiento.Sector.precio);
+
         // Calcular monto total (convertir a centavos para Stripe)
-        const montoCentavos = Math.round(Number(precio) * 100);
+        const montoCentavos = Math.round(precioFinal * 100);
 
         // Crear sesión de pago en Stripe
         const session = await stripe.checkout.sessions.create({
@@ -142,7 +159,7 @@ const crearSesionPagoEntrada = async (req, res = response) => {
         const datosCompra = {
             partidoId,
             asientoId,
-            precio,
+            precio: precioFinal,
             nombre,
             apellidos,
             genero,
@@ -166,7 +183,7 @@ const crearSesionPagoEntrada = async (req, res = response) => {
             tipo: 'entrada',
             estado: 'pendiente',
             datosCompra,
-            monto: precio,
+            monto: precioFinal,
             fechaExpiracion
         });
 
@@ -322,15 +339,10 @@ const crearSesionPagoAbono = async (req, res = response) => {
 };
 
 /**
- * Confirma el pago y crea la entrada/abono correspondiente
+ * Confirma el pago — solo devuelve estado desde BD.
+ * La creación de entrada/abono es responsabilidad exclusiva del webhook.
  */
 const confirmarPago = async (req, res = response) => {
-    if (!stripe || !process.env.STRIPE_SECRET_KEY || process.env.STRIPE_SECRET_KEY === 'sk_test_placeholder') {
-        return res.status(503).json({ 
-            msg: 'El sistema de pagos no está configurado. Por favor, contacta al administrador.' 
-        });
-    }
-    
     try {
         const { session_id } = req.query;
 
@@ -338,233 +350,22 @@ const confirmarPago = async (req, res = response) => {
             return res.status(400).json({ msg: 'El session_id es requerido' });
         }
 
-        // Marcar atómicamente como 'procesando' para evitar race condition con webhook
-        const [updatedRows] = await PagoSession.update(
-            { estado: 'procesando' },
-            { where: { stripeSessionId: session_id, estado: 'pendiente' } }
-        );
-
-        if (updatedRows === 0) {
-            const existing = await PagoSession.findOne({ where: { stripeSessionId: session_id } });
-            if (!existing) return res.status(404).json({ msg: 'Sesión de pago no encontrada' });
-            if (existing.estado === 'completado') return res.json({ msg: 'Pago ya procesado correctamente', completado: true });
-            return res.status(400).json({ msg: 'Este pago ya está siendo procesado' });
-        }
-
         const pagoSession = await PagoSession.findOne({ where: { stripeSessionId: session_id } });
 
-        // Verificar el estado del pago en Stripe
-        const stripeSession = await stripe.checkout.sessions.retrieve(session_id);
-
-        if (stripeSession.payment_status !== 'paid') {
-            await PagoSession.update(
-                { estado: 'pendiente' },
-                { where: { stripeSessionId: session_id, estado: 'procesando' } }
-            );
-            return res.status(400).json({ msg: 'El pago no ha sido completado' });
+        if (!pagoSession) {
+            return res.status(404).json({ msg: 'Sesión de pago no encontrada' });
         }
 
-        const datosCompra = pagoSession.datosCompra;
-
-        // Crear o buscar usuario
-        let usuario = await Usuario.findOne({ where: { email: datosCompra.email } });
-        let nuevaCuenta = false;
-        let passwordPlano = '';
-
-        if (!usuario) {
-            passwordPlano = generarPasswordAleatoria(10);
-            const salt = bcryptjs.genSaltSync();
-            const hashedPassword = bcryptjs.hashSync(passwordPlano, salt);
-
-            usuario = await Usuario.create({
-                nombre: datosCompra.nombre,
-                email: datosCompra.email,
-                profileImage: 'default_profile_photo.png',
-                password: hashedPassword,
-                dni: datosCompra.dni
-            });
-
-            nuevaCuenta = true;
-        }
-
-        let resultado = null;
-
-        if (pagoSession.tipo === 'entrada') {
-            // Generar token único para la entrada
-            // Asegurar que el token sea único (muy poco probable que se repita, pero por seguridad)
-            let token = null;
-            let entradaExistente = null;
-            let intentos = 0;
-            const maxIntentos = 10; // Límite de seguridad para evitar bucles infinitos
-            
-            do {
-                token = generarIdUnico();
-                entradaExistente = await Entrada.findOne({ where: { token } });
-                intentos++;
-                
-                if (intentos >= maxIntentos) {
-                    console.error('Error: No se pudo generar un token único después de múltiples intentos');
-                    return res.status(500).json({ 
-                        msg: 'Error al generar el token de la entrada. Por favor, intenta nuevamente.' 
-                    });
-                }
-            } while (entradaExistente);
-            
-            // Crear entrada
-            const entrada = await Entrada.create({
-                token: token,
-                qrCode: token,
-                codigoAcceso: generarCodigoAcceso(12),
-                partidoId: datosCompra.partidoId,
-                asientoId: datosCompra.asientoId,
-                precio: datosCompra.precio,
-                usuarioId: usuario.id
-            });
-
-            // Actualizar estado del asiento
-            const asiento = await Asiento.findByPk(datosCompra.asientoId);
-            if (asiento && asiento.estado !== 'ocupado') {
-                asiento.estado = 'ocupado';
-                await asiento.save();
-            }
-
-            // Enviar email de confirmación (no crítico - si falla, el pago ya está confirmado)
-            try {
-                const partido = await Partido.findByPk(datosCompra.partidoId);
-                const asientoDetalle = await Asiento.findByPk(datosCompra.asientoId, {
-                    include: { model: Sector, attributes: ['nombre'] }
-                });
-
-                if (nuevaCuenta && partido && asientoDetalle) {
-                    const transporter = nodemailer.createTransport({
-                        host: process.env.EMAIL_HOST,
-                        port: process.env.EMAIL_PORT,
-                        secure: process.env.EMAIL_ENCRYPTION === 'ssl',
-                        auth: {
-                            user: process.env.EMAIL_USER,
-                            pass: process.env.EMAIL_PASS
-                        }
-                    });
-
-                    await transporter.sendMail({
-                        from: `"Algeciras CF" <${process.env.EMAIL_USER}>`,
-                        to: datosCompra.email,
-                        subject: '🎟️ Entrada comprada - Algeciras CF',
-                        html: `
-                            <h2>¡Gracias por tu compra en Algeciras CF!</h2>
-                            <p>Te hemos creado una cuenta para que puedas acceder a tu perfil y consultar tus entradas.</p>
-                            <p><strong>Email de acceso:</strong> ${datosCompra.email}</p>
-                            <p>Para acceder a tu cuenta, <a href="${process.env.BACKEND_URL || 'https://backend-algeciras.hawkins.es'}/acceso?token=${await generarJWT(usuario.id)}">haz clic aquí</a> (válido 1 hora).</p>
-                            <hr/>
-                            <h3>📅 Detalles de tu entrada:</h3>
-                            <p><strong>Partido:</strong> ${partido.equipoLocal} vs ${partido.equipoVisitante}</p>
-                            <p><strong>Fecha:</strong> ${new Date(partido.fecha).toLocaleDateString()}</p>
-                            <p><strong>Hora:</strong> ${partido.hora || 'Por determinar'}</p>
-                            <p><strong>Asiento:</strong> Fila ${asientoDetalle.fila}, Butaca ${asientoDetalle.numero}</p>
-                            <p><strong>Sector:</strong> ${asientoDetalle.Sector?.nombre || 'N/A'}</p>
-                            <p><strong>Precio:</strong> ${datosCompra.precio} €</p>
-                            <hr/>
-                            <p>⚽ Puedes acceder a tu cuenta desde nuestra web para revisar tus compras o renovar tus entradas.</p>
-                            <p><strong>algecirascf.com</strong></p>
-                        `
-                    });
-                }
-            } catch (emailError) {
-                // El email falló, pero el pago ya está confirmado - solo registramos el error
-                console.error('⚠️  Error al enviar email de confirmación (pago confirmado de todas formas):', emailError.message);
-            }
-
-            resultado = { entrada, nuevaCuenta };
-
-        } else if (pagoSession.tipo === 'abono') {
-            // Crear abono
-            const abono = await Abono.create({
-                fechaInicio: datosCompra.fechaInicio,
-                fechaFin: datosCompra.fechaFin,
-                nombre: datosCompra.nombre,
-                apellidos: datosCompra.apellidos,
-                genero: datosCompra.genero,
-                dni: datosCompra.dni,
-                fechaNacimiento: datosCompra.fechaNacimiento,
-                email: datosCompra.email,
-                telefono: datosCompra.telefono,
-                pais: datosCompra.pais,
-                provincia: datosCompra.provincia,
-                localidad: datosCompra.localidad,
-                domicilio: datosCompra.domicilio,
-                codigoPostal: datosCompra.codigoPostal,
-                usuarioId: usuario.id,
-                asientoId: datosCompra.asientoId,
-                precio: pagoSession.monto,
-                codigoAcceso: generarCodigoAcceso(8)
-            });
-
-            // Actualizar estado del asiento
-            const asiento = await Asiento.findByPk(datosCompra.asientoId, {
-                include: { model: Sector, attributes: ['nombre'] }
-            });
-            asiento.estado = 'ocupado';
-            await asiento.save();
-            actualizarJSONAsiento(datosCompra.asientoId, 'ocupado');
-
-            // Enviar email de confirmación (no crítico - si falla, el pago ya está confirmado)
-            try {
-                const transporter = nodemailer.createTransport({
-                    host: process.env.EMAIL_HOST,
-                    port: process.env.EMAIL_PORT,
-                    secure: process.env.EMAIL_ENCRYPTION === 'ssl',
-                    auth: {
-                        user: process.env.EMAIL_USER,
-                        pass: process.env.EMAIL_PASS
-                    }
-                });
-
-                await transporter.sendMail({
-                    from: `"Algeciras CF" <${process.env.EMAIL_USER}>`,
-                    to: datosCompra.email,
-                    subject: 'Abono confirmado - Algeciras CF',
-                    html: `
-                        <h2>¡Gracias por adquirir tu abono!</h2>
-                        <p><strong>Nombre:</strong> ${datosCompra.nombre} ${datosCompra.apellidos}</p>
-                        <p><strong>Zona:</strong> Sector ${asiento.Sector.nombre} - Fila ${asiento.fila}, Butaca ${asiento.numero}</p>
-                        <p><strong>Email de acceso:</strong> ${datosCompra.email}</p>
-                        ${nuevaCuenta ? `<p>Para acceder a tu cuenta, <a href="${process.env.BACKEND_URL || 'https://backend-algeciras.hawkins.es'}/acceso?token=${await generarJWT(usuario.id)}">haz clic aquí</a> (válido 1 hora).</p>` : ''}
-                        <p><strong>Código de abono:</strong> ${abono.id}</p>
-                        <p><strong>Precio del abono:</strong> ${pagoSession.monto} €</p>
-                        <hr/>
-                        <p>⚽ Algeciras CF</p>
-                    `
-                });
-            } catch (emailError) {
-                // El email falló, pero el pago ya está confirmado - solo registramos el error
-                console.error('⚠️  Error al enviar email de confirmación (pago confirmado de todas formas):', emailError.message);
-            }
-
-            resultado = { abono, nuevaCuenta };
-        }
-
-        // Marcar la sesión de pago como completada
-        pagoSession.estado = 'completado';
-        await pagoSession.save();
-
-        // Sync compralaentrada zone immediately after confirming payment
-        try {
-            const asientoConfirmado = await Asiento.findByPk(datosCompra.asientoId);
-            if (asientoConfirmado && asientoConfirmado.sectorId) {
-                sincronizarZona(asientoConfirmado.sectorId).catch(() => {});
-            }
-        } catch (_) {}
-
-        res.json({
-            msg: 'Pago confirmado correctamente',
-            entradaToken: resultado.entrada ? resultado.entrada.token : null,
-            ...resultado
+        return res.json({
+            estado: pagoSession.estado,
+            tipo: pagoSession.tipo,
+            completado: pagoSession.estado === 'completado'
         });
 
     } catch (error) {
-        console.error('Error al confirmar pago:', error);
+        console.error('Error al consultar estado de pago:', error);
         res.status(500).json({
-            msg: 'Error al confirmar el pago',
+            msg: 'Error al consultar el estado del pago',
             error: error.message
         });
     }

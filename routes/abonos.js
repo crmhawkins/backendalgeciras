@@ -45,7 +45,7 @@ router.post('/create', validarJWT, esAdmin, [
 
 router.post('/liberar', validarJWT, liberarAsiento);
 
-router.post('/renovar', renovarAbonoLimiter, [
+router.post('/renovar', renovarAbonoLimiter, validarJWT, [
     check('dni', 'El DNI es obligatorio').not().isEmpty(),
     check('codigo', 'El código de abonado debe ser un número').isInt(),
     validarCampos

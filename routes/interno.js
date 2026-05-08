@@ -44,7 +44,22 @@ function basicAuth(req, res, next) {
     const user = decoded.slice(0, colonIdx);
     const pass = decoded.slice(colonIdx + 1);
 
-    if (user === adminUser && pass === adminPass) {
+    let userMatch = false;
+    let passMatch = false;
+    try {
+        const providedUser = Buffer.from(user, 'utf8');
+        const expectedUser = Buffer.from(adminUser, 'utf8');
+        const providedPass = Buffer.from(pass, 'utf8');
+        const expectedPass = Buffer.from(adminPass, 'utf8');
+        userMatch = providedUser.length === expectedUser.length &&
+            crypto.timingSafeEqual(providedUser, expectedUser);
+        passMatch = providedPass.length === expectedPass.length &&
+            crypto.timingSafeEqual(providedPass, expectedPass);
+    } catch {
+        return res.status(401).json({ ok: false, msg: 'Credenciales inválidas' });
+    }
+
+    if (userMatch && passMatch) {
         return next();
     }
 
@@ -60,7 +75,22 @@ router.post('/login', limiter, (req, res) => {
         return res.status(503).json({ ok: false, msg: 'Panel interno no configurado' });
     }
 
-    if (username === adminUser && password === adminPass) {
+    let userMatch = false;
+    let passMatch = false;
+    try {
+        const providedUser = Buffer.from(username, 'utf8');
+        const expectedUser = Buffer.from(adminUser, 'utf8');
+        const providedPass = Buffer.from(password, 'utf8');
+        const expectedPass = Buffer.from(adminPass, 'utf8');
+        userMatch = providedUser.length === expectedUser.length &&
+            crypto.timingSafeEqual(providedUser, expectedUser);
+        passMatch = providedPass.length === expectedPass.length &&
+            crypto.timingSafeEqual(providedPass, expectedPass);
+    } catch {
+        return res.status(401).json({ ok: false, msg: 'Credenciales incorrectas' });
+    }
+
+    if (userMatch && passMatch) {
         return res.json({ ok: true });
     }
 

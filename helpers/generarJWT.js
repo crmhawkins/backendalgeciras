@@ -18,9 +18,7 @@ const generarJWT = ( uid = '' ) => {
             if (err) {
                 console.log('❌ Error al generar JWT:', err);
                 reject('No se pudo generar el token');
-            }else{
-                console.log(`✅ JWT generado para usuario ID: ${uid}`);
-                console.log(`   Duración: ${expiresIn} (expira el ${expirationDate.toLocaleString('es-ES', { timeZone: 'Europe/Madrid' })})`);
+            } else {
                 resolve( token );
             }
         })

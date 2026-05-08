@@ -3,6 +3,7 @@ const { check } = require('express-validator');
 const { partidoGet, partidoPost, eventosGet, partidoGetById } = require('../controllers/partidos');
 const { validarCampos } = require('../middlewares/validar-campos');
 const { validarJWT } = require('../middlewares/validar-jwt');
+const { esAdmin } = require('../middlewares/es-admin');
 
 const router = Router();
 
@@ -14,6 +15,7 @@ router.get('/:id', partidoGetById);
 
 router.post('/create', [
     validarJWT,
+    esAdmin,
     check('fecha', 'La fecha es obligatoria').isDate(),
     check('hora', 'La hora es obligatoria').not().isEmpty(),
     check('equipoLocal', 'El equipo local es obligatorio').not().isEmpty(),

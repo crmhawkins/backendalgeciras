@@ -2,13 +2,13 @@ const axios = require('axios');
 const cheerio = require('cheerio');
 const Clasificacion = require('../models/clasificacion');
 
-const now = new Date();
-const currentSeasonEndYear = now.getMonth() >= 6 ? now.getFullYear() + 1 : now.getFullYear();
-const URL = `https://www.resultados-futbol.com/historico/algeciras-cf/${currentSeasonEndYear}`;
-
 async function obtenerClasificacion() {
+  const now = new Date();
+  const currentSeasonEndYear = now.getMonth() >= 6 ? now.getFullYear() + 1 : now.getFullYear();
+  const url = `https://www.resultados-futbol.com/historico/algeciras-cf/${currentSeasonEndYear}`;
+
   try {
-    const { data } = await axios.get(URL);
+    const { data } = await axios.get(url);
     const $ = cheerio.load(data);
 
     const rows = $('#tabla2 tbody tr');

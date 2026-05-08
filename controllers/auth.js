@@ -8,6 +8,17 @@ const WordpressUser = require('../models/usuarioWP');
 const {generateRandomPassword} = require('../helpers/password-generator');
 const jwt = require('jsonwebtoken');
 
+// Singleton transporter — creado una vez al cargar el módulo
+const transporter = nodemailer.createTransport({
+    host: process.env.EMAIL_HOST,
+    port: process.env.EMAIL_PORT,
+    secure: process.env.EMAIL_ENCRYPTION === 'ssl',
+    auth: {
+        user: process.env.EMAIL_USER,
+        pass: process.env.EMAIL_PASS
+    }
+});
+
 // Authenticate User
 const authenticatePost = async (req, res = response) => {
     const { email, password } = req.body;
@@ -35,7 +46,7 @@ const authenticatePost = async (req, res = response) => {
 
         // If user not found in both databases
         if (!usuario) {
-            return res.status(400).json({ msg: 'Usuario / Password incorrectos - Email' });
+            return res.status(400).json({ msg: 'Usuario o contraseña incorrectos' });
         }
 
         // Validate password with bcrypt
@@ -45,7 +56,7 @@ const authenticatePost = async (req, res = response) => {
         }
 
         if (!validPassword) {
-            return res.status(400).json({ msg: 'Usuario / Password incorrectos - password' });
+            return res.status(400).json({ msg: 'Usuario o contraseña incorrectos' });
         }
 
         // Generate JWT token
@@ -134,16 +145,6 @@ const enviarRecuperacion = async (req, res = response) => {
         await usuario.save();
 
         const resetLink = `${req.protocol}://${req.headers.host}/reset-password.html?token=${token}`;
-
-        const transporter = nodemailer.createTransport({
-            host: process.env.EMAIL_HOST,
-            port: process.env.EMAIL_PORT,
-            secure: process.env.EMAIL_ENCRYPTION === 'ssl',
-            auth: {
-                user: process.env.EMAIL_USER,
-                pass: process.env.EMAIL_PASS
-            }
-        });
 
         await transporter.sendMail({
             from: 'Algeciras CF <dani.mefle@hawkins.es>',

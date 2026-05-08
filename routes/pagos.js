@@ -7,6 +7,7 @@ const {
     webhookStripe,
     crearSesionPagoUnificada,
     estadoPago,
+    historialPagos,
     paginaPagoExitoso,
     paginaPagoCancelado
 } = require('../controllers/pagos');
@@ -149,6 +150,9 @@ router.post('/aplicar-codigo', validarJWT, [
     check('monto', 'monto debe ser numérico').isNumeric(),
     validarCampos
 ], aplicarCodigo);
+
+// Historial de pagos completados del usuario autenticado
+router.get('/historial', validarJWT, historialPagos);
 
 // Estado de pago (para que la app verifique tras el browser)
 router.get('/status', estadoPago);

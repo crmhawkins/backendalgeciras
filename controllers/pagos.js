@@ -712,6 +712,58 @@ const crearSesionPagoUnificada = async (req, res = response) => {
     }
 };
 
+/**
+ * Historial de pagos completados del usuario autenticado
+ * GET /api/pagos/historial?page=1&limit=20
+ */
+const historialPagos = async (req, res = response) => {
+    try {
+        const usuarioId = req.uid;
+        const page  = Math.max(1, parseInt(req.query.page)  || 1);
+        const limit = Math.min(100, Math.max(1, parseInt(req.query.limit) || 20));
+        const offset = (page - 1) * limit;
+
+        // Resolve email from JWT uid
+        const usuario = await Usuario.findByPk(usuarioId, { attributes: ['id', 'email'] });
+        if (!usuario) {
+            return res.status(401).json({ msg: 'Usuario no encontrado' });
+        }
+
+        const { count, rows } = await PagoSession.findAndCountAll({
+            where: {
+                estado: 'completado',
+                datosCompra: { [Op.like]: `%"email":"${usuario.email}"%` }
+            },
+            order: [['createdAt', 'DESC']],
+            limit,
+            offset
+        });
+
+        const data = rows.map(p => {
+            const datos = p.datosCompra || {};
+            return {
+                id:        p.id,
+                tipo:      p.tipo,
+                monto:     parseFloat(p.monto),
+                fecha:     p.createdAt,
+                estado:    p.estado,
+                partidoId: datos.partidoId || null
+            };
+        });
+
+        return res.json({
+            data,
+            total:      count,
+            page,
+            totalPages: Math.ceil(count / limit)
+        });
+
+    } catch (error) {
+        console.error('Error al obtener historial de pagos:', error);
+        return res.status(500).json({ msg: 'Error al obtener historial de pagos', error: error.message });
+    }
+};
+
 const estadoPago = async (req, res = response) => {
     const { session_id } = req.query;
     if (!session_id) return res.status(400).json({ msg: 'session_id requerido' });
@@ -762,6 +814,7 @@ module.exports = {
     webhookStripe,
     crearSesionPagoUnificada,
     estadoPago,
+    historialPagos,
     paginaPagoExitoso,
     paginaPagoCancelado
 };

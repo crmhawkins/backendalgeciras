@@ -1,49 +1,49 @@
 const axios = require('axios');
-const cheerio = require('cheerio');
 const Clasificacion = require('../models/clasificacion');
 
+const TOURNAMENT_ID = 17073;
+const SEASON_ID = 77727;
+
+const HEADERS = {
+  'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36',
+  'Accept': 'application/json',
+  'Referer': 'https://www.sofascore.com/',
+  'Origin': 'https://www.sofascore.com',
+};
+
 async function obtenerClasificacion() {
-  const now = new Date();
-  const currentSeasonEndYear = now.getMonth() >= 6 ? now.getFullYear() + 1 : now.getFullYear();
-  const url = `https://www.resultados-futbol.com/historico/algeciras-cf/${currentSeasonEndYear}`;
-
   try {
-    const { data } = await axios.get(url);
-    const $ = cheerio.load(data);
+    const url = `https://api.sofascore.com/api/v1/unique-tournament/${TOURNAMENT_ID}/season/${SEASON_ID}/standings/total`;
+    const { data } = await axios.get(url, { headers: HEADERS, timeout: 10000 });
 
-    const rows = $('#tabla2 tbody tr');
-
-    for (let i = 0; i < rows.length; i++) {
-        const row = $(rows[i]);
-      
-        const posicion = parseInt(row.find('th').text().trim(), 10);
-        const equipo = row.find('.equipo a').text().trim();
-        const escudo = row.find('.equipo img').attr('src');
-        const pj = parseInt(row.find('td').eq(1).text().trim(), 10);
-        const gf = parseInt(row.find('td').eq(2).text().trim(), 10);
-        const gc = parseInt(row.find('td').eq(3).text().trim(), 10);
-        const puntos = parseInt(row.find('td').eq(4).text().trim(), 10);
-      
-        const escudoInvalido = !escudo || escudo.trim() === '';
-        const puntosInvalidos = isNaN(puntos) || puntos === 0;
-        if (escudoInvalido && puntosInvalidos) continue;
-      
-        await Clasificacion.upsert({
-          equipo,
-          posicion,
-          escudo,
-          pj,
-          gf,
-          gc,
-          puntos
-        });
+    const standings = data?.standings?.[0]?.rows ?? [];
+    if (!standings.length) {
+      console.warn('[Clasificacion] SofaScore devolvió standings vacíos');
+      return;
     }
-      
 
-    console.log('✅ Clasificación actualizada correctamente');
+    await Clasificacion.destroy({ where: {} });
+
+    for (const row of standings) {
+      const team = row.team;
+      await Clasificacion.create({
+        posicion: row.position,
+        equipo:   team.name,
+        escudo:   `https://api.sofascore.com/api/v1/team/${team.id}/image`,
+        pj:       row.matches,
+        g:        row.wins,
+        e:        row.draws,
+        d:        row.losses,
+        gf:       row.scoresFor,
+        gc:       row.scoresAgainst,
+        puntos:   row.points,
+      });
+    }
+
+    console.log(`✅ Clasificación actualizada: ${standings.length} equipos`);
   } catch (error) {
-    console.error('❌ Error al hacer scraping de clasificación:', error.message);
+    console.error('❌ Error al obtener clasificación de SofaScore:', error.message);
   }
 }
 
-module.exports={obtenerClasificacion};
+module.exports = { obtenerClasificacion };

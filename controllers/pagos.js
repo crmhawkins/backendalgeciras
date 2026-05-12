@@ -47,6 +47,7 @@ const generarCodigoAcceso = (longitud = 16) => {
 };
 const { actualizarJSONAsiento } = require('../services/updateJSON');
 const { verificarAsientoEnCompralaentrada, sincronizarZona } = require('../services/compralaentradaService');
+const { enviarPushUsuario } = require('../services/notificacionesService');
 
 // Singleton transporter — creado una vez al cargar el módulo
 const transporter = nodemailer.createTransport({
@@ -548,6 +549,7 @@ const webhookStripe = async (req, res) => {
                 const asiento = await Asiento.findByPk(datosCompra.asientoId);
                 if (asiento) { asiento.estado = 'ocupado'; await asiento.save(); sectorId = asiento.sectorId; }
                 actualizarJSONAsiento(datosCompra.asientoId, 'ocupado');
+                enviarPushUsuario(usuario.id, '¡Abono confirmado! ✅', 'Tu abono de temporada está activo. ¡Disfruta del Algeciras CF!', { tipo: 'abono' }).catch(() => {});
             } else if (pagoSession.tipo === 'entrada') {
                 // Token único con retry (igual que confirmarPago)
                 let token = null;
@@ -570,6 +572,7 @@ const webhookStripe = async (req, res) => {
                 });
                 const asiento = await Asiento.findByPk(datosCompra.asientoId);
                 if (asiento) { asiento.estado = 'ocupado'; await asiento.save(); sectorId = asiento.sectorId; }
+                enviarPushUsuario(usuario.id, '¡Entrada confirmada! ✅', 'Tu entrada está lista. ¡Nos vemos en El Muni!', { tipo: 'entrada' }).catch(() => {});
             }
 
             pagoSession.estado = 'completado';

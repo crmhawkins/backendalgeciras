@@ -3,6 +3,10 @@ const { sendNotificationToAll } = require('./fcm');
 const { Op } = require('sequelize');
 
 const verificarProximosPartidos = async () => {
+  if (process.env.NOTIFICACIONES_ACTIVAS !== 'true') {
+    console.log('[verificarPartido] NOTIFICACIONES_ACTIVAS no activa, saltando');
+    return;
+  }
   const hoy = new Date();
   const fechaLimite = new Date();
   fechaLimite.setDate(hoy.getDate() + 2);

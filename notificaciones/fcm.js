@@ -29,6 +29,10 @@ try {
 }
 
 const sendNotificationToAll = async (title, body) => {
+    if (process.env.NOTIFICACIONES_ACTIVAS !== 'true') {
+        console.warn('[FCM] NOTIFICACIONES_ACTIVAS no activa — notificación omitida');
+        return;
+    }
     if (!messaging) {
         console.warn('[FCM] Firebase no inicializado — notificación omitida');
         return;

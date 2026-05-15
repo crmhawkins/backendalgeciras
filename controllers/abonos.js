@@ -153,6 +153,7 @@ const abonoPost = async (req, res) => {
         actualizarJSONAsiento(asientoId, 'ocupado');
 
         try {
+            if (process.env.NOTIFICACIONES_ACTIVAS !== 'true') { console.warn('[email] NOTIFICACIONES_ACTIVAS no activa'); } else
             await transporter.sendMail({
                 from: `"Algeciras CF" <${process.env.EMAIL_USER}>`,
                 to: email,

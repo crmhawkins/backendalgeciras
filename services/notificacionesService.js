@@ -123,6 +123,7 @@ async function procesarNotificaciones() {
  * @returns {Promise<{enviados: number, errores: number}>}
  */
 async function enviarPushMasivo(titulo, cuerpo, data = {}) {
+    if (process.env.NOTIFICACIONES_ACTIVAS !== 'true') { console.warn('[push] NOTIFICACIONES_ACTIVAS no activa'); return { enviados: 0, errores: 0 }; }
     const { expo, Expo } = await getExpo();
 
     const rows = await db.query(
@@ -192,6 +193,7 @@ async function enviarPushMasivo(titulo, cuerpo, data = {}) {
  * @returns {Promise<{enviados: number, errores: number}>}
  */
 async function enviarPushUsuario(userId, titulo, cuerpo, data = {}) {
+    if (process.env.NOTIFICACIONES_ACTIVAS !== 'true') { console.warn('[push] NOTIFICACIONES_ACTIVAS no activa'); return { enviados: 0, errores: 0 }; }
     const { expo, Expo } = await getExpo();
 
     const rows = await db.query(

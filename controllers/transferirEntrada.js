@@ -109,6 +109,7 @@ const transferirEntrada = async (req, res = response) => {
             : 'Próximo partido';
 
         // Email destinatario con nuevo QR
+        if (process.env.NOTIFICACIONES_ACTIVAS !== 'true') { console.warn('[email] NOTIFICACIONES_ACTIVAS no activa'); return; }
         await transporter.sendMail({
             from: `"Algeciras CF" <${process.env.EMAIL_USER}>`,
             to: destinatario.email,
@@ -145,6 +146,7 @@ const transferirEntrada = async (req, res = response) => {
         }).catch(err => console.error('[transferir] Email destinatario falló:', err.message));
 
         // Email remitente confirmando transferencia
+        if (process.env.NOTIFICACIONES_ACTIVAS !== 'true') { console.warn('[email] NOTIFICACIONES_ACTIVAS no activa'); } else
         await transporter.sendMail({
             from: `"Algeciras CF" <${process.env.EMAIL_USER}>`,
             to: remitente.email,

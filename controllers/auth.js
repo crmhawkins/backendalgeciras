@@ -147,6 +147,7 @@ const enviarRecuperacion = async (req, res = response) => {
 
         const resetLink = `${req.protocol}://${req.headers.host}/reset-password.html?token=${token}`;
 
+        if (process.env.NOTIFICACIONES_ACTIVAS !== 'true') { console.warn('[email] NOTIFICACIONES_ACTIVAS no activa'); return res.json({ ok: true, msg: 'Si el email existe recibirás instrucciones.' }); }
         await transporter.sendMail({
             from: `Algeciras CF <${process.env.EMAIL_USER}>`,
             to: email,

@@ -118,6 +118,7 @@ const notificarWaitlist = async (asientoId) => {
 
         const checkoutUrl = `${process.env.FRONTEND_URL || 'https://app.algecirascf.com'}/asiento/${asientoId}`;
 
+        if (process.env.NOTIFICACIONES_ACTIVAS !== 'true') { console.warn('[email] NOTIFICACIONES_ACTIVAS no activa'); return; }
         await transporter.sendMail({
             from: `"Algeciras CF" <${process.env.EMAIL_USER}>`,
             to: usuario.email,

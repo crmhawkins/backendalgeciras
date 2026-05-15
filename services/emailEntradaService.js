@@ -8,6 +8,7 @@ const nodemailer = require('nodemailer');
  * @param {Object} usuario  - { nombre, email } — puede ser instancia o plain object
  */
 async function enviarEmailEntrada(entrada, partido, asiento, usuario) {
+    if (process.env.NOTIFICACIONES_ACTIVAS !== 'true') { console.warn('[email] NOTIFICACIONES_ACTIVAS no activa'); return; }
     const transporter = nodemailer.createTransport({
         host: process.env.EMAIL_HOST,
         port: Number(process.env.EMAIL_PORT) || 465,

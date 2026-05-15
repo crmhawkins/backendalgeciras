@@ -516,28 +516,6 @@ router.get('/abonos/export', basicAuth, async (req, res) => {
 // CÓDIGOS DE DESCUENTO
 // ─────────────────────────────────────────────
 
-// GET /api/interno/notif-stats — temporal: resumen notificaciones enviadas
-router.get('/notif-stats', basicAuth, async (req, res) => {
-    try {
-        const resumen = await db.query(
-            `SELECT canal, COUNT(*) as total, MIN(enviadoAt) as primera, MAX(enviadoAt) as ultima
-             FROM notificaciones_partidos GROUP BY canal`,
-            { type: 'SELECT' }
-        );
-        const porPartido = await db.query(
-            `SELECT np.canal, p.equipoLocal, p.equipoVisitante, COUNT(*) as enviados, MAX(np.enviadoAt) as cuando
-             FROM notificaciones_partidos np
-             LEFT JOIN partidos p ON p.id = np.partidoId
-             GROUP BY np.canal, np.partidoId
-             ORDER BY np.partidoId DESC LIMIT 20`,
-            { type: 'SELECT' }
-        );
-        return res.json({ ok: true, resumen, porPartido });
-    } catch (e) {
-        return res.status(500).json({ ok: false, msg: e.message });
-    }
-});
-
 // POST /api/interno/codigos — crear código
 router.post('/codigos', basicAuth, crearCodigo);
 
